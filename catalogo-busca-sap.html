@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo SAP · Busca de Tabelas</title>
+<style>
+  :root{
+    --bg: #EEF0EF;
+    --paper: #FFFFFF;
+    --ink: #17211D;
+    --ink-soft: #576159;
+    --line: #DADFDA;
+    --line-soft: #E7EAE6;
+    --teal: #1F6F5C;
+    --teal-dark: #164F42;
+    --teal-wash: #E4F0EC;
+    --amber: #B9762D;
+    --amber-wash: #F7ECDE;
+    --plum: #5B4B8A;
+    --plum-wash: #ECE8F5;
+    --mark: #FCE6A6;
+    --radius: 10px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  }
+  :root[data-theme="dark"]{
+    --bg: #11201B;
+    --paper: #16231E;
+    --ink: #E8EEEC;
+    --ink-soft: #92A49C;
+    --line: #233830;
+    --line-soft: #1D2D27;
+    --teal: #3FB492;
+    --teal-dark: #7FDDBE;
+    --teal-wash: #1B3830;
+    --amber: #E3A95D;
+    --amber-wash: #39301A;
+    --plum: #C2B0EC;
+    --plum-wash: #2B2440;
+    --mark: #4F3C14;
+  }
+  :root[data-theme="dark"] mark{ color: #FFD98A; }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background .15s ease, color .15s ease;
+  }
+  .theme-toggle{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    color: var(--ink-soft);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--sans);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
+
+  /* ---------- Header ---------- */
+  header.top{
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 28px 24px 22px;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .nav-back { 
+    display: inline-block; 
+    font-size: 13px; 
+    font-weight: 600; 
+    color: var(--ink-soft); 
+    text-decoration: none; 
+    margin-bottom: 16px; 
+    transition: color 0.15s ease; 
+  }
+  .nav-back:hover { color: var(--teal-dark); }
+  .brand-eyebrow{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+    font-weight: 600;
+    margin: 0 0 6px;
+  }
+  h1{
+    font-family: var(--serif);
+    font-size: 34px;
+    line-height: 1.1;
+    margin: 0 0 6px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .subtitle{
+    margin:0;
+    color: var(--ink-soft);
+    font-size: 14.5px;
+    max-width: 480px;
+  }
+  .header-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .update-badge {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    background: var(--line-soft);
+    padding: 5px 9px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+  }
+  .hero-stat{
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .hero-stat .num{
+    font-family: var(--serif);
+    font-size: 44px;
+    line-height: 1;
+    color: var(--teal-dark);
+    font-variant-numeric: tabular-nums;
+  }
+  .hero-stat .label{
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-top: 4px;
+  }
+
+  /* ---------- Controls ---------- */
+  .controls-wrap{
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .controls{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 16px 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+  }
+  .search-box{
+    position: relative;
+    flex: 1 1 320px;
+    min-width: 240px;
+  }
+  .search-box input{
+    width: 100%;
+    padding: 11px 40px 11px 38px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    font-size: 15px;
+    font-family: var(--sans);
+    color: var(--ink);
+    outline: none;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .search-box input:focus{
+    border-color: var(--teal);
+    background: var(--paper);
+  }
+  .search-box svg.icon-search{
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 16px; height: 16px;
+    stroke: var(--ink-soft);
+  }
+  .clear-btn{
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 6px;
+    display: none;
+  }
+  .clear-btn:hover{ background: var(--line-soft); color: var(--ink); }
+
+  .segmented{
+    display: flex;
+    gap: 6px;
+    background: var(--bg);
+    padding: 4px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+  .seg-btn{
+    border: none;
+    background: transparent;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease;
+  }
+  .seg-btn .dot{
+    width: 7px; height: 7px; border-radius: 50%;
+    background: currentColor;
+    opacity: .55;
+  }
+  .seg-btn.active{
+    background: var(--paper);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .seg-btn.active[data-src="hierarquia"]{ color: var(--teal-dark); }
+  .seg-btn.active[data-src="marca"]{ color: var(--amber); }
+  .seg-btn.active[data-src="categoria"]{ color: var(--plum); }
+  .seg-btn .count{
+    font-family: var(--mono);
+    font-size: 11px;
+    opacity: .65;
+  }
+
+  .level-filter{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .level-filter select{
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 13.5px;
+    color: var(--ink);
+    font-family: var(--sans);
+    cursor: pointer;
+  }
+
+  /* ---------- Main ---------- */
+  main{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 22px 24px 60px;
+  }
+  .results-meta{
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+  .results-meta strong{ color: var(--ink); }
+  .hint{
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  .table-section{
+    margin-bottom: 28px;
+  }
+  .table-section-head{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 10px;
+  }
+  .table-section-head .tag{
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 3px 8px;
+    border-radius: 5px;
+    font-weight: 700;
+  }
+  .tag.hierarquia{ background: var(--teal-wash); color: var(--teal-dark); }
+  .tag.marca{ background: var(--amber-wash); color: var(--amber); }
+  .tag.categoria{ background: var(--plum-wash); color: var(--plum); }
+  .table-section-head .n{
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+  .copy-toggle{
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+    background: var(--bg);
+    padding: 3px;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+  }
+  .copy-toggle span.lbl{
+    font-size: 11px;
+    color: var(--ink-soft);
+    padding: 0 6px 0 8px;
+  }
+  .copy-toggle-btn{
+    border: none;
+    background: transparent;
+    padding: 5px 11px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+    font-family: var(--mono);
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: background .15s ease, color .15s ease;
+  }
+  .copy-toggle-btn.active{
+    background: var(--paper);
+    color: var(--teal-dark);
+    box-shadow: 0 1px 2px rgba(0,0,0,.12);
+  }
+
+  .card{
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  table{
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+  thead th{
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--ink-soft);
+    font-weight: 700;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #FAFAF8;
+    white-space: nowrap;
+  }
+  tbody td{
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--line-soft);
+    vertical-align: top;
+  }
+  tbody tr:last-child td{ border-bottom: none; }
+  tbody tr{
+    cursor: pointer;
+    transition: background .1s ease;
+  }
+  tbody tr:hover{ background: var(--teal-wash); }
+  td.col-id{
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    width: 90px;
+  }
+  td.col-nivel{
+    width: 70px;
+    color: var(--ink-soft);
+    font-family: var(--mono);
+    font-size: 12.5px;
+  }
+  .trail{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 3px;
+    line-height: 1.6;
+  }
+  .trail .crumb{
+    color: var(--ink-soft);
+    font-size: 12.5px;
+  }
+  .trail .crumb.last{
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 14px;
+  }
+  .trail .sep{
+    color: var(--line);
+    font-size: 12px;
+  }
+  mark{
+    background: var(--mark);
+    color: inherit;
+    padding: 0 1px;
+    border-radius: 2px;
+  }
+
+  .empty-state{
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-soft);
+  }
+  .empty-state .big{
+    font-family: var(--serif);
+    font-size: 22px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  .toast{
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #17211D;
+    color: #fff;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 13.5px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+    z-index: 100;
+  }
+  .toast.show{
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  footer{
+    text-align: center;
+    padding: 18px 24px 34px;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+
+  @media (max-width: 640px){
+    h1{ font-size: 26px; }
+    .hero-stat{ text-align: left; }
+    .top-inner{ flex-direction: column; align-items: flex-start; }
+    .header-right{ align-items: flex-start; margin-top: 12px; gap: 16px; }
+    .update-badge{ margin-bottom: 0; }
+    .card{ overflow-x: auto; }
+    table{ min-width: 480px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <a href="index.html" class="nav-back">← Voltar ao Hub</a>
+      <p class="brand-eyebrow">Catálogo SAP</p>
+      <h1>Busca de Tabelas</h1>
+      <p class="subtitle">Consulta unificada de Hierarquia de Grupo de Item, Marca e Categoria — tudo em um só lugar, sem precisar cruzar planilhas.</p>
+    </div>
+    <div class="header-right">
+      <div class="update-badge">Última atualização: 09/2026</div>
+      <div style="display:flex; align-items:center; gap:18px;">
+        <div class="hero-stat">
+          <div class="num" id="totalCount">0</div>
+          <div class="label">registros carregados</div>
+        </div>
+        <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="controls-wrap">
+  <div class="controls">
+    <div class="search-box">
+      <svg class="icon-search" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="searchInput" placeholder="Buscar por nome ou ID (ex: Notebook, 1206, HD Externo)..." autocomplete="off" autofocus>
+      <button class="clear-btn" id="clearBtn" title="Limpar busca">×</button>
+    </div>
+
+    <div class="segmented" id="segmented">
+      <button class="seg-btn active" data-src="todas"><span class="dot"></span>Todas <span class="count" id="cnt-todas"></span></button>
+      <button class="seg-btn" data-src="hierarquia"><span class="dot"></span>Hierarquia <span class="count" id="cnt-hierarquia"></span></button>
+      <button class="seg-btn" data-src="marca"><span class="dot"></span>Marca <span class="count" id="cnt-marca"></span></button>
+      <button class="seg-btn" data-src="categoria"><span class="dot"></span>Categoria <span class="count" id="cnt-categoria"></span></button>
+    </div>
+
+    <div class="level-filter" id="levelFilterWrap" style="display:none;">
+      <label for="levelFilter">Nível</label>
+      <select id="levelFilter">
+        <option value="all">Todos</option>
+      </select>
+    </div>
+
+    <div class="level-filter" id="sortFilterWrap">
+      <label for="sortFilter">Ordenar</label>
+      <select id="sortFilter">
+        <option value="alpha">A-Z</option>
+        <option value="id">ID</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="results-meta">
+    <span><strong id="resultCount">0</strong> resultado(s)</span>
+    <span class="hint">Dica: clique em uma linha para copiar — em Hierarquia, escolha Caminho ou ID no seletor da seção</span>
+  </div>
+  <div id="resultsContainer"></div>
+</main>
+
+<footer>Dados carregados localmente a partir de ID_Hierarquia.txt e planilha_SAP_</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const HIERARQUIA = [{"id": "1", "nome": "ACESSORIOS PARA VEICULOS", "nivel": 1, "caminho": "ACESSORIOS PARA VEICULOS"}, {"id": "2", "nome": "FERRAMENTAS", "nivel": 2, "caminho": "ACESSORIOS PARA VEICULOS > FERRAMENTAS"}, {"id": "3", "nome": "FERRAMENTAS PARA BATERIA", "nivel": 3, "caminho": "ACESSORIOS PARA VEICULOS > FERRAMENTAS > FERRAMENTAS PARA BATERIA"}, {"id": "4", "nome": "CARREGADORES DE BATERIAS", "nivel": 4, "caminho": "ACESSORIOS PARA VEICULOS > FERRAMENTAS > FERRAMENTAS PARA BATERIA > CARREGADORES DE BATERIAS"}, {"id": "598", "nome": "FERRAMENTAS PARA JARDIM", "nivel": 3, "caminho": "ACESSORIOS PARA VEICULOS > FERRAMENTAS > FERRAMENTAS PARA JARDIM"}, {"id": "599", "nome": "SOPRADORAS", "nivel": 4, "caminho": "ACESSORIOS PARA VEICULOS > FERRAMENTAS > FERRAMENTAS PARA JARDIM > SOPRADORAS"}, {"id": "600", "nome": "ELÉTRICAS", "nivel": 5, "caminho": "ACESSORIOS PARA VEICULOS > FERRAMENTAS > FERRAMENTAS PARA JARDIM > SOPRADORAS > ELÉTRICAS"}, {"id": "500", "nome": "Soprador", "nivel": 6, "caminho": "ACESSORIOS PARA VEICULOS > FERRAMENTAS > FERRAMENTAS PARA JARDIM > SOPRADORAS > ELÉTRICAS > Soprador"}, {"id": "5", "nome": "NAVEGADORES GPS", "nivel": 2, "caminho": "ACESSORIOS PARA VEICULOS > NAVEGADORES GPS"}, {"id": "6", "nome": "APARELHOS GPS", "nivel": 3, "caminho": "ACESSORIOS PARA VEICULOS > NAVEGADORES GPS > APARELHOS GPS"}, {"id": "434", "nome": "SOM AUTOMOTIVO", "nivel": 2, "caminho": "ACESSORIOS PARA VEICULOS > SOM AUTOMOTIVO"}, {"id": "435", "nome": "REPRODUTORES", "nivel": 3, "caminho": "ACESSORIOS PARA VEICULOS > SOM AUTOMOTIVO > REPRODUTORES"}, {"id": "436", "nome": "ESTÉREOS", "nivel": 4, "caminho": "ACESSORIOS PARA VEICULOS > SOM AUTOMOTIVO > REPRODUTORES > ESTÉREOS"}, {"id": "437", "nome": "COM TELA", "nivel": 5, "caminho": "ACESSORIOS PARA VEICULOS > SOM AUTOMOTIVO > REPRODUTORES > ESTÉREOS > COM TELA"}, {"id": "440", "nome": "ESPORTE E FITNESS", "nivel": 4, "caminho": "ACESSORIOS PARA VEICULOS > SOM AUTOMOTIVO > REPRODUTORES > ESPORTE E FITNESS"}, {"id": "7", "nome": "ARTE, PAPELARIA E ARMARIO", "nivel": 1, "caminho": "ARTE, PAPELARIA E ARMARIO"}, {"id": "26", "nome": "MATERIAIS ESCOLARES", "nivel": 2, "caminho": "ARTE, PAPELARIA E ARMARIO > MATERIAIS ESCOLARES"}, {"id": "27", "nome": "COMERCIAL E ORGANIZAÇÃO", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > MATERIAIS ESCOLARES > COMERCIAL E ORGANIZAÇÃO"}, {"id": "28", "nome": "CALCULADORAS E AGENDAS", "nivel": 4, "caminho": "ARTE, PAPELARIA E ARMARIO > MATERIAIS ESCOLARES > COMERCIAL E ORGANIZAÇÃO > CALCULADORAS E AGENDAS"}, {"id": "29", "nome": "CALCULADORAS", "nivel": 5, "caminho": "ARTE, PAPELARIA E ARMARIO > MATERIAIS ESCOLARES > COMERCIAL E ORGANIZAÇÃO > CALCULADORAS E AGENDAS > CALCULADORAS"}, {"id": "439", "nome": "ARTE E TRABALHOS MANUAIS", "nivel": 2, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS"}, {"id": "468", "nome": "CANETAS E CANETINHAS", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > CANETAS E CANETINHAS"}, {"id": "469", "nome": "FERRAMENTAS DE ARTESANATO", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > FERRAMENTAS DE ARTESANATO"}, {"id": "470", "nome": "FOLHA DE SUBLIMAÇÃO", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > FOLHA DE SUBLIMAÇÃO"}, {"id": "471", "nome": "FOLHA DE SUBLIMAÇÃO SIMPLES", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > FOLHA DE SUBLIMAÇÃO SIMPLES"}, {"id": "472", "nome": "VINIL PERMANENTE", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > VINIL PERMANENTE"}, {"id": "473", "nome": "BASE DE CORTE", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > BASE DE CORTE"}, {"id": "474", "nome": "INFUSIBLE INK", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > INFUSIBLE INK"}, {"id": "475", "nome": "LÂMINAS E SUPORTE", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > LÂMINAS E SUPORTE"}, {"id": "476", "nome": "MÁQUINAS DE CORTE", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > MÁQUINAS DE CORTE"}, {"id": "477", "nome": "PRENSA TÉRMICA", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > PRENSA TÉRMICA"}, {"id": "478", "nome": "PRENSA TÉRMICA PARA BONÉS", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > PRENSA TÉRMICA PARA BONÉS"}, {"id": "479", "nome": "PRENSA TÉRMICA PARA CANECAS", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > PRENSA TÉRMICA PARA CANECAS"}, {"id": "480", "nome": "TRANSFER", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > TRANSFER"}, {"id": "481", "nome": "VINIL REMOVÍVEL", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > VINIL REMOVÍVEL"}, {"id": "482", "nome": "VINIL TERMOCOLANTE", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > VINIL TERMOCOLANTE"}, {"id": "483", "nome": "VINIL PERMANENTE", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > VINIL PERMANENTE"}, {"id": "484", "nome": "MÁQUINAS DE COSTURA", "nivel": 3, "caminho": "ARTE, PAPELARIA E ARMARIO > ARTE E TRABALHOS MANUAIS > MÁQUINAS DE COSTURA"}, {"id": "8", "nome": "BEBÊS", "nivel": 1, "caminho": "BEBÊS"}, {"id": "30", "nome": "PASSEIO DO BEBE", "nivel": 2, "caminho": "BEBÊS > PASSEIO DO BEBE"}, {"id": "31", "nome": "CADEIRAS DE BEBE PARA CARRO", "nivel": 3, "caminho": "BEBÊS > PASSEIO DO BEBE > CADEIRAS DE BEBE PARA CARRO"}, {"id": "32", "nome": "SEGURANÇA PARA BEBES", "nivel": 2, "caminho": "BEBÊS > SEGURANÇA PARA BEBES"}, {"id": "33", "nome": "BABA ELETRONICA", "nivel": 3, "caminho": "BEBÊS > SEGURANÇA PARA BEBES > BABA ELETRONICA"}, {"id": "9", "nome": "BELEZA E CUIDADO PESSOAL", "nivel": 1, "caminho": "BELEZA E CUIDADO PESSOAL"}, {"id": "34", "nome": "ARTEFATOS PARA CABELO", "nivel": 2, "caminho": "BELEZA E CUIDADO PESSOAL > ARTEFATOS PARA CABELO"}, {"id": "35", "nome": "ESCOVAS ELETRICAS", "nivel": 3, "caminho": "BELEZA E CUIDADO PESSOAL > ARTEFATOS PARA CABELO > ESCOVAS ELETRICAS"}, {"id": "36", "nome": "ALISADORAS", "nivel": 4, "caminho": "BELEZA E CUIDADO PESSOAL > ARTEFATOS PARA CABELO > ESCOVAS ELETRICAS > ALISADORAS"}, {"id": "174", "nome": "ROTATIVAS", "nivel": 4, "caminho": "BELEZA E CUIDADO PESSOAL > ARTEFATOS PARA CABELO > ESCOVAS ELETRICAS > ROTATIVAS"}, {"id": "171", "nome": "PRANCHAS PARA CABELO", "nivel": 3, "caminho": "BELEZA E CUIDADO PESSOAL > ARTEFATOS PARA CABELO > PRANCHAS PARA CABELO"}, {"id": "172", "nome": "SECADORES DE CABELO", "nivel": 3, "caminho": "BELEZA E CUIDADO PESSOAL > ARTEFATOS PARA CABELO > SECADORES DE CABELO"}, {"id": "166", "nome": "BARBEARIA", "nivel": 2, "caminho": "BELEZA E CUIDADO PESSOAL > BARBEARIA"}, {"id": "168", "nome": "BARBEADORES", "nivel": 3, "caminho": "BELEZA E CUIDADO PESSOAL > BARBEARIA > BARBEADORES"}, {"id": "173", "nome": "BARBEADORES ELETRICOS", "nivel": 4, "caminho": "BELEZA E CUIDADO PESSOAL > BARBEARIA > BARBEADORES > BARBEADORES ELETRICOS"}, {"id": "170", "nome": "LAMINAS DE BARBEAR", "nivel": 3, "caminho": "BELEZA E CUIDADO PESSOAL > BARBEARIA > LAMINAS DE BARBEAR"}, {"id": "167", "nome": "HIGIENE PESSOAL", "nivel": 2, "caminho": "BELEZA E CUIDADO PESSOAL > HIGIENE PESSOAL"}, {"id": "169", "nome": "HIGIENE BUCAL", "nivel": 3, "caminho": "BELEZA E CUIDADO PESSOAL > HIGIENE PESSOAL > HIGIENE BUCAL"}, {"id": "10", "nome": "BRINQUEDOS E HOBBIES", "nivel": 1, "caminho": "BRINQUEDOS E HOBBIES"}, {"id": "37", "nome": "BONECOS E BONECAS", "nivel": 2, "caminho": "BRINQUEDOS E HOBBIES > BONECOS E BONECAS"}, {"id": "177", "nome": "BONECAS", "nivel": 3, "caminho": "BRINQUEDOS E HOBBIES > BONECOS E BONECAS > BONECAS"}, {"id": "175", "nome": "MINI VEICULOS E BICICLETAS", "nivel": 2, "caminho": "BRINQUEDOS E HOBBIES > MINI VEICULOS E BICICLETAS"}, {"id": "178", "nome": "PATINETES", "nivel": 3, "caminho": "BRINQUEDOS E HOBBIES > MINI VEICULOS E BICICLETAS > PATINETES"}, {"id": "176", "nome": "VEICULOS DE BRINQUEDO", "nivel": 2, "caminho": "BRINQUEDOS E HOBBIES > VEICULOS DE BRINQUEDO"}, {"id": "179", "nome": "PISTAS E CENARIOS", "nivel": 3, "caminho": "BRINQUEDOS E HOBBIES > VEICULOS DE BRINQUEDO > PISTAS E CENARIOS"}, {"id": "180", "nome": "PISTAS E LANÇADORES DE CARROS", "nivel": 4, "caminho": "BRINQUEDOS E HOBBIES > VEICULOS DE BRINQUEDO > PISTAS E CENARIOS > PISTAS E LANÇADORES DE CARROS"}, {"id": "11", "nome": "CALÇADOS, ROUPAS E BOLSAS", "nivel": 1, "caminho": "CALÇADOS, ROUPAS E BOLSAS"}, {"id": "181", "nome": "MALAS E BOLSAS", "nivel": 2, "caminho": "CALÇADOS, ROUPAS E BOLSAS > MALAS E BOLSAS"}, {"id": "182", "nome": "BAGAGEM E ACESSORIOS DE VIAGEM", "nivel": 3, "caminho": "CALÇADOS, ROUPAS E BOLSAS > MALAS E BOLSAS > BAGAGEM E ACESSORIOS DE VIAGEM"}, {"id": "184", "nome": "MALAS", "nivel": 4, "caminho": "CALÇADOS, ROUPAS E BOLSAS > MALAS E BOLSAS > BAGAGEM E ACESSORIOS DE VIAGEM > MALAS"}, {"id": "183", "nome": "PASTAS", "nivel": 3, "caminho": "CALÇADOS, ROUPAS E BOLSAS > MALAS E BOLSAS > PASTAS"}, {"id": "185", "nome": "PASTAS TRANSVERSAIS", "nivel": 4, "caminho": "CALÇADOS, ROUPAS E BOLSAS > MALAS E BOLSAS > PASTAS > PASTAS TRANSVERSAIS"}, {"id": "12", "nome": "CÂMERAS E ACESSÓRIOS", "nivel": 1, "caminho": "CÂMERAS E ACESSÓRIOS"}, {"id": "186", "nome": "ACESSÓRIOS PARA CÂMERA", "nivel": 2, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA"}, {"id": "187", "nome": "ESTUDIO E ILUMINAÇÃO", "nivel": 3, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > ESTUDIO E ILUMINAÇÃO"}, {"id": "191", "nome": "ILUMINADORES", "nivel": 4, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > ESTUDIO E ILUMINAÇÃO > ILUMINADORES"}, {"id": "188", "nome": "FILMES FOTOGRAFICOS", "nivel": 3, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > FILMES FOTOGRAFICOS"}, {"id": "192", "nome": "PARA INSTANTANEAS", "nivel": 4, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > FILMES FOTOGRAFICOS > PARA INSTANTANEAS"}, {"id": "189", "nome": "SUPORTES E ESTABILIZADORES", "nivel": 3, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > SUPORTES E ESTABILIZADORES"}, {"id": "190", "nome": "ESTABILIZADORES", "nivel": 4, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > SUPORTES E ESTABILIZADORES > ESTABILIZADORES"}, {"id": "613", "nome": "CARREGADORES E BATERIAS", "nivel": 3, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > CARREGADORES E BATERIAS"}, {"id": "614", "nome": "BATERIAS", "nivel": 4, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > CARREGADORES E BATERIAS > BATERIAS"}, {"id": "623", "nome": "CÂMERA DE AÇÃO", "nivel": 3, "caminho": "CÂMERAS E ACESSÓRIOS > ACESSÓRIOS PARA CÂMERA > CÂMERA DE AÇÃO"}, {"id": "13", "nome": "CASA, MOVEIS E DECORAÇÃO", "nivel": 1, "caminho": "CASA, MOVEIS E DECORAÇÃO"}, {"id": "45", "nome": "SEGURANÇA PARA CASA", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA"}, {"id": "46", "nome": "SISTEMAS DE MONITORAMENTO", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > SISTEMAS DE MONITORAMENTO"}, {"id": "47", "nome": "GRAVADORES DVR", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > SISTEMAS DE MONITORAMENTO > GRAVADORES DVR"}, {"id": "215", "nome": "ALARMES E SENSORES", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > SISTEMAS DE MONITORAMENTO > ALARMES E SENSORES"}, {"id": "217", "nome": "CAMERAS DE SEGURANCA", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > SISTEMAS DE MONITORAMENTO > CAMERAS DE SEGURANCA"}, {"id": "218", "nome": "CONTROLE REMOTOS PARA ALARMES", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > SISTEMAS DE MONITORAMENTO > CONTROLE REMOTOS PARA ALARMES"}, {"id": "226", "nome": "PORTEIROS ELETRICOS", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > SISTEMAS DE MONITORAMENTO > PORTEIROS ELETRICOS"}, {"id": "200", "nome": "AUTOMOÇÃO PARA PORTOES", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > AUTOMOÇÃO PARA PORTOES"}, {"id": "201", "nome": "CONTROLE REMOTO PARA PORTOES", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > AUTOMOÇÃO PARA PORTOES > CONTROLE REMOTO PARA PORTOES"}, {"id": "202", "nome": "CABOS DE REDE E ACESSORIOS", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > CABOS DE REDE E ACESSORIOS"}, {"id": "203", "nome": "CABOS DE REDE", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > CABOS DE REDE E ACESSORIOS > CABOS DE REDE"}, {"id": "206", "nome": "FERRAGENS DE SEGURANÇA", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > FERRAGENS DE SEGURANÇA"}, {"id": "219", "nome": "FECHADURAS", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > FERRAGENS DE SEGURANÇA > FECHADURAS"}, {"id": "438", "nome": "DIGITAIS", "nivel": 5, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > FERRAGENS DE SEGURANÇA > FECHADURAS > DIGITAIS"}, {"id": "209", "nome": "LOCALIZADORES DE CHAVE", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > LOCALIZADORES DE CHAVE"}, {"id": "212", "nome": "PORTEIROS ELETRONICOS", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > SEGURANÇA PARA CASA > PORTEIROS ELETRONICOS"}, {"id": "193", "nome": "COZINHA", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA"}, {"id": "205", "nome": "COZIMENTO", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > COZIMENTO"}, {"id": "222", "nome": "PANELAS E FRIGIDEIRAS", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > COZIMENTO > PANELAS E FRIGIDEIRAS"}, {"id": "225", "nome": "FRIGIDEIRAS", "nivel": 5, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > COZIMENTO > PANELAS E FRIGIDEIRAS > FRIGIDEIRAS"}, {"id": "227", "nome": "JOGO DE PANELAS", "nivel": 5, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > COZIMENTO > PANELAS E FRIGIDEIRAS > JOGO DE PANELAS"}, {"id": "423", "nome": "ARTIGOS DE VINHO E BAR", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > ARTIGOS DE VINHO E BAR"}, {"id": "424", "nome": "ACESSÓRIOS PARA VINHO", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > ARTIGOS DE VINHO E BAR > ACESSÓRIOS PARA VINHO"}, {"id": "425", "nome": "SACA ROLHA", "nivel": 5, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > ARTIGOS DE VINHO E BAR > ACESSÓRIOS PARA VINHO > SACA ROLHA"}, {"id": "607", "nome": "FAQUEIRO", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > COZINHA > FAQUEIRO"}, {"id": "194", "nome": "ENFEITES E DECORAÇÃO DA CASA", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > ENFEITES E DECORAÇÃO DA CASA"}, {"id": "214", "nome": "RELOGIOS", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > ENFEITES E DECORAÇÃO DA CASA > RELOGIOS"}, {"id": "195", "nome": "ILUMINAÇÃO RESIDENCIAL", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > ILUMINAÇÃO RESIDENCIAL"}, {"id": "207", "nome": "FITAS DE LED", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > ILUMINAÇÃO RESIDENCIAL > FITAS DE LED"}, {"id": "208", "nome": "LAMPADAS", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > ILUMINAÇÃO RESIDENCIAL > LAMPADAS"}, {"id": "210", "nome": "LUMINARIAS", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > ILUMINAÇÃO RESIDENCIAL > LUMINARIAS"}, {"id": "220", "nome": "LUMINARIAS DE MESA", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > ILUMINAÇÃO RESIDENCIAL > LUMINARIAS > LUMINARIAS DE MESA"}, {"id": "221", "nome": "LUMINARIAS DE TETO", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > ILUMINAÇÃO RESIDENCIAL > LUMINARIAS > LUMINARIAS DE TETO"}, {"id": "196", "nome": "JARDIM E AR LIVRE", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > JARDIM E AR LIVRE"}, {"id": "211", "nome": "PISCINAS E ACESSORIOS", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > JARDIM E AR LIVRE > PISCINAS E ACESSORIOS"}, {"id": "223", "nome": "PISCINAS", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > JARDIM E AR LIVRE > PISCINAS E ACESSORIOS > PISCINAS"}, {"id": "224", "nome": "PISCINA INFLAVEL", "nivel": 5, "caminho": "CASA, MOVEIS E DECORAÇÃO > JARDIM E AR LIVRE > PISCINAS E ACESSORIOS > PISCINAS > PISCINA INFLAVEL"}, {"id": "197", "nome": "MOVEIS PARA CASA", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > MOVEIS PARA CASA"}, {"id": "204", "nome": "CADEIRAS, SOFAS E BANQUETAS", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > MOVEIS PARA CASA > CADEIRAS, SOFAS E BANQUETAS"}, {"id": "216", "nome": "CADEIRAS PARA ESCRITORIO", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > MOVEIS PARA CASA > CADEIRAS, SOFAS E BANQUETAS > CADEIRAS PARA ESCRITORIO"}, {"id": "433", "nome": "APOIO PARA PÉS", "nivel": 4, "caminho": "CASA, MOVEIS E DECORAÇÃO > MOVEIS PARA CASA > CADEIRAS, SOFAS E BANQUETAS > APOIO PARA PÉS"}, {"id": "198", "nome": "TEXTEIS DE CASA E DECORAÇÃO", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > TEXTEIS DE CASA E DECORAÇÃO"}, {"id": "199", "nome": "TAPETES", "nivel": 3, "caminho": "CASA, MOVEIS E DECORAÇÃO > TEXTEIS DE CASA E DECORAÇÃO > TAPETES"}, {"id": "213", "nome": "ENFEITES E DECORAÇÃO DA CASA", "nivel": 2, "caminho": "CASA, MOVEIS E DECORAÇÃO > ENFEITES E DECORAÇÃO DA CASA"}, {"id": "14", "nome": "CELULARES E TELEFONES", "nivel": 1, "caminho": "CELULARES E TELEFONES"}, {"id": "228", "nome": "ACESSÓRIOS PARA CELULARES", "nivel": 2, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES"}, {"id": "236", "nome": "ADAPTADORES", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > ADAPTADORES"}, {"id": "237", "nome": "BATERIAS", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > BATERIAS"}, {"id": "238", "nome": "CABOS", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > CABOS"}, {"id": "239", "nome": "CARCAÇAS, CAPAS E PROTETORES", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > CARCAÇAS, CAPAS E PROTETORES"}, {"id": "240", "nome": "CARREGADORES", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > CARREGADORES"}, {"id": "251", "nome": "CARREGADORES COM FIO", "nivel": 4, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > CARREGADORES > CARREGADORES COM FIO"}, {"id": "419", "nome": "PORTATIL", "nivel": 4, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > CARREGADORES > PORTATIL"}, {"id": "241", "nome": "CARTOES DE MEMORIA", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > CARTOES DE MEMORIA"}, {"id": "242", "nome": "COLGANTES E SUPORTES", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > COLGANTES E SUPORTES"}, {"id": "250", "nome": "APOIO PARA CELULARES", "nivel": 4, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > COLGANTES E SUPORTES > APOIO PARA CELULARES"}, {"id": "243", "nome": "FONES E KITS VIVA VOZ", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > FONES E KITS VIVA VOZ"}, {"id": "244", "nome": "OUTROS", "nivel": 3, "caminho": "CELULARES E TELEFONES > ACESSÓRIOS PARA CELULARES > OUTROS"}, {"id": "229", "nome": "CELULARES E SMARTPHONES", "nivel": 2, "caminho": "CELULARES E TELEFONES > CELULARES E SMARTPHONES"}, {"id": "230", "nome": "PEÇAS PARA CELULAR", "nivel": 2, "caminho": "CELULARES E TELEFONES > PEÇAS PARA CELULAR"}, {"id": "418", "nome": "DISPLAYS E LCD", "nivel": 3, "caminho": "CELULARES E TELEFONES > PEÇAS PARA CELULAR > DISPLAYS E LCD"}, {"id": "231", "nome": "PLACAS PARA CELULAR", "nivel": 2, "caminho": "CELULARES E TELEFONES > PLACAS PARA CELULAR"}, {"id": "245", "nome": "PLACAS DE CARREGAMENTO", "nivel": 3, "caminho": "CELULARES E TELEFONES > PLACAS PARA CELULAR > PLACAS DE CARREGAMENTO"}, {"id": "232", "nome": "RADIO COMUNICADORES", "nivel": 2, "caminho": "CELULARES E TELEFONES > RADIO COMUNICADORES"}, {"id": "249", "nome": "WALKIE TALKIES", "nivel": 3, "caminho": "CELULARES E TELEFONES > RADIO COMUNICADORES > WALKIE TALKIES"}, {"id": "233", "nome": "SMARTWATCHES E ACESSORIOS", "nivel": 2, "caminho": "CELULARES E TELEFONES > SMARTWATCHES E ACESSORIOS"}, {"id": "246", "nome": "SMARTWATCHES", "nivel": 3, "caminho": "CELULARES E TELEFONES > SMARTWATCHES E ACESSORIOS > SMARTWATCHES"}, {"id": "234", "nome": "TELEFONIA FIXA E SEM FIO", "nivel": 2, "caminho": "CELULARES E TELEFONES > TELEFONIA FIXA E SEM FIO"}, {"id": "247", "nome": "TELEFONES", "nivel": 3, "caminho": "CELULARES E TELEFONES > TELEFONIA FIXA E SEM FIO > TELEFONES"}, {"id": "235", "nome": "VOIP", "nivel": 2, "caminho": "CELULARES E TELEFONES > VOIP"}, {"id": "248", "nome": "TELEFONES", "nivel": 3, "caminho": "CELULARES E TELEFONES > VOIP > TELEFONES"}, {"id": "15", "nome": "CONSTRUÇAO", "nivel": 1, "caminho": "CONSTRUÇAO"}, {"id": "252", "nome": "ENERGIA", "nivel": 2, "caminho": "CONSTRUÇAO > ENERGIA"}, {"id": "254", "nome": "CABOS E ACESSORIOS", "nivel": 3, "caminho": "CONSTRUÇAO > ENERGIA > CABOS E ACESSORIOS"}, {"id": "263", "nome": "FILTROS DE LINHA", "nivel": 4, "caminho": "CONSTRUÇAO > ENERGIA > CABOS E ACESSORIOS > FILTROS DE LINHA"}, {"id": "255", "nome": "FITAS ISOLANTES", "nivel": 3, "caminho": "CONSTRUÇAO > ENERGIA > FITAS ISOLANTES"}, {"id": "256", "nome": "FUZIVEIS", "nivel": 3, "caminho": "CONSTRUÇAO > ENERGIA > FUZIVEIS"}, {"id": "257", "nome": "MEDIDORES DE ENERGIA ELETRICA", "nivel": 3, "caminho": "CONSTRUÇAO > ENERGIA > MEDIDORES DE ENERGIA ELETRICA"}, {"id": "262", "nome": "CAIXA DE ENTRADA DE ENERGIA", "nivel": 4, "caminho": "CONSTRUÇAO > ENERGIA > MEDIDORES DE ENERGIA ELETRICA > CAIXA DE ENTRADA DE ENERGIA"}, {"id": "265", "nome": "INVENTORES DE FREQUENCIA", "nivel": 4, "caminho": "CONSTRUÇAO > ENERGIA > MEDIDORES DE ENERGIA ELETRICA > INVENTORES DE FREQUENCIA"}, {"id": "258", "nome": "TOMADAS E INTERRUPTORES", "nivel": 3, "caminho": "CONSTRUÇAO > ENERGIA > TOMADAS E INTERRUPTORES"}, {"id": "261", "nome": "BASTIDORES ELETRICOS", "nivel": 4, "caminho": "CONSTRUÇAO > ENERGIA > TOMADAS E INTERRUPTORES > BASTIDORES ELETRICOS"}, {"id": "264", "nome": "INTERRUPTORES", "nivel": 4, "caminho": "CONSTRUÇAO > ENERGIA > TOMADAS E INTERRUPTORES > INTERRUPTORES"}, {"id": "266", "nome": "INTERRUPTORES AUTOMATICOS", "nivel": 5, "caminho": "CONSTRUÇAO > ENERGIA > TOMADAS E INTERRUPTORES > INTERRUPTORES > INTERRUPTORES AUTOMATICOS"}, {"id": "267", "nome": "INTERRUPTORES ELETRICOS", "nivel": 5, "caminho": "CONSTRUÇAO > ENERGIA > TOMADAS E INTERRUPTORES > INTERRUPTORES > INTERRUPTORES ELETRICOS"}, {"id": "259", "nome": "TRANSFORMADORES", "nivel": 3, "caminho": "CONSTRUÇAO > ENERGIA > TRANSFORMADORES"}, {"id": "467", "nome": "GERADORES DE ENERGIRA ELETRICOS", "nivel": 3, "caminho": "CONSTRUÇAO > ENERGIA > GERADORES DE ENERGIRA ELETRICOS"}, {"id": "490", "nome": "GERADOR DE ENERGIA", "nivel": 4, "caminho": "CONSTRUÇAO > ENERGIA > GERADORES DE ENERGIRA ELETRICOS > GERADOR DE ENERGIA"}, {"id": "253", "nome": "MATERIAIS DE OBRA", "nivel": 2, "caminho": "CONSTRUÇAO > MATERIAIS DE OBRA"}, {"id": "260", "nome": "TUBOS", "nivel": 3, "caminho": "CONSTRUÇAO > MATERIAIS DE OBRA > TUBOS"}, {"id": "16", "nome": "ELETRODOMESTICOS", "nivel": 1, "caminho": "ELETRODOMESTICOS"}, {"id": "268", "nome": "AR E VENTILAÇÃO", "nivel": 2, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO"}, {"id": "275", "nome": "CLIMATIZADOR PORTATIL", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > CLIMATIZADOR PORTATIL"}, {"id": "283", "nome": "VENTILADORES", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > VENTILADORES"}, {"id": "453", "nome": "VENTILADOR DE TETO", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > VENTILADOR DE TETO"}, {"id": "454", "nome": "VENTILADOR DE PAREDE", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > VENTILADOR DE PAREDE"}, {"id": "595", "nome": "VENTILADOR DE COLUNA", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > VENTILADOR DE COLUNA"}, {"id": "596", "nome": "VENTILADOR DE TORRE", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > VENTILADOR DE TORRE"}, {"id": "608", "nome": "VENTILADOR DE MESA", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > VENTILADOR DE MESA"}, {"id": "618", "nome": "ARES CONDICIONADOS", "nivel": 3, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > ARES CONDICIONADOS"}, {"id": "619", "nome": "AR CONDICIONADO", "nivel": 4, "caminho": "ELETRODOMESTICOS > AR E VENTILAÇÃO > ARES CONDICIONADOS > AR CONDICIONADO"}, {"id": "269", "nome": "FORNOS E FOGÕES", "nivel": 2, "caminho": "ELETRODOMESTICOS > FORNOS E FOGÕES"}, {"id": "277", "nome": "COOKTOP", "nivel": 3, "caminho": "ELETRODOMESTICOS > FORNOS E FOGÕES > COOKTOP"}, {"id": "280", "nome": "MICROONDAS", "nivel": 3, "caminho": "ELETRODOMESTICOS > FORNOS E FOGÕES > MICROONDAS"}, {"id": "455", "nome": "FORNO ELÉTRICO", "nivel": 3, "caminho": "ELETRODOMESTICOS > FORNOS E FOGÕES > FORNO ELÉTRICO"}, {"id": "461", "nome": "FOGÃO 4 BOCAS", "nivel": 3, "caminho": "ELETRODOMESTICOS > FORNOS E FOGÕES > FOGÃO 4 BOCAS"}, {"id": "617", "nome": "FOGÕES", "nivel": 3, "caminho": "ELETRODOMESTICOS > FORNOS E FOGÕES > FOGÕES"}, {"id": "270", "nome": "LAVADORES", "nivel": 2, "caminho": "ELETRODOMESTICOS > LAVADORES"}, {"id": "279", "nome": "MAQUINAS DE LAVAR", "nivel": 3, "caminho": "ELETRODOMESTICOS > LAVADORES > MAQUINAS DE LAVAR"}, {"id": "458", "nome": "CENTRIFUGA", "nivel": 3, "caminho": "ELETRODOMESTICOS > LAVADORES > CENTRIFUGA"}, {"id": "616", "nome": "LAVADORA DE ALTA PRESSAO", "nivel": 3, "caminho": "ELETRODOMESTICOS > LAVADORES > LAVADORA DE ALTA PRESSAO"}, {"id": "271", "nome": "PEQUENOS ELETRODOMESTICOS", "nivel": 2, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS"}, {"id": "281", "nome": "PARA A CASA", "nivel": 3, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A CASA"}, {"id": "286", "nome": "FERRO DE PASSAR", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A CASA > FERRO DE PASSAR"}, {"id": "289", "nome": "ROBOS ASPIRADORES", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A CASA > ROBOS ASPIRADORES"}, {"id": "290", "nome": "VAPORIZADOR", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A CASA > VAPORIZADOR"}, {"id": "590", "nome": "TRITURADORES DE LIXO", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A CASA > TRITURADORES DE LIXO"}, {"id": "615", "nome": "ASPIRADOR DE PÓ VERTICAL", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A CASA > ASPIRADOR DE PÓ VERTICAL"}, {"id": "282", "nome": "PARA A COZINHA", "nivel": 3, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA"}, {"id": "284", "nome": "CAFETEIRAS", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > CAFETEIRAS"}, {"id": "285", "nome": "CHALEIRAS ELETRICAS", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > CHALEIRAS ELETRICAS"}, {"id": "287", "nome": "PREPARAÇÃO DE ALIMENTOS", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS"}, {"id": "291", "nome": "BATEDEIRAS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > BATEDEIRAS"}, {"id": "292", "nome": "CHURRASQUEIRAS ELÉTRICAS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > CHURRASQUEIRAS ELÉTRICAS"}, {"id": "293", "nome": "FRITADEIRAS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > FRITADEIRAS"}, {"id": "295", "nome": "MIXER", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > MIXER"}, {"id": "296", "nome": "PANELAS DE ARROZ", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > PANELAS DE ARROZ"}, {"id": "297", "nome": "PANELAS ELETRICAS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > PANELAS ELETRICAS"}, {"id": "298", "nome": "SANDUICHEIRAS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > SANDUICHEIRAS"}, {"id": "299", "nome": "TORRADEIRAS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > TORRADEIRAS"}, {"id": "422", "nome": "MÁQUINAS DE WAFFLES", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE ALIMENTOS > MÁQUINAS DE WAFFLES"}, {"id": "288", "nome": "PREPARAÇÃO DE BEBIDAS", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE BEBIDAS"}, {"id": "294", "nome": "LIQUIDIFICADORES", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE BEBIDAS > LIQUIDIFICADORES"}, {"id": "429", "nome": "ESPREMEDORES ELÉTRICOS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > PREPARAÇÃO DE BEBIDAS > ESPREMEDORES ELÉTRICOS"}, {"id": "430", "nome": "MOEDORES DE CAFÉ ELÉTRICOS", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > MOEDORES DE CAFÉ ELÉTRICOS"}, {"id": "431", "nome": "MÁQUINAS PARA SOBREMESAS", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > MÁQUINAS PARA SOBREMESAS"}, {"id": "432", "nome": "SORVETEIRAS", "nivel": 5, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > MÁQUINAS PARA SOBREMESAS > SORVETEIRAS"}, {"id": "462", "nome": "LAVA LOUÇAS", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > LAVA LOUÇAS"}, {"id": "276", "nome": "COIFAS E DEPURADORES", "nivel": 4, "caminho": "ELETRODOMESTICOS > PEQUENOS ELETRODOMESTICOS > PARA A COZINHA > COIFAS E DEPURADORES"}, {"id": "272", "nome": "REFRIGERAÇÃO", "nivel": 2, "caminho": "ELETRODOMESTICOS > REFRIGERAÇÃO"}, {"id": "274", "nome": "ADEGAS CLIMATIZADAS", "nivel": 3, "caminho": "ELETRODOMESTICOS > REFRIGERAÇÃO > ADEGAS CLIMATIZADAS"}, {"id": "278", "nome": "FRIGOBARES", "nivel": 3, "caminho": "ELETRODOMESTICOS > REFRIGERAÇÃO > FRIGOBARES"}, {"id": "485", "nome": "CERVEJEIRA", "nivel": 3, "caminho": "ELETRODOMESTICOS > REFRIGERAÇÃO > CERVEJEIRA"}, {"id": "273", "nome": "OUTROS", "nivel": 2, "caminho": "ELETRODOMESTICOS > OUTROS"}, {"id": "17", "nome": "ELETRÔNICOS, ÁUDIO E VÍDEO", "nivel": 1, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO"}, {"id": "300", "nome": "ACESSÓRIOS PARA AUDIO E VIDEO", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ACESSÓRIOS PARA AUDIO E VIDEO"}, {"id": "314", "nome": "ADAPTADORES", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ACESSÓRIOS PARA AUDIO E VIDEO > ADAPTADORES"}, {"id": "321", "nome": "CONVERSORES DE AUDIO E VIDEO", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ACESSÓRIOS PARA AUDIO E VIDEO > CONVERSORES DE AUDIO E VIDEO"}, {"id": "328", "nome": "SWITCHES E SPLITTERS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ACESSÓRIOS PARA AUDIO E VIDEO > SWITCHES E SPLITTERS"}, {"id": "329", "nome": "OUTROS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ACESSÓRIOS PARA AUDIO E VIDEO > OUTROS"}, {"id": "301", "nome": "ACESSÓRIOS PARA TV", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ACESSÓRIOS PARA TV"}, {"id": "330", "nome": "SUPORTES", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ACESSÓRIOS PARA TV > SUPORTES"}, {"id": "302", "nome": "AUDIO", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO"}, {"id": "315", "nome": "ASSISTENTES PESSOAIS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > ASSISTENTES PESSOAIS"}, {"id": "316", "nome": "AUDIO PORTATIL E ACESSORIOS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > AUDIO PORTATIL E ACESSORIOS"}, {"id": "339", "nome": "ACESSORIOS", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > AUDIO PORTATIL E ACESSORIOS > ACESSORIOS"}, {"id": "420", "nome": "CAIXAS BLUETOOH", "nivel": 5, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > AUDIO PORTATIL E ACESSORIOS > ACESSORIOS > CAIXAS BLUETOOH"}, {"id": "318", "nome": "CAIXAS ACUSTICAS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > CAIXAS ACUSTICAS"}, {"id": "319", "nome": "CD PLAYERS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > CD PLAYERS"}, {"id": "323", "nome": "EQUIPAMENTOS PARA DJS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > EQUIPAMENTOS PARA DJS"}, {"id": "344", "nome": "EFEITO E LUZES", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > EQUIPAMENTOS PARA DJS > EFEITO E LUZES"}, {"id": "421", "nome": "LUZES LED PROFISSIONAIS", "nivel": 5, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > EQUIPAMENTOS PARA DJS > EFEITO E LUZES > LUZES LED PROFISSIONAIS"}, {"id": "324", "nome": "FONES DE OUVIDO", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > FONES DE OUVIDO"}, {"id": "326", "nome": "HOME THEATERS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > HOME THEATERS"}, {"id": "327", "nome": "TORRES DE SOM", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > AUDIO > TORRES DE SOM"}, {"id": "303", "nome": "CABOS", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > CABOS"}, {"id": "317", "nome": "CABOS DE AUDIO E VIDEO", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > CABOS > CABOS DE AUDIO E VIDEO"}, {"id": "304", "nome": "CABOS E HUBS USB", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > CABOS E HUBS USB"}, {"id": "331", "nome": "OUTROS CABOS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > CABOS E HUBS USB > OUTROS CABOS"}, {"id": "305", "nome": "COMPONENTES ELETRONICOS", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > COMPONENTES ELETRONICOS"}, {"id": "320", "nome": "CONECTORES", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > COMPONENTES ELETRONICOS > CONECTORES"}, {"id": "325", "nome": "FONTES DE ALIMENTAÇÃO", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > COMPONENTES ELETRONICOS > FONTES DE ALIMENTAÇÃO"}, {"id": "345", "nome": "FONTES", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > COMPONENTES ELETRONICOS > FONTES DE ALIMENTAÇÃO > FONTES"}, {"id": "335", "nome": "SENSORES INDUTIVOS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > COMPONENTES ELETRONICOS > SENSORES INDUTIVOS"}, {"id": "306", "nome": "CONTROLES REMOTOS", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > CONTROLES REMOTOS"}, {"id": "332", "nome": "PARA TV", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > CONTROLES REMOTOS > PARA TV"}, {"id": "338", "nome": "UNIVERSAIS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > CONTROLES REMOTOS > UNIVERSAIS"}, {"id": "307", "nome": "DRONES E ACESSORIOS", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS"}, {"id": "313", "nome": "ACESSORIOS E PEÇAS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > ACESSORIOS E PEÇAS"}, {"id": "340", "nome": "BATERIAS", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > ACESSORIOS E PEÇAS > BATERIAS"}, {"id": "341", "nome": "CABOS FLEX", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > ACESSORIOS E PEÇAS > CABOS FLEX"}, {"id": "342", "nome": "CARCAÇAS", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > ACESSORIOS E PEÇAS > CARCAÇAS"}, {"id": "343", "nome": "CARREGADORES", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > ACESSORIOS E PEÇAS > CARREGADORES"}, {"id": "346", "nome": "MOCHILAS E CASES", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > ACESSORIOS E PEÇAS > MOCHILAS E CASES"}, {"id": "347", "nome": "OUTROS", "nivel": 4, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > ACESSORIOS E PEÇAS > OUTROS"}, {"id": "322", "nome": "DRONES", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > DRONES E ACESSORIOS > DRONES"}, {"id": "308", "nome": "MEDIA STREAMING", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > MEDIA STREAMING"}, {"id": "309", "nome": "PILHAS E CARREGADORES", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > PILHAS E CARREGADORES"}, {"id": "333", "nome": "PILHAS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > PILHAS E CARREGADORES > PILHAS"}, {"id": "417", "nome": "FONTES DE ALIMENTAÇÃO", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > PILHAS E CARREGADORES > FONTES DE ALIMENTAÇÃO"}, {"id": "310", "nome": "PROJETORES E TELAS", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > PROJETORES E TELAS"}, {"id": "334", "nome": "PROJETORES", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > PROJETORES E TELAS > PROJETORES"}, {"id": "336", "nome": "SUPORTES", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > PROJETORES E TELAS > SUPORTES"}, {"id": "337", "nome": "TELAS", "nivel": 3, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > PROJETORES E TELAS > TELAS"}, {"id": "311", "nome": "TELEVISORES", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > TELEVISORES"}, {"id": "312", "nome": "OUTROS ELETRICOS", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > OUTROS ELETRICOS"}, {"id": "601", "nome": "ADAPTADOR USB WIFI", "nivel": 2, "caminho": "ELETRÔNICOS, ÁUDIO E VÍDEO > ADAPTADOR USB WIFI"}, {"id": "18", "nome": "ESPORTES E FITNESS", "nivel": 1, "caminho": "ESPORTES E FITNESS"}, {"id": "348", "nome": "MONITORES ESPORTIVOS", "nivel": 2, "caminho": "ESPORTES E FITNESS > MONITORES ESPORTIVOS"}, {"id": "349", "nome": "CICLISMO", "nivel": 2, "caminho": "ESPORTES E FITNESS > CICLISMO"}, {"id": "350", "nome": "BICICLETAS", "nivel": 3, "caminho": "ESPORTES E FITNESS > CICLISMO > BICICLETAS"}, {"id": "19", "nome": "FERRAMENTAS", "nivel": 1, "caminho": "FERRAMENTAS"}, {"id": "351", "nome": "FERRAMENTAS ELETRICAS", "nivel": 2, "caminho": "FERRAMENTAS > FERRAMENTAS ELETRICAS"}, {"id": "353", "nome": "PARAFUSADEIRAS", "nivel": 3, "caminho": "FERRAMENTAS > FERRAMENTAS ELETRICAS > PARAFUSADEIRAS"}, {"id": "354", "nome": "PERFURAÇÃO", "nivel": 3, "caminho": "FERRAMENTAS > FERRAMENTAS ELETRICAS > PERFURAÇÃO"}, {"id": "358", "nome": "FURADEIRAS", "nivel": 4, "caminho": "FERRAMENTAS > FERRAMENTAS ELETRICAS > PERFURAÇÃO > FURADEIRAS"}, {"id": "492", "nome": "PARAFUSADEIRA E FURADEIRA", "nivel": 4, "caminho": "FERRAMENTAS > FERRAMENTAS ELETRICAS > PERFURAÇÃO > PARAFUSADEIRA E FURADEIRA"}, {"id": "593", "nome": "MOTOSSERRAS A GALOSINA", "nivel": 3, "caminho": "FERRAMENTAS > FERRAMENTAS ELETRICAS > MOTOSSERRAS A GALOSINA"}, {"id": "612", "nome": "ESMERILHADEIRA", "nivel": 3, "caminho": "FERRAMENTAS > FERRAMENTAS ELETRICAS > ESMERILHADEIRA"}, {"id": "352", "nome": "FERRAMENTAS MANUAIS", "nivel": 2, "caminho": "FERRAMENTAS > FERRAMENTAS MANUAIS"}, {"id": "355", "nome": "FIXAÇÃO", "nivel": 3, "caminho": "FERRAMENTAS > FERRAMENTAS MANUAIS > FIXAÇÃO"}, {"id": "357", "nome": "CHAVES DE APERTO", "nivel": 4, "caminho": "FERRAMENTAS > FERRAMENTAS MANUAIS > FIXAÇÃO > CHAVES DE APERTO"}, {"id": "356", "nome": "KITS DE FERRAMENTAS", "nivel": 3, "caminho": "FERRAMENTAS > FERRAMENTAS MANUAIS > KITS DE FERRAMENTAS"}, {"id": "592", "nome": "FERRAMENTAS PARA JARDIM", "nivel": 2, "caminho": "FERRAMENTAS > FERRAMENTAS PARA JARDIM"}, {"id": "594", "nome": "ROÇADEIRAS E APARADORES", "nivel": 3, "caminho": "FERRAMENTAS > FERRAMENTAS PARA JARDIM > ROÇADEIRAS E APARADORES"}, {"id": "20", "nome": "GAMES", "nivel": 1, "caminho": "GAMES"}, {"id": "359", "nome": "ACESSÓRIOS PARA CONSOLES", "nivel": 2, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES"}, {"id": "362", "nome": "PARA NINTENDO", "nivel": 3, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA NINTENDO"}, {"id": "365", "nome": "NES", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA NINTENDO > NES"}, {"id": "378", "nome": "CONTROLES E JOYSTICKS PARA NES", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA NINTENDO > NES > CONTROLES E JOYSTICKS PARA NES"}, {"id": "620", "nome": "CONTROLES E JOYSTICKS PARA NINTENDO", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA NINTENDO > CONTROLES E JOYSTICKS PARA NINTENDO"}, {"id": "363", "nome": "PARA PLAYSTATION", "nivel": 3, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION"}, {"id": "366", "nome": "PLAYSTATION 2", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 2"}, {"id": "376", "nome": "CONTROLES E JOYSTICKS PARA PLAYSTATION 2", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 2 > CONTROLES E JOYSTICKS PARA PLAYSTATION 2"}, {"id": "384", "nome": "VOLANTES", "nivel": 6, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 2 > CONTROLES E JOYSTICKS PARA PLAYSTATION 2 > VOLANTES"}, {"id": "381", "nome": "ÁUDIO E VIDEO PARA GAMING", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 2 > ÁUDIO E VIDEO PARA GAMING"}, {"id": "383", "nome": "MICROFONES", "nivel": 6, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 2 > ÁUDIO E VIDEO PARA GAMING > MICROFONES"}, {"id": "367", "nome": "PLAYSTATION 3", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 3"}, {"id": "375", "nome": "CONTROLES E JOYSTICKS PARA PLAYSTATION 3", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 3 > CONTROLES E JOYSTICKS PARA PLAYSTATION 3"}, {"id": "382", "nome": "JOYSTICKS", "nivel": 6, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 3 > CONTROLES E JOYSTICKS PARA PLAYSTATION 3 > JOYSTICKS"}, {"id": "368", "nome": "PLAYSTATION 4", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 4"}, {"id": "369", "nome": "PLAYSTATION 5", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 5"}, {"id": "372", "nome": "ÁUDIO E VIDEO PARA GAMING", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 5 > ÁUDIO E VIDEO PARA GAMING"}, {"id": "373", "nome": "CÂMERAS PARA GAMING", "nivel": 6, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 5 > ÁUDIO E VIDEO PARA GAMING > CÂMERAS PARA GAMING"}, {"id": "379", "nome": "CONTROLES E JOYSTICKS PARA PLAYSTATION 5", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA PLAYSTATION > PLAYSTATION 5 > CONTROLES E JOYSTICKS PARA PLAYSTATION 5"}, {"id": "364", "nome": "PARA XBOX", "nivel": 3, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA XBOX"}, {"id": "370", "nome": "XBOX 360", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA XBOX > XBOX 360"}, {"id": "380", "nome": "HEADSETS", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA XBOX > XBOX 360 > HEADSETS"}, {"id": "371", "nome": "XBOX ONE", "nivel": 4, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA XBOX > XBOX ONE"}, {"id": "374", "nome": "CABOS E ADAPTADORES", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA XBOX > XBOX ONE > CABOS E ADAPTADORES"}, {"id": "377", "nome": "CONTROLES E JOYSTICKS PARA XBOX ONE", "nivel": 5, "caminho": "GAMES > ACESSÓRIOS PARA CONSOLES > PARA XBOX > XBOX ONE > CONTROLES E JOYSTICKS PARA XBOX ONE"}, {"id": "360", "nome": "CONSOLES", "nivel": 2, "caminho": "GAMES > CONSOLES"}, {"id": "361", "nome": "VIDEO GAMES", "nivel": 2, "caminho": "GAMES > VIDEO GAMES"}, {"id": "448", "nome": "PLAYSTATION 5", "nivel": 3, "caminho": "GAMES > VIDEO GAMES > PLAYSTATION 5"}, {"id": "449", "nome": "PLAYSTATION 4", "nivel": 3, "caminho": "GAMES > VIDEO GAMES > PLAYSTATION 4"}, {"id": "450", "nome": "NINTENDO SWITCH", "nivel": 3, "caminho": "GAMES > VIDEO GAMES > NINTENDO SWITCH"}, {"id": "21", "nome": "INDUSTRIA E COMERCIO", "nivel": 1, "caminho": "INDUSTRIA E COMERCIO"}, {"id": "385", "nome": "EMBALAGEM E LOGISTICA", "nivel": 2, "caminho": "INDUSTRIA E COMERCIO > EMBALAGEM E LOGISTICA"}, {"id": "389", "nome": "MATERIAIS", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > EMBALAGEM E LOGISTICA > MATERIAIS"}, {"id": "400", "nome": "ABRAÇADEIRAS", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EMBALAGEM E LOGISTICA > MATERIAIS > ABRAÇADEIRAS"}, {"id": "386", "nome": "EQUIPAMENTOS PARA COMERCIO", "nivel": 2, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO"}, {"id": "390", "nome": "BALANÇAS", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > BALANÇAS"}, {"id": "397", "nome": "COMERCIAIS", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > BALANÇAS > COMERCIAIS"}, {"id": "391", "nome": "COBRANÇA E CONTROLE", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > COBRANÇA E CONTROLE"}, {"id": "398", "nome": "LEITORES DE CODIGO DE BARRAS", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > COBRANÇA E CONTROLE > LEITORES DE CODIGO DE BARRAS"}, {"id": "416", "nome": "CAIXAS REGISTRADORAS", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > COBRANÇA E CONTROLE > CAIXAS REGISTRADORAS"}, {"id": "392", "nome": "ORGANIZAÇÃO E EXIBIÇÃO", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > ORGANIZAÇÃO E EXIBIÇÃO"}, {"id": "401", "nome": "EXPOSITORES", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > ORGANIZAÇÃO E EXIBIÇÃO > EXPOSITORES"}, {"id": "393", "nome": "ROTULAGEM DE MERCADORIA", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > ROTULAGEM DE MERCADORIA"}, {"id": "403", "nome": "FITAS PARA ROTULADORES", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > ROTULAGEM DE MERCADORIA > FITAS PARA ROTULADORES"}, {"id": "404", "nome": "ETIQUETADORAS", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA COMERCIO > ROTULAGEM DE MERCADORIA > ETIQUETADORAS"}, {"id": "387", "nome": "EQUIPAMENTOS PARA ESCRITORIO", "nivel": 2, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA ESCRITORIO"}, {"id": "394", "nome": "CONTROLE E ACESSO DE CHEGADA", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA ESCRITORIO > CONTROLE E ACESSO DE CHEGADA"}, {"id": "399", "nome": "ARTIGOS DE PROXIMIDADE", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA ESCRITORIO > CONTROLE E ACESSO DE CHEGADA > ARTIGOS DE PROXIMIDADE"}, {"id": "405", "nome": "CHAVEIRO DE PROXIMIDADE", "nivel": 5, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA ESCRITORIO > CONTROLE E ACESSO DE CHEGADA > ARTIGOS DE PROXIMIDADE > CHAVEIRO DE PROXIMIDADE"}, {"id": "406", "nome": "LEITORES DE PROXIMIDADE", "nivel": 5, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA ESCRITORIO > CONTROLE E ACESSO DE CHEGADA > ARTIGOS DE PROXIMIDADE > LEITORES DE PROXIMIDADE"}, {"id": "395", "nome": "FRAGMENTADORAS DE PAPEIS", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > EQUIPAMENTOS PARA ESCRITORIO > FRAGMENTADORAS DE PAPEIS"}, {"id": "388", "nome": "SEGURANÇA LABORAL", "nivel": 2, "caminho": "INDUSTRIA E COMERCIO > SEGURANÇA LABORAL"}, {"id": "396", "nome": "PROTEÇÃO PESSOAL", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > SEGURANÇA LABORAL > PROTEÇÃO PESSOAL"}, {"id": "402", "nome": "LUVAS DE SEGURANÇA", "nivel": 4, "caminho": "INDUSTRIA E COMERCIO > SEGURANÇA LABORAL > PROTEÇÃO PESSOAL > LUVAS DE SEGURANÇA"}, {"id": "621", "nome": "GRÁFICA E IMPRESSÃO", "nivel": 2, "caminho": "INDUSTRIA E COMERCIO > GRÁFICA E IMPRESSÃO"}, {"id": "622", "nome": "LÂMINAS PARA PLOTTERS", "nivel": 3, "caminho": "INDUSTRIA E COMERCIO > GRÁFICA E IMPRESSÃO > LÂMINAS PARA PLOTTERS"}, {"id": "22", "nome": "INFORMATICA", "nivel": 1, "caminho": "INFORMATICA"}, {"id": "38", "nome": "SOFTWARE", "nivel": 2, "caminho": "INFORMATICA > SOFTWARE"}, {"id": "39", "nome": "SOFTWARE DE ESCRITORIO", "nivel": 3, "caminho": "INFORMATICA > SOFTWARE > SOFTWARE DE ESCRITORIO"}, {"id": "40", "nome": "SOFTWARE COMERCIAL", "nivel": 3, "caminho": "INFORMATICA > SOFTWARE > SOFTWARE COMERCIAL"}, {"id": "41", "nome": "ANTI VIRUS E SEGURANÇA", "nivel": 3, "caminho": "INFORMATICA > SOFTWARE > ANTI VIRUS E SEGURANÇA"}, {"id": "42", "nome": "SISTEMAS OPERACIONAIS", "nivel": 3, "caminho": "INFORMATICA > SOFTWARE > SISTEMAS OPERACIONAIS"}, {"id": "43", "nome": "ACESSORIOS PARA PC GAMING", "nivel": 2, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING"}, {"id": "44", "nome": "FONES", "nivel": 3, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > FONES"}, {"id": "61", "nome": "MICROFONES", "nivel": 3, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > MICROFONES"}, {"id": "407", "nome": "CONSOLES E JOYSTICKS", "nivel": 3, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONSOLES E JOYSTICKS"}, {"id": "409", "nome": "JOYSTICKS", "nivel": 4, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONSOLES E JOYSTICKS > JOYSTICKS"}, {"id": "408", "nome": "CONTROLES E JOYSTICKS", "nivel": 3, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONTROLES E JOYSTICKS"}, {"id": "410", "nome": "COCKPITS", "nivel": 4, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONTROLES E JOYSTICKS > COCKPITS"}, {"id": "411", "nome": "JOYSTICKS", "nivel": 4, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONTROLES E JOYSTICKS > JOYSTICKS"}, {"id": "609", "nome": "ARO DE VOLANTE", "nivel": 4, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONTROLES E JOYSTICKS > ARO DE VOLANTE"}, {"id": "610", "nome": "BASE PARA SIMULADOR", "nivel": 4, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONTROLES E JOYSTICKS > BASE PARA SIMULADOR"}, {"id": "611", "nome": "PEDAIS PARA SIMULADOR", "nivel": 4, "caminho": "INFORMATICA > ACESSORIOS PARA PC GAMING > CONTROLES E JOYSTICKS > PEDAIS PARA SIMULADOR"}, {"id": "48", "nome": "PERIFERICOS PARA PC", "nivel": 2, "caminho": "INFORMATICA > PERIFERICOS PARA PC"}, {"id": "49", "nome": "MOUSES E TECLADOS", "nivel": 3, "caminho": "INFORMATICA > PERIFERICOS PARA PC > MOUSES E TECLADOS"}, {"id": "50", "nome": "TECLADOS", "nivel": 4, "caminho": "INFORMATICA > PERIFERICOS PARA PC > MOUSES E TECLADOS > TECLADOS"}, {"id": "51", "nome": "TECLADOS FISICOS", "nivel": 5, "caminho": "INFORMATICA > PERIFERICOS PARA PC > MOUSES E TECLADOS > TECLADOS > TECLADOS FISICOS"}, {"id": "52", "nome": "MOUSE PADS", "nivel": 4, "caminho": "INFORMATICA > PERIFERICOS PARA PC > MOUSES E TECLADOS > MOUSE PADS"}, {"id": "53", "nome": "KITS DE TECLADOS E MOUSE", "nivel": 4, "caminho": "INFORMATICA > PERIFERICOS PARA PC > MOUSES E TECLADOS > KITS DE TECLADOS E MOUSE"}, {"id": "135", "nome": "MESAS DIGITALIZADORAS", "nivel": 4, "caminho": "INFORMATICA > PERIFERICOS PARA PC > MOUSES E TECLADOS > MESAS DIGITALIZADORAS"}, {"id": "136", "nome": "MOUSE", "nivel": 4, "caminho": "INFORMATICA > PERIFERICOS PARA PC > MOUSES E TECLADOS > MOUSE"}, {"id": "133", "nome": "WEBCAM", "nivel": 3, "caminho": "INFORMATICA > PERIFERICOS PARA PC > WEBCAM"}, {"id": "134", "nome": "CAIXAS DE SOM E SUBWOOFER", "nivel": 3, "caminho": "INFORMATICA > PERIFERICOS PARA PC > CAIXAS DE SOM E SUBWOOFER"}, {"id": "456", "nome": "HEADSET PARA PC", "nivel": 3, "caminho": "INFORMATICA > PERIFERICOS PARA PC > HEADSET PARA PC"}, {"id": "457", "nome": "VOLANTES", "nivel": 3, "caminho": "INFORMATICA > PERIFERICOS PARA PC > VOLANTES"}, {"id": "597", "nome": "ADAPTADORES USB", "nivel": 3, "caminho": "INFORMATICA > PERIFERICOS PARA PC > ADAPTADORES USB"}, {"id": "54", "nome": "PC DE MESA", "nivel": 2, "caminho": "INFORMATICA > PC DE MESA"}, {"id": "55", "nome": "ALL IN ONE", "nivel": 3, "caminho": "INFORMATICA > PC DE MESA > ALL IN ONE"}, {"id": "56", "nome": "COMPUTADORES", "nivel": 3, "caminho": "INFORMATICA > PC DE MESA > COMPUTADORES"}, {"id": "132", "nome": "MINI PCS", "nivel": 3, "caminho": "INFORMATICA > PC DE MESA > MINI PCS"}, {"id": "57", "nome": "PORTATEIS E ACESSORIOS", "nivel": 2, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS"}, {"id": "58", "nome": "NOTEBOOKS", "nivel": 3, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > NOTEBOOKS"}, {"id": "59", "nome": "PEÇAS E PARTES PARA NOTEBOOK", "nivel": 3, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > PEÇAS E PARTES PARA NOTEBOOK"}, {"id": "60", "nome": "BATERIAS PARA NOTEBOOK", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > PEÇAS E PARTES PARA NOTEBOOK > BATERIAS PARA NOTEBOOK"}, {"id": "138", "nome": "DOBRADIÇAS", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > PEÇAS E PARTES PARA NOTEBOOK > DOBRADIÇAS"}, {"id": "139", "nome": "PLACAS PARA NOTEBOOK", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > PEÇAS E PARTES PARA NOTEBOOK > PLACAS PARA NOTEBOOK"}, {"id": "154", "nome": "PLACAS MAE PARA NOTEBOOK", "nivel": 5, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > PEÇAS E PARTES PARA NOTEBOOK > PLACAS PARA NOTEBOOK > PLACAS MAE PARA NOTEBOOK"}, {"id": "140", "nome": "TECLADOS PARA NOTEBOOK", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > PEÇAS E PARTES PARA NOTEBOOK > TECLADOS PARA NOTEBOOK"}, {"id": "141", "nome": "TELAS LCD PARA NOTEBOOK", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > PEÇAS E PARTES PARA NOTEBOOK > TELAS LCD PARA NOTEBOOK"}, {"id": "137", "nome": "ACESSÓRIOS PARA NOTEBOOK", "nivel": 3, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK"}, {"id": "142", "nome": "CABOS E ADAPTADORES", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > CABOS E ADAPTADORES"}, {"id": "143", "nome": "CASES E CAPAS", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > CASES E CAPAS"}, {"id": "144", "nome": "COOLERS EXTERNOS PARA NOTEBOOK", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > COOLERS EXTERNOS PARA NOTEBOOK"}, {"id": "145", "nome": "FONTES PARA NOTEBOOK", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > FONTES PARA NOTEBOOK"}, {"id": "146", "nome": "MALETAS E BOLSAS", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > MALETAS E BOLSAS"}, {"id": "152", "nome": "MALETAS", "nivel": 5, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > MALETAS E BOLSAS > MALETAS"}, {"id": "153", "nome": "MOCHILAS PARA NOTEBOOK", "nivel": 5, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > MALETAS E BOLSAS > MOCHILAS PARA NOTEBOOK"}, {"id": "147", "nome": "PASSADORES DE SLIDES", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > PASSADORES DE SLIDES"}, {"id": "148", "nome": "PELÍCULAS PROTETORAS DE TELA", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > PELÍCULAS PROTETORAS DE TELA"}, {"id": "149", "nome": "SUPORTES E MESAS", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > SUPORTES E MESAS"}, {"id": "150", "nome": "TRAVAS", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > TRAVAS"}, {"id": "151", "nome": "OUTROS", "nivel": 4, "caminho": "INFORMATICA > PORTATEIS E ACESSORIOS > ACESSÓRIOS PARA NOTEBOOK > OUTROS"}, {"id": "62", "nome": "ARMAZENAMENTO", "nivel": 2, "caminho": "INFORMATICA > ARMAZENAMENTO"}, {"id": "63", "nome": "DISCOS E ACESSÓRIOS", "nivel": 3, "caminho": "INFORMATICA > ARMAZENAMENTO > DISCOS E ACESSÓRIOS"}, {"id": "65", "nome": "ACESSÓRIOS", "nivel": 4, "caminho": "INFORMATICA > ARMAZENAMENTO > DISCOS E ACESSÓRIOS > ACESSÓRIOS"}, {"id": "66", "nome": "GAVETAS PARA HDS", "nivel": 5, "caminho": "INFORMATICA > ARMAZENAMENTO > DISCOS E ACESSÓRIOS > ACESSÓRIOS > GAVETAS PARA HDS"}, {"id": "67", "nome": "HDS E SSDS", "nivel": 4, "caminho": "INFORMATICA > ARMAZENAMENTO > DISCOS E ACESSÓRIOS > HDS E SSDS"}, {"id": "64", "nome": "PEN DRIVES", "nivel": 3, "caminho": "INFORMATICA > ARMAZENAMENTO > PEN DRIVES"}, {"id": "68", "nome": "CABOS E HUBS USB", "nivel": 2, "caminho": "INFORMATICA > CABOS E HUBS USB"}, {"id": "69", "nome": "CABOS", "nivel": 3, "caminho": "INFORMATICA > CABOS E HUBS USB > CABOS"}, {"id": "71", "nome": "CABOS DE REDE", "nivel": 4, "caminho": "INFORMATICA > CABOS E HUBS USB > CABOS > CABOS DE REDE"}, {"id": "72", "nome": "CABOS DE ENERGIA", "nivel": 4, "caminho": "INFORMATICA > CABOS E HUBS USB > CABOS > CABOS DE ENERGIA"}, {"id": "73", "nome": "CABOS DE DADOS", "nivel": 4, "caminho": "INFORMATICA > CABOS E HUBS USB > CABOS > CABOS DE DADOS"}, {"id": "74", "nome": "CABOS DE AUDIO E VIDEO", "nivel": 4, "caminho": "INFORMATICA > CABOS E HUBS USB > CABOS > CABOS DE AUDIO E VIDEO"}, {"id": "70", "nome": "HUBS USB", "nivel": 3, "caminho": "INFORMATICA > CABOS E HUBS USB > HUBS USB"}, {"id": "75", "nome": "COMPONENTES PARA PC", "nivel": 2, "caminho": "INFORMATICA > COMPONENTES PARA PC"}, {"id": "76", "nome": "COOLERS E FANS", "nivel": 3, "caminho": "INFORMATICA > COMPONENTES PARA PC > COOLERS E FANS"}, {"id": "82", "nome": "COOLERS PARA PC", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > COOLERS E FANS > COOLERS PARA PC"}, {"id": "77", "nome": "FONTES DE ALIMENTAÇÃO", "nivel": 3, "caminho": "INFORMATICA > COMPONENTES PARA PC > FONTES DE ALIMENTAÇÃO"}, {"id": "83", "nome": "FONTES", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > FONTES DE ALIMENTAÇÃO > FONTES"}, {"id": "90", "nome": "CABOS DE ENERGIA", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > FONTES DE ALIMENTAÇÃO > CABOS DE ENERGIA"}, {"id": "78", "nome": "GABINETES DE PC E SUPORTES", "nivel": 3, "caminho": "INFORMATICA > COMPONENTES PARA PC > GABINETES DE PC E SUPORTES"}, {"id": "84", "nome": "GABINETES", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > GABINETES DE PC E SUPORTES > GABINETES"}, {"id": "79", "nome": "MEMORIAS RAM", "nivel": 3, "caminho": "INFORMATICA > COMPONENTES PARA PC > MEMORIAS RAM"}, {"id": "80", "nome": "PLACAS", "nivel": 3, "caminho": "INFORMATICA > COMPONENTES PARA PC > PLACAS"}, {"id": "85", "nome": "PLACA DE VIDEO", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > PLACAS > PLACA DE VIDEO"}, {"id": "86", "nome": "PLACAS DE CAPTURA DE VIDEO", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > PLACAS > PLACAS DE CAPTURA DE VIDEO"}, {"id": "87", "nome": "PLACAS DE SOM", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > PLACAS > PLACAS DE SOM"}, {"id": "88", "nome": "PLACAS MAE", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > PLACAS > PLACAS MAE"}, {"id": "89", "nome": "PLACAS PARA CONTROLADORES", "nivel": 4, "caminho": "INFORMATICA > COMPONENTES PARA PC > PLACAS > PLACAS PARA CONTROLADORES"}, {"id": "81", "nome": "PROCESSADORES", "nivel": 3, "caminho": "INFORMATICA > COMPONENTES PARA PC > PROCESSADORES"}, {"id": "91", "nome": "OUTROS", "nivel": 3, "caminho": "INFORMATICA > COMPONENTES PARA PC > OUTROS"}, {"id": "92", "nome": "CONECTIVIDADE E REDE", "nivel": 2, "caminho": "INFORMATICA > CONECTIVIDADE E REDE"}, {"id": "93", "nome": "CABOS DE REDE E ACESSORIOS", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > CABOS DE REDE E ACESSORIOS"}, {"id": "100", "nome": "ADAPTADORES DE CABOS DE REDE", "nivel": 4, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > CABOS DE REDE E ACESSORIOS > ADAPTADORES DE CABOS DE REDE"}, {"id": "101", "nome": "CABOS DE REDE", "nivel": 4, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > CABOS DE REDE E ACESSORIOS > CABOS DE REDE"}, {"id": "466", "nome": "KEYSTONE", "nivel": 5, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > CABOS DE REDE E ACESSORIOS > CABOS DE REDE > KEYSTONE"}, {"id": "102", "nome": "CONECTORES DE REDE", "nivel": 4, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > CABOS DE REDE E ACESSORIOS > CONECTORES DE REDE"}, {"id": "103", "nome": "ORGANIZADORES DE CABOS", "nivel": 4, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > CABOS DE REDE E ACESSORIOS > ORGANIZADORES DE CABOS"}, {"id": "94", "nome": "FERRAMENTAS", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > FERRAMENTAS"}, {"id": "104", "nome": "OUTRAS FERRAMENTAS", "nivel": 4, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > FERRAMENTAS > OUTRAS FERRAMENTAS"}, {"id": "95", "nome": "HUBS", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > HUBS"}, {"id": "96", "nome": "PLACAS DE REDE", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > PLACAS DE REDE"}, {"id": "97", "nome": "RACKS DE SERVIDORES", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > RACKS DE SERVIDORES"}, {"id": "98", "nome": "ROTEADORES", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > ROTEADORES"}, {"id": "99", "nome": "SWITCHES", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > SWITCHES"}, {"id": "445", "nome": "ANTENAS", "nivel": 3, "caminho": "INFORMATICA > CONECTIVIDADE E REDE > ANTENAS"}, {"id": "105", "nome": "ESTABILIZADORES E NO BREAKS", "nivel": 2, "caminho": "INFORMATICA > ESTABILIZADORES E NO BREAKS"}, {"id": "106", "nome": "ESTABILIZADORES", "nivel": 3, "caminho": "INFORMATICA > ESTABILIZADORES E NO BREAKS > ESTABILIZADORES"}, {"id": "107", "nome": "NO BREAKS", "nivel": 3, "caminho": "INFORMATICA > ESTABILIZADORES E NO BREAKS > NO BREAKS"}, {"id": "108", "nome": "IMPRESSÃO", "nivel": 2, "caminho": "INFORMATICA > IMPRESSÃO"}, {"id": "109", "nome": "ACESSORIOS", "nivel": 3, "caminho": "INFORMATICA > IMPRESSÃO > ACESSORIOS"}, {"id": "110", "nome": "IMPRESSÃO 3D", "nivel": 3, "caminho": "INFORMATICA > IMPRESSÃO > IMPRESSÃO 3D"}, {"id": "115", "nome": "IMPRESSORAS 3D", "nivel": 4, "caminho": "INFORMATICA > IMPRESSÃO > IMPRESSÃO 3D > IMPRESSORAS 3D"}, {"id": "111", "nome": "IMPRESSORAS", "nivel": 3, "caminho": "INFORMATICA > IMPRESSÃO > IMPRESSORAS"}, {"id": "465", "nome": "IMPRESSORA LASER", "nivel": 4, "caminho": "INFORMATICA > IMPRESSÃO > IMPRESSORAS > IMPRESSORA LASER"}, {"id": "112", "nome": "PEÇAS", "nivel": 3, "caminho": "INFORMATICA > IMPRESSÃO > PEÇAS"}, {"id": "117", "nome": "OUTRAS PEÇAS", "nivel": 4, "caminho": "INFORMATICA > IMPRESSÃO > PEÇAS > OUTRAS PEÇAS"}, {"id": "113", "nome": "SUPRIMENTOS DE IMPRESSÃO", "nivel": 3, "caminho": "INFORMATICA > IMPRESSÃO > SUPRIMENTOS DE IMPRESSÃO"}, {"id": "116", "nome": "RECARGAS DE TINTA", "nivel": 4, "caminho": "INFORMATICA > IMPRESSÃO > SUPRIMENTOS DE IMPRESSÃO > RECARGAS DE TINTA"}, {"id": "114", "nome": "OUTROS", "nivel": 3, "caminho": "INFORMATICA > IMPRESSÃO > OUTROS"}, {"id": "451", "nome": "IMPRESSORA MULTIFUNCIONAL", "nivel": 3, "caminho": "INFORMATICA > IMPRESSÃO > IMPRESSORA MULTIFUNCIONAL"}, {"id": "452", "nome": "IMPRESSORA JATO DE TINTA", "nivel": 4, "caminho": "INFORMATICA > IMPRESSÃO > IMPRESSORA MULTIFUNCIONAL > IMPRESSORA JATO DE TINTA"}, {"id": "464", "nome": "IMPRESSORA TANQUE DE TINTA", "nivel": 4, "caminho": "INFORMATICA > IMPRESSÃO > IMPRESSORA MULTIFUNCIONAL > IMPRESSORA TANQUE DE TINTA"}, {"id": "118", "nome": "LEITORES E SCANNERS", "nivel": 2, "caminho": "INFORMATICA > LEITORES E SCANNERS"}, {"id": "119", "nome": "LEITORES DE CARTÃO", "nivel": 3, "caminho": "INFORMATICA > LEITORES E SCANNERS > LEITORES DE CARTÃO"}, {"id": "120", "nome": "LEITORES DE CODIGO DE BARRAS", "nivel": 3, "caminho": "INFORMATICA > LEITORES E SCANNERS > LEITORES DE CODIGO DE BARRAS"}, {"id": "121", "nome": "LEITORES E GRAVADORES", "nivel": 3, "caminho": "INFORMATICA > LEITORES E SCANNERS > LEITORES E GRAVADORES"}, {"id": "123", "nome": "GRAVADORES DE DVD,CD, BLURAY", "nivel": 4, "caminho": "INFORMATICA > LEITORES E SCANNERS > LEITORES E GRAVADORES > GRAVADORES DE DVD,CD, BLURAY"}, {"id": "122", "nome": "SCANNERS", "nivel": 3, "caminho": "INFORMATICA > LEITORES E SCANNERS > SCANNERS"}, {"id": "124", "nome": "LIMPEZA DE PCS", "nivel": 2, "caminho": "INFORMATICA > LIMPEZA DE PCS"}, {"id": "125", "nome": "PASTA TERMICA", "nivel": 3, "caminho": "INFORMATICA > LIMPEZA DE PCS > PASTA TERMICA"}, {"id": "126", "nome": "MONITORES E ACESSORIOS", "nivel": 2, "caminho": "INFORMATICA > MONITORES E ACESSORIOS"}, {"id": "127", "nome": "MONITORES", "nivel": 3, "caminho": "INFORMATICA > MONITORES E ACESSORIOS > MONITORES"}, {"id": "447", "nome": "Monitor Gamer", "nivel": 4, "caminho": "INFORMATICA > MONITORES E ACESSORIOS > MONITORES > Monitor Gamer"}, {"id": "128", "nome": "PELICULAS DE PRIVACIDADE", "nivel": 3, "caminho": "INFORMATICA > MONITORES E ACESSORIOS > PELICULAS DE PRIVACIDADE"}, {"id": "129", "nome": "SUPORTES", "nivel": 3, "caminho": "INFORMATICA > MONITORES E ACESSORIOS > SUPORTES"}, {"id": "130", "nome": "PALMS E HANDHELDS", "nivel": 2, "caminho": "INFORMATICA > PALMS E HANDHELDS"}, {"id": "131", "nome": "ACESSORIOS", "nivel": 3, "caminho": "INFORMATICA > PALMS E HANDHELDS > ACESSORIOS"}, {"id": "155", "nome": "TABLETS E ACESSORIOS", "nivel": 2, "caminho": "INFORMATICA > TABLETS E ACESSORIOS"}, {"id": "156", "nome": "ACESSORIOS", "nivel": 3, "caminho": "INFORMATICA > TABLETS E ACESSORIOS > ACESSORIOS"}, {"id": "159", "nome": "CANETAS", "nivel": 4, "caminho": "INFORMATICA > TABLETS E ACESSORIOS > ACESSORIOS > CANETAS"}, {"id": "160", "nome": "CAPAS", "nivel": 4, "caminho": "INFORMATICA > TABLETS E ACESSORIOS > ACESSORIOS > CAPAS"}, {"id": "161", "nome": "OUTROS", "nivel": 4, "caminho": "INFORMATICA > TABLETS E ACESSORIOS > ACESSORIOS > OUTROS"}, {"id": "157", "nome": "ACESSORIOS CAPAS", "nivel": 3, "caminho": "INFORMATICA > TABLETS E ACESSORIOS > ACESSORIOS CAPAS"}, {"id": "158", "nome": "TABLETS", "nivel": 3, "caminho": "INFORMATICA > TABLETS E ACESSORIOS > TABLETS"}, {"id": "23", "nome": "INSTRUMENTOS MUSICAIS", "nivel": 1, "caminho": "INSTRUMENTOS MUSICAIS"}, {"id": "412", "nome": "MICROFONES E AMPLIFICADORES", "nivel": 2, "caminho": "INSTRUMENTOS MUSICAIS > MICROFONES E AMPLIFICADORES"}, {"id": "413", "nome": "MICROFONES", "nivel": 3, "caminho": "INSTRUMENTOS MUSICAIS > MICROFONES E AMPLIFICADORES > MICROFONES"}, {"id": "24", "nome": "PASSEIO DO BEBE", "nivel": 1, "caminho": "PASSEIO DO BEBE"}, {"id": "25", "nome": "SAUDE", "nivel": 1, "caminho": "SAUDE"}, {"id": "414", "nome": "CUIDADO DA SAUDE", "nivel": 2, "caminho": "SAUDE > CUIDADO DA SAUDE"}, {"id": "415", "nome": "BALANÇAS", "nivel": 3, "caminho": "SAUDE > CUIDADO DA SAUDE > BALANÇAS"}, {"id": "162", "nome": "ANTIGUIDADES E COLEÇÕES", "nivel": 1, "caminho": "ANTIGUIDADES E COLEÇÕES"}, {"id": "163", "nome": "ANTIGUIDADES", "nivel": 2, "caminho": "ANTIGUIDADES E COLEÇÕES > ANTIGUIDADES"}, {"id": "164", "nome": "SOM ANTIGO", "nivel": 3, "caminho": "ANTIGUIDADES E COLEÇÕES > ANTIGUIDADES > SOM ANTIGO"}, {"id": "165", "nome": "TOCA DISCOS", "nivel": 4, "caminho": "ANTIGUIDADES E COLEÇÕES > ANTIGUIDADES > SOM ANTIGO > TOCA DISCOS"}, {"id": "426", "nome": "ANIMAIS", "nivel": 1, "caminho": "ANIMAIS"}, {"id": "427", "nome": "AVES E ACESSORIOS", "nivel": 2, "caminho": "ANIMAIS > AVES E ACESSORIOS"}, {"id": "428", "nome": "BRINQUEDOS", "nivel": 3, "caminho": "ANIMAIS > AVES E ACESSORIOS > BRINQUEDOS"}, {"id": "441", "nome": "ESPORTE E FITNESS", "nivel": 1, "caminho": "ESPORTE E FITNESS"}, {"id": "442", "nome": "FITNESS E MUSCULAÇÃO", "nivel": 2, "caminho": "ESPORTE E FITNESS > FITNESS E MUSCULAÇÃO"}, {"id": "443", "nome": "APARELHOS CARDIOVASCULARES", "nivel": 3, "caminho": "ESPORTE E FITNESS > FITNESS E MUSCULAÇÃO > APARELHOS CARDIOVASCULARES"}, {"id": "444", "nome": "BICICLETAS ERGOMÉTRICAS", "nivel": 4, "caminho": "ESPORTE E FITNESS > FITNESS E MUSCULAÇÃO > APARELHOS CARDIOVASCULARES > BICICLETAS ERGOMÉTRICAS"}, {"id": "459", "nome": "ESPORTE E LAZER", "nivel": 1, "caminho": "ESPORTE E LAZER"}, {"id": "460", "nome": "TENDAS E GAZEBOS", "nivel": 2, "caminho": "ESPORTE E LAZER > TENDAS E GAZEBOS"}, {"id": "463", "nome": "MESA DOBRÁVEL", "nivel": 2, "caminho": "ESPORTE E LAZER > MESA DOBRÁVEL"}, {"id": "491", "nome": "COLCHÕES INFLÁVEIS", "nivel": 2, "caminho": "ESPORTE E LAZER > COLCHÕES INFLÁVEIS"}, {"id": "602", "nome": "ALIMENTOS", "nivel": 1, "caminho": "ALIMENTOS"}, {"id": "603", "nome": "PANETTONES", "nivel": 2, "caminho": "ALIMENTOS > PANETTONES"}, {"id": "607", "nome": "OVO DE PÁSCOA", "nivel": 2, "caminho": "ALIMENTOS > OVO DE PÁSCOA"}, {"id": "604", "nome": "WHEY", "nivel": 2, "caminho": "ALIMENTOS > WHEY"}, {"id": "606", "nome": "DOCES", "nivel": 2, "caminho": "ALIMENTOS > DOCES"}, {"id": "605", "nome": "BARRA DE PROTEINA", "nivel": 2, "caminho": "ALIMENTOS > BARRA DE PROTEINA"}, {"id": "624", "nome": "CAFÉ", "nivel": 2, "caminho": "ALIMENTOS > CAFÉ"}, {"id": "625", "nome": "CREATINA", "nivel": 2, "caminho": "ALIMENTOS > CREATINA"}, {"id": "626", "nome": "MELATONINA", "nivel": 2, "caminho": "ALIMENTOS > MELATONINA"}];
+const MARCA = [{"id": "1", "nome": "0"}, {"id": "100", "nome": "Hantol"}, {"id": "101", "nome": "Otto Brasil"}, {"id": "102", "nome": "Phitronics"}, {"id": "103", "nome": "Advantek Networks"}, {"id": "104", "nome": "ZAGG"}, {"id": "105", "nome": "Bluecase"}, {"id": "106", "nome": "Extream"}, {"id": "107", "nome": "C3Tech"}, {"id": "108", "nome": "iLuv"}, {"id": "109", "nome": "Pluscable"}, {"id": "110", "nome": "Sumdex"}, {"id": "111", "nome": "Orange"}, {"id": "112", "nome": "Genesis"}, {"id": "113", "nome": "Pretigio"}, {"id": "1130", "nome": "Hayonik"}, {"id": "114", "nome": "Nokia"}, {"id": "115", "nome": "Panda"}, {"id": "116", "nome": "Motorola"}, {"id": "117", "nome": "Lifetech"}, {"id": "118", "nome": "Konami"}, {"id": "119", "nome": "Markvision"}, {"id": "120", "nome": "OCZ"}, {"id": "121", "nome": "His"}, {"id": "122", "nome": "Sapphire"}, {"id": "123", "nome": "ECS"}, {"id": "124", "nome": "Trendnet"}, {"id": "125", "nome": "Javier"}, {"id": "126", "nome": "MSI"}, {"id": "127", "nome": "BRPC"}, {"id": "128", "nome": "Elgin"}, {"id": "129", "nome": "Zotac"}, {"id": "130", "nome": "Duex"}, {"id": "131", "nome": "Navcity"}, {"id": "132", "nome": "Mirage"}, {"id": "133", "nome": "Western Digital"}, {"id": "1331", "nome": "Prizi"}, {"id": "1332", "nome": "Nintendo"}, {"id": "1333", "nome": "Lexmark"}, {"id": "1334", "nome": "PALIT"}, {"id": "1335", "nome": "Netcore"}, {"id": "1336", "nome": "Essenza"}, {"id": "1337", "nome": "-"}, {"id": "134", "nome": "Wise Case"}, {"id": "1340", "nome": "iSync"}, {"id": "1341", "nome": "Astro"}, {"id": "1342", "nome": "Blue"}, {"id": "1343", "nome": "Logitech G"}, {"id": "1344", "nome": "Fisher-Price"}, {"id": "1345", "nome": "Lotus"}, {"id": "1346", "nome": "Valianty"}, {"id": "1347", "nome": "UnionBoard"}, {"id": "1348", "nome": "Digitron"}, {"id": "1349", "nome": "Predator"}, {"id": "135", "nome": "Nvidia"}, {"id": "1350", "nome": "Creality"}, {"id": "1351", "nome": "Xtrax"}, {"id": "1352", "nome": "Roku"}, {"id": "1353", "nome": "Mondial"}, {"id": "1354", "nome": "Aplus Tech"}, {"id": "1355", "nome": "Havanna"}, {"id": "1356", "nome": "Gertec"}, {"id": "1357", "nome": "Vonder"}, {"id": "1358", "nome": "Electrolux"}, {"id": "1359", "nome": "Checkpoint"}, {"id": "136", "nome": "Bassetti"}, {"id": "1360", "nome": "TCL"}, {"id": "1361", "nome": "Lian Li"}, {"id": "1362", "nome": "Scythe"}, {"id": "1363", "nome": "Raveo"}, {"id": "1364", "nome": "Blu"}, {"id": "1365", "nome": "Xzone"}, {"id": "1366", "nome": "VXPro"}, {"id": "1367", "nome": "Brastemp"}, {"id": "1368", "nome": "Consul"}, {"id": "1369", "nome": "Semp"}, {"id": "137", "nome": "Goodyear"}, {"id": "1370", "nome": "Control ID"}, {"id": "1371", "nome": "Suggar"}, {"id": "1372", "nome": "Kodak"}, {"id": "1373", "nome": "House Of Marley"}, {"id": "1374", "nome": "Britânia"}, {"id": "1375", "nome": "ViewSonic"}, {"id": "1376", "nome": "Itatiaia"}, {"id": "1377", "nome": "Amazfit"}, {"id": "1378", "nome": "Importway"}, {"id": "1379", "nome": "Warner Bros"}, {"id": "138", "nome": "Enermax"}, {"id": "1380", "nome": "Cuisinart"}, {"id": "1381", "nome": "Infinix"}, {"id": "1382", "nome": "Cadence"}, {"id": "1383", "nome": "Oster"}, {"id": "1384", "nome": "Pioneer"}, {"id": "1386", "nome": "Extreme Simracing"}, {"id": "1387", "nome": "Singer"}, {"id": "1388", "nome": "Polimet"}, {"id": "1389", "nome": "Bomber"}, {"id": "139", "nome": "Vivitar"}, {"id": "1390", "nome": "Acte Sports"}, {"id": "1391", "nome": "Insta360"}, {"id": "1392", "nome": "Cricut"}, {"id": "1393", "nome": "Fischer"}, {"id": "1394", "nome": "Arno"}, {"id": "1395", "nome": "Gaabor"}, {"id": "1396", "nome": "Elements"}, {"id": "1397", "nome": "Ventidelta"}, {"id": "1398", "nome": "Black And Decker"}, {"id": "1399", "nome": "ZTE"}, {"id": "140", "nome": "PowerX"}, {"id": "1400", "nome": "Agratto"}, {"id": "1401", "nome": "Edifier"}, {"id": "1402", "nome": "MIDEA"}, {"id": "1403", "nome": "Amvox"}, {"id": "1404", "nome": "Wap"}, {"id": "1405", "nome": "Pro Eletronic"}, {"id": "1406", "nome": "Taiff"}, {"id": "1407", "nome": "Ga.Ma Italy"}, {"id": "1408", "nome": "Jabra"}, {"id": "1409", "nome": "New.Up!"}, {"id": "141", "nome": "Duracell"}, {"id": "1410", "nome": "Colormaq"}, {"id": "1411", "nome": "Daewoo"}, {"id": "14111", "nome": "--"}, {"id": "14112", "nome": "Tesla"}, {"id": "14113", "nome": "RayNeoo"}, {"id": "14114", "nome": "Atlas"}, {"id": "14115", "nome": "Liketec"}, {"id": "14116", "nome": "Leadertech"}, {"id": "1412", "nome": "Coringa"}, {"id": "1413", "nome": "WD Black"}, {"id": "1414", "nome": "Ventisol"}, {"id": "1415", "nome": "McAfee"}, {"id": "1416", "nome": "Dazz"}, {"id": "1417", "nome": "Razi"}, {"id": "1418", "nome": "Praxis"}, {"id": "1419", "nome": "Nautika"}, {"id": "142", "nome": "Avant"}, {"id": "1420", "nome": "Bestway"}, {"id": "1421", "nome": "Backbone"}, {"id": "1422", "nome": "Comtac"}, {"id": "1423", "nome": "Stanley"}, {"id": "1424", "nome": "AIWA"}, {"id": "1425", "nome": "Safe ProWork"}, {"id": "1426", "nome": "Poly"}, {"id": "1427", "nome": "Mimo Style"}, {"id": "1428", "nome": "Franke"}, {"id": "1429", "nome": "Neuhaus"}, {"id": "143", "nome": "Philco"}, {"id": "1430", "nome": "Panduit"}, {"id": "1431", "nome": "Esmaltec"}, {"id": "1432", "nome": "HDL"}, {"id": "1433", "nome": "Starlink"}, {"id": "1434", "nome": "EFL"}, {"id": "1435", "nome": "MTA"}, {"id": "1436", "nome": "Kross"}, {"id": "1437", "nome": "Tramontina"}, {"id": "1438", "nome": "Saeco"}, {"id": "1439", "nome": "RayNeo"}, {"id": "144", "nome": "Epson"}, {"id": "1440", "nome": "Telecom"}, {"id": "1441", "nome": "TILE"}, {"id": "1442", "nome": "Nonus"}, {"id": "1443", "nome": "Furukawa"}, {"id": "1444", "nome": "BRV"}, {"id": "1445", "nome": "KRAIDE"}, {"id": "145", "nome": "PCTop"}, {"id": "146", "nome": "K-Mex"}, {"id": "147", "nome": "Lenoxx"}, {"id": "148", "nome": "Nexans"}, {"id": "149", "nome": "Lexar"}, {"id": "150", "nome": "GeForce"}, {"id": "151", "nome": "Totolink"}, {"id": "152", "nome": "Fibrilar"}, {"id": "153", "nome": "Canon"}, {"id": "154", "nome": "CCE"}, {"id": "155", "nome": "Tecvoz"}, {"id": "156", "nome": "Intelbras"}, {"id": "157", "nome": "Seiden"}, {"id": "158", "nome": "Dutoplast"}, {"id": "159", "nome": "SND"}, {"id": "160", "nome": "Bosch"}, {"id": "161", "nome": "PNY"}, {"id": "162", "nome": "EVGA"}, {"id": "163", "nome": "ASRock"}, {"id": "164", "nome": "JBL"}, {"id": "165", "nome": "Menno"}, {"id": "166", "nome": "QBEX"}, {"id": "167", "nome": "Black Adata"}, {"id": "168", "nome": "Adata"}, {"id": "169", "nome": "Akasa"}, {"id": "170", "nome": "Hyper"}, {"id": "171", "nome": "Makita"}, {"id": "172", "nome": "EMachines"}, {"id": "173", "nome": "Link One"}, {"id": "174", "nome": "Philips"}, {"id": "175", "nome": "Pixxo"}, {"id": "176", "nome": "PCWare"}, {"id": "177", "nome": "Power Color"}, {"id": "178", "nome": "APC"}, {"id": "179", "nome": "Liteon"}, {"id": "180", "nome": "GoPro"}, {"id": "181", "nome": "Thunderbolt"}, {"id": "182", "nome": "Google"}, {"id": "183", "nome": "Lacie"}, {"id": "184", "nome": "Boyu"}, {"id": "185", "nome": "Notepal"}, {"id": "186", "nome": "Maymax"}, {"id": "187", "nome": "Polycom"}, {"id": "188", "nome": "Transcend"}, {"id": "189", "nome": "DYMO"}, {"id": "190", "nome": "Razer"}, {"id": "191", "nome": "Point"}, {"id": "192", "nome": "Cardman"}, {"id": "193", "nome": "Riosul Tools"}, {"id": "194", "nome": "Karsect"}, {"id": "195", "nome": "Maxxtro"}, {"id": "196", "nome": "Hitto"}, {"id": "197", "nome": "XFX"}, {"id": "198", "nome": "Panasonic"}, {"id": "199", "nome": "Nardelli"}, {"id": "200", "nome": "Wacom"}, {"id": "201", "nome": "PCYes"}, {"id": "202", "nome": "Galax"}, {"id": "203", "nome": "Feasso"}, {"id": "204", "nome": "Cisco"}, {"id": "205", "nome": "Aerocool"}, {"id": "206", "nome": "Raidmax"}, {"id": "207", "nome": "Cooler Master Technology"}, {"id": "208", "nome": "Redragon"}, {"id": "209", "nome": "Tecdrive"}, {"id": "210", "nome": "BR-One"}, {"id": "211", "nome": "MyWay"}, {"id": "212", "nome": "Huawei"}, {"id": "213", "nome": "Positivo"}, {"id": "214", "nome": "Brother"}, {"id": "215", "nome": "Bematech"}, {"id": "216", "nome": "Argox"}, {"id": "217", "nome": "Zebra"}, {"id": "218", "nome": "Thermaltake"}, {"id": "219", "nome": "Alienware"}, {"id": "220", "nome": "DJI"}, {"id": "221", "nome": "STI"}, {"id": "222", "nome": "TSI"}, {"id": "223", "nome": "Blackmagic"}, {"id": "224", "nome": "Evercool"}, {"id": "225", "nome": "Diebold"}, {"id": "226", "nome": "Fortrek"}, {"id": "227", "nome": "Brasforma"}, {"id": "228", "nome": "Crucial"}, {"id": "229", "nome": "Sweda"}, {"id": "230", "nome": "DVA Lima"}, {"id": "231", "nome": "Eletronic Arts"}, {"id": "232", "nome": "Warner"}, {"id": "233", "nome": "Bethesda"}, {"id": "234", "nome": "Activision"}, {"id": "235", "nome": "Ubisoft"}, {"id": "236", "nome": "Blizzard"}, {"id": "237", "nome": "Rockstar"}, {"id": "238", "nome": "Gainward"}, {"id": "239", "nome": "Elpida"}, {"id": "240", "nome": "Ontime"}, {"id": "241", "nome": "Huion"}, {"id": "242", "nome": "Dahua"}, {"id": "243", "nome": "Cougar"}, {"id": "244", "nome": "Force Line"}, {"id": "245", "nome": "HTC"}, {"id": "246", "nome": "Hikvision"}, {"id": "247", "nome": "Fuji"}, {"id": "248", "nome": "Mushkin"}, {"id": "249", "nome": "Casemall"}, {"id": "250", "nome": "China"}, {"id": "251", "nome": "Visionbras"}, {"id": "252", "nome": "Sem Fabricante"}, {"id": "253", "nome": "ThunderX3"}, {"id": "254", "nome": "Deepcool"}, {"id": "255", "nome": "T-Dagger"}, {"id": "256", "nome": "F-New"}, {"id": "257", "nome": "Gamdias"}, {"id": "258", "nome": "Amazon"}, {"id": "259", "nome": "Exbom"}, {"id": "260", "nome": "Sphero"}, {"id": "261", "nome": "Smart"}, {"id": "262", "nome": "Snapall"}, {"id": "263", "nome": "3D Rise"}, {"id": "264", "nome": "MakerBot"}, {"id": "265", "nome": "Ubiquiti"}, {"id": "266", "nome": "Ultimate Ears"}, {"id": "267", "nome": "Inpower"}, {"id": "268", "nome": "ATENÇÃO USAR ESSE"}, {"id": "269", "nome": "SK Hynix"}, {"id": "270", "nome": "Hoopson"}, {"id": "271", "nome": "Duto Plast"}, {"id": "272", "nome": "AFOX"}, {"id": "273", "nome": "Flashforge"}, {"id": "274", "nome": "VAIO"}, {"id": "275", "nome": "JiKatec"}, {"id": "276", "nome": "HyperX"}, {"id": "277", "nome": "AverMedia"}, {"id": "278", "nome": "F3"}, {"id": "279", "nome": "Gamemax"}, {"id": "280", "nome": "Weg"}, {"id": "281", "nome": "Biostar"}, {"id": "282", "nome": "KWG"}, {"id": "283", "nome": "Patriot"}, {"id": "284", "nome": "Viper Gaming"}, {"id": "285", "nome": "DT3"}, {"id": "286", "nome": "DT3sports"}, {"id": "287", "nome": "HHGears"}, {"id": "288", "nome": "XPG"}, {"id": "289", "nome": "Cooler Master"}, {"id": "290", "nome": "Aerocool Advanced Technologies"}, {"id": "291", "nome": "Knup"}, {"id": "292", "nome": "Brazil PC"}, {"id": "293", "nome": "Vinik"}, {"id": "294", "nome": "Loosafe"}, {"id": "295", "nome": "Xiaomi"}, {"id": "296", "nome": "Imilab"}, {"id": "297", "nome": "Audio-Technica"}, {"id": "298", "nome": "TecToy"}, {"id": "299", "nome": "Multikids"}, {"id": "300", "nome": "XP-PEN"}, {"id": "301", "nome": "Hot Wheels"}, {"id": "302", "nome": "Motospeed"}, {"id": "303", "nome": "Draxen"}, {"id": "304", "nome": "OnePower"}, {"id": "305", "nome": "Aigo"}, {"id": "306", "nome": "Trust"}, {"id": "307", "nome": "Mercusys"}, {"id": "308", "nome": "Tanca"}, {"id": "309", "nome": "Evolut"}, {"id": "310", "nome": "TS Shara"}, {"id": "311", "nome": "Tronos"}, {"id": "312", "nome": "Pulse"}, {"id": "313", "nome": "MikroTik"}, {"id": "314", "nome": "NZXT"}, {"id": "315", "nome": "Loop"}, {"id": "316", "nome": "SafeGamer"}, {"id": "317", "nome": "OEX"}, {"id": "318", "nome": "Sak'es"}, {"id": "319", "nome": "Opticon"}, {"id": "320", "nome": "Bandai"}, {"id": "321", "nome": "Nilko"}, {"id": "322", "nome": "Hilook"}, {"id": "323", "nome": "Ezviz"}, {"id": "324", "nome": "Havit"}, {"id": "325", "nome": "CorPC"}, {"id": "326", "nome": "Warrior"}, {"id": "327", "nome": "Everex"}, {"id": "328", "nome": "X-Cell"}, {"id": "329", "nome": "Atrio"}, {"id": "330", "nome": "Rapoo"}, {"id": "331", "nome": "0"}, {"id": "454", "nome": "INATIVADO"}, {"id": "51", "nome": "Asus"}, {"id": "52", "nome": "HP"}, {"id": "53", "nome": "Lenovo"}, {"id": "54", "nome": "AMD"}, {"id": "55", "nome": "Intel"}, {"id": "56", "nome": "Acer"}, {"id": "57", "nome": "Sony"}, {"id": "58", "nome": "Samsung"}, {"id": "59", "nome": "Hitachi"}, {"id": "60", "nome": "Seagate"}, {"id": "61", "nome": "Compaq"}, {"id": "62", "nome": "Toshiba"}, {"id": "63", "nome": "Dell"}, {"id": "64", "nome": "Targus"}, {"id": "65", "nome": "Apple"}, {"id": "66", "nome": "Centrium"}, {"id": "67", "nome": "Benq"}, {"id": "68", "nome": "Microsoft"}, {"id": "69", "nome": "Visiograf"}, {"id": "70", "nome": "Kaspersky"}, {"id": "71", "nome": "Gateway"}, {"id": "72", "nome": "TP-Link"}, {"id": "73", "nome": "Genius"}, {"id": "74", "nome": "Klip Xtreme"}, {"id": "75", "nome": "Kingston"}, {"id": "76", "nome": "Titan"}, {"id": "77", "nome": "Corsair"}, {"id": "78", "nome": "Gigabyte"}, {"id": "79", "nome": "Logitech"}, {"id": "80", "nome": "Mtek"}, {"id": "81", "nome": "Labetec"}, {"id": "82", "nome": "Speed"}, {"id": "83", "nome": "Multilaser"}, {"id": "84", "nome": "D-Link"}, {"id": "85", "nome": "REUTILIZAR"}, {"id": "86", "nome": "Super Talent"}, {"id": "87", "nome": "Sandisk"}, {"id": "88", "nome": "AOC"}, {"id": "89", "nome": "LG"}, {"id": "90", "nome": "SMS"}, {"id": "91", "nome": "Noteship"}, {"id": "92", "nome": "Leadership"}, {"id": "93", "nome": "Marvel"}, {"id": "94", "nome": "Vectrux"}, {"id": "95", "nome": "Yos"}, {"id": "96", "nome": "Goldship"}, {"id": "97", "nome": "Bicartti"}, {"id": "98", "nome": "Belkin"}, {"id": "99", "nome": "MyMax"}];
+const CATEGORIA = [{"id": "1", "nome": "1"}, {"id": "1006", "nome": "-"}, {"id": "1130", "nome": "."}, {"id": "1167", "nome": "Radeon RX 6000 Series"}, {"id": "1199", "nome": "Sem Categoria"}, {"id": "1205", "nome": "Celular e Telefone"}, {"id": "1206", "nome": "Smartphone"}, {"id": "1208", "nome": "Cadeiras e Mesas"}, {"id": "1210", "nome": "Patinete"}, {"id": "1211", "nome": "Bebês"}, {"id": "1212", "nome": "Cadeiras de Bebê para Carro"}, {"id": "1213", "nome": "Fontes 1000W a 1600W"}, {"id": "1214", "nome": "Placa-Mãe Intel Socket 1700"}, {"id": "1215", "nome": "Esporte e Lazer"}, {"id": "1216", "nome": "Piscina"}, {"id": "1217", "nome": "Ventilador"}, {"id": "1218", "nome": "Fragmentadora"}, {"id": "1219", "nome": "Circulador de Ar"}, {"id": "1220", "nome": "Ferramentas e Acessórios"}, {"id": "1221", "nome": "NÃO UTILIZAR"}, {"id": "1222", "nome": "Panela de arroz"}, {"id": "1223", "nome": "Mercado"}, {"id": "1225", "nome": "Doceria"}, {"id": "1226", "nome": "Ovo de Páscoa"}, {"id": "1227", "nome": "Micro-Ondas"}, {"id": "1228", "nome": "Memória DDR5"}, {"id": "1232", "nome": "Áudio"}, {"id": "1233", "nome": "Toca-Discos e Vitrolas"}, {"id": "1234", "nome": "Vitrola"}, {"id": "1235", "nome": "Toca-Discos"}, {"id": "1236", "nome": "Ferragem"}, {"id": "1237", "nome": "Adega Climatizada"}, {"id": "1239", "nome": "Bebidas"}, {"id": "1240", "nome": "Energéticos"}, {"id": "1241", "nome": "Playstation 5"}, {"id": "1242", "nome": "Gabinete Rack"}, {"id": "1243", "nome": "Mixer"}, {"id": "1244", "nome": "Liquidificador"}, {"id": "1245", "nome": "Ferro"}, {"id": "1246", "nome": "Chaleira"}, {"id": "1247", "nome": "Batedeira"}, {"id": "1248", "nome": "Canetas"}, {"id": "1249", "nome": "Panetones e Chocotones"}, {"id": "1250", "nome": "GeForce RTX 40 Series"}, {"id": "1251", "nome": "Cooktop"}, {"id": "1252", "nome": "Cooktop a gás"}, {"id": "1254", "nome": "Caixa de Som"}, {"id": "1255", "nome": "Caixa De Som Portátil"}, {"id": "1256", "nome": "Caixa de som bluetooth"}, {"id": "1258", "nome": "Placa-Mãe AMD Socket AM5"}, {"id": "1259", "nome": "Bicicleta Eletrica"}, {"id": "1260", "nome": "Coifa e Depuradores"}, {"id": "1264", "nome": "Não usar"}, {"id": "1266", "nome": "Som Automotivo"}, {"id": "1267", "nome": "Memória para Notebook DDR5"}, {"id": "1268", "nome": "Academia"}, {"id": "1269", "nome": "Arte e Trabalhos Manuais"}, {"id": "1272", "nome": "Rádio Comunicadores"}, {"id": "1273", "nome": "Walkie-Talkies"}, {"id": "1276", "nome": "Fornos"}, {"id": "1329", "nome": "Máquinas de Corte"}, {"id": "1330", "nome": "Materiais e Acessórios"}, {"id": "1331", "nome": "Prensas Térmicas"}, {"id": "1338", "nome": "Tipo de Ferramenta"}, {"id": "1339", "nome": "Cricut Explore"}, {"id": "1340", "nome": "Cricut Joy"}, {"id": "1341", "nome": "Cricut Maker"}, {"id": "1344", "nome": "Materiais para Recorte e Transferência"}, {"id": "1346", "nome": "EasyPress 2"}, {"id": "1347", "nome": "Hat Press"}, {"id": "1348", "nome": "Mug Press"}, {"id": "1351", "nome": "Ferramentas para artesanato"}, {"id": "1356", "nome": "Ferramentas e Lâminas"}, {"id": "1361", "nome": "Cricut Explore 3"}, {"id": "1362", "nome": "Cricut Explore Air 2"}, {"id": "1369", "nome": "Joy"}, {"id": "1375", "nome": "Maker"}, {"id": "1376", "nome": "Maker 3"}, {"id": "1393", "nome": "Vinil Termocolante"}, {"id": "1427", "nome": "Ferramentas"}, {"id": "1428", "nome": "Parafusadeira Elétrica"}, {"id": "1429", "nome": "Kit de Ferramentas"}, {"id": "1464", "nome": "Sopradores"}, {"id": "1465", "nome": "Radeon RX 7000 Series"}, {"id": "1467", "nome": "Umidificador"}, {"id": "1468", "nome": "Mesas, Cadeiras e Banquetas"}, {"id": "1471", "nome": "GeForce RTX 50 Series"}, {"id": "1472", "nome": "Radeon RX 9000 Series"}, {"id": "1473", "nome": "Placa-Mãe Intel Socket 1851"}, {"id": "1474", "nome": "Panela de Pressão"}, {"id": "1475", "nome": "Panela"}, {"id": "1476", "nome": "Triturador de Alimentos"}, {"id": "1477", "nome": "Patch Panel"}, {"id": "1478", "nome": "Máquina de Costura"}, {"id": "1480", "nome": "EasyPress Mini"}, {"id": "1481", "nome": "Joy Xtra"}, {"id": "1482", "nome": "Cricut Venture"}, {"id": "1483", "nome": "Venture"}, {"id": "1484", "nome": "Bases"}, {"id": "1485", "nome": "Bases de Corte Adesiva"}, {"id": "1486", "nome": "Bases Regenerativa"}, {"id": "1487", "nome": "Base Para Transferência"}, {"id": "1488", "nome": "Base de Corte Forte"}, {"id": "1489", "nome": "Base de Corte Leve"}, {"id": "1490", "nome": "Base de Corte Padrão"}, {"id": "1491", "nome": "Base de Corte para Tecidos"}, {"id": "1492", "nome": "Base Térmica"}, {"id": "1493", "nome": "Kit Base de Corte"}, {"id": "1495", "nome": "Vinil Adesivo Removível"}, {"id": "1496", "nome": "Vinil Adesivo Permanente Smart"}, {"id": "1497", "nome": "Vinil Adesivo Permanente"}, {"id": "1498", "nome": "Vinil Adesivo Imprimível"}, {"id": "1499", "nome": "Transfer Termocolante"}, {"id": "1500", "nome": "Folha de Tinta de Sublimação"}, {"id": "1501", "nome": "Smart Transfer"}, {"id": "1502", "nome": "Transfer Para Tecidos"}, {"id": "1503", "nome": "Máscara de Transferência"}, {"id": "1504", "nome": "Kit de Materiais"}, {"id": "1505", "nome": "Folha Foil"}, {"id": "1506", "nome": "Filme de Recorte"}, {"id": "1507", "nome": "Cervejeira"}, {"id": "1508", "nome": "Caneta de Vinco"}, {"id": "1509", "nome": "Caneta para Sublimação"}, {"id": "1510", "nome": "Canetas com Glitter"}, {"id": "1511", "nome": "Canetas Metalicas"}, {"id": "1512", "nome": "Canetas ponta fina"}, {"id": "1513", "nome": "Cortador Circular"}, {"id": "1514", "nome": "Estilete"}, {"id": "1515", "nome": "Ferramenta de Corte Manual"}, {"id": "1516", "nome": "Ferramenta de Foil"}, {"id": "1517", "nome": "Fitas"}, {"id": "1518", "nome": "Fita Térmica"}, {"id": "1519", "nome": "Gancho Removedor Para Vinil"}, {"id": "1521", "nome": "Lixeira"}, {"id": "1524", "nome": "Alfajores"}, {"id": "1525", "nome": "Cafés e Cappuccinos"}, {"id": "1526", "nome": "Chocolates, Barras, Bombons e Havannets"}, {"id": "1527", "nome": "Doce de Leite"}, {"id": "1528", "nome": "Funcionais"}, {"id": "1529", "nome": "Presentes e Acessórios"}, {"id": "1530", "nome": "Alfajor Havanna 70% Cacau"}, {"id": "1531", "nome": "Alfajor Havanna com Nozes"}, {"id": "1532", "nome": "Alfajor Havanna de Chocolate"}, {"id": "1533", "nome": "Alfajor Havanna de Chocolate ao Leite"}, {"id": "1534", "nome": "Alfajor Havanna de Chocolate Branco"}, {"id": "1535", "nome": "Alfajor Havanna de Merengue"}, {"id": "1536", "nome": "Alfajor Havanna Sortido"}, {"id": "1537", "nome": "Alfajor Havanna Super com Doce de Leite"}, {"id": "1538", "nome": "Alfajor Havanna Vegano"}, {"id": "1539", "nome": "Mini Alfajor Havanna de Chocolate"}, {"id": "1540", "nome": "Mini Alfajor Havanna de Chocolate Branco"}, {"id": "1541", "nome": "Café Havanna"}, {"id": "1542", "nome": "Cápsulas de Cappuccino Havanna"}, {"id": "1543", "nome": "Caixa com Havannets Havanna"}, {"id": "1544", "nome": "Galletita Havanna"}, {"id": "1545", "nome": "Havannets com Doce de Leite Havanna"}, {"id": "1546", "nome": "Doce de Leite Havanna Pote"}, {"id": "1547", "nome": "Barra de Proteína Havanna"}, {"id": "1548", "nome": "Barra Whey Havanna"}, {"id": "1549", "nome": "Barrita Havanna"}, {"id": "1550", "nome": "Bebida Lácte Havanna"}, {"id": "1551", "nome": "Pasta de Amendoim Havanna"}, {"id": "1552", "nome": "Wafer de Proteína Havanna"}, {"id": "1553", "nome": "Whey Grego Havanna"}, {"id": "1554", "nome": "Whey Havanna"}, {"id": "1555", "nome": "Caneca Havanna"}, {"id": "1556", "nome": "Hidratante Labial Havanna"}, {"id": "1557", "nome": "Sacola de Presente Havanna"}, {"id": "1558", "nome": "Panettone Havanna"}, {"id": "1559", "nome": "Panettone Havanna Caramelo Salgado"}, {"id": "1560", "nome": "Panettone Havanna Doce de Leite"}, {"id": "1561", "nome": "Panettone Havanna Genovês"}, {"id": "1562", "nome": "Panettone Havanna Goiabada"}, {"id": "1563", "nome": "Panettone Havanna Gotas de Chocolate"}, {"id": "1564", "nome": "Panettone Havanna Limone"}, {"id": "1565", "nome": "Panettone Havanna Pistache"}, {"id": "1566", "nome": "Panettone Havanna Zero Açucar"}, {"id": "1567", "nome": "Goiabada ao Leite"}, {"id": "1576", "nome": "Havannita"}, {"id": "1577", "nome": "Alfajor Havanna Zero Açucar"}, {"id": "1579", "nome": "Panettone Havanna Churros"}, {"id": "1580", "nome": "Doce de Leite Zero Lactose"}, {"id": "1581", "nome": "Cremes e Pastas"}, {"id": "1582", "nome": "Creme de Pistache"}, {"id": "1583", "nome": "Alfajor Havanna de Pistache"}, {"id": "1584", "nome": "Rastreador"}, {"id": "370", "nome": "Periféricos"}, {"id": "375", "nome": "Fones"}, {"id": "378", "nome": "Placas de Vídeo"}, {"id": "379", "nome": "Processadores"}, {"id": "381", "nome": "Energia"}, {"id": "383", "nome": "Memórias"}, {"id": "384", "nome": "SSDs"}, {"id": "385", "nome": "HDs"}, {"id": "386", "nome": "Fontes"}, {"id": "387", "nome": "Coolers"}, {"id": "388", "nome": "Monitores"}, {"id": "389", "nome": "Impressoras"}, {"id": "390", "nome": "Notebooks"}, {"id": "391", "nome": "Segurança"}, {"id": "392", "nome": "Software"}, {"id": "394", "nome": "Rede"}, {"id": "395", "nome": "Gabinetes"}, {"id": "398", "nome": "Computadores"}, {"id": "399", "nome": "Automação"}, {"id": "458", "nome": "Mouses"}, {"id": "459", "nome": "Acessórios Câmeras"}, {"id": "460", "nome": "Acessórios Drone"}, {"id": "461", "nome": "Acessórios PC"}, {"id": "462", "nome": "Acessórios Games"}, {"id": "463", "nome": "Adaptadores"}, {"id": "466", "nome": "Caixas de Som"}, {"id": "467", "nome": "Cabos"}, {"id": "468", "nome": "Cadeiras & Mesas"}, {"id": "469", "nome": "Cartão de Memória"}, {"id": "472", "nome": "Gravadores"}, {"id": "474", "nome": "Mesa Digitalizadora"}, {"id": "475", "nome": "Microfones"}, {"id": "476", "nome": "Malas e Mochilas"}, {"id": "477", "nome": "Mousepads"}, {"id": "478", "nome": "Pen drive"}, {"id": "479", "nome": "Periféricos Kit"}, {"id": "480", "nome": "Projetores"}, {"id": "481", "nome": "Scanners"}, {"id": "482", "nome": "Servidor"}, {"id": "483", "nome": "Suportes"}, {"id": "484", "nome": "Teclados"}, {"id": "487", "nome": "Headphone"}, {"id": "488", "nome": "Headset"}, {"id": "489", "nome": "Headset Gamer"}, {"id": "490", "nome": "Fone de Ouvido"}, {"id": "494", "nome": "Tablets"}, {"id": "496", "nome": "Teclado + Mouse + Headset + Mousepad"}, {"id": "497", "nome": "Teclado + Mouse + Mousepad"}, {"id": "498", "nome": "Teclado + Mouse + Headset"}, {"id": "499", "nome": "Teclado + Mouse"}, {"id": "500", "nome": "Mouse + Mousepad"}, {"id": "501", "nome": "Teclado Gamer"}, {"id": "504", "nome": "Teclado Padrão"}, {"id": "505", "nome": "Mouse Gamer"}, {"id": "506", "nome": "Mouse Padrão"}, {"id": "507", "nome": "Mousepad S"}, {"id": "508", "nome": "Mousepad M"}, {"id": "509", "nome": "Mousepad L"}, {"id": "510", "nome": "Mousepad XL"}, {"id": "512", "nome": "Caneta para Mesa Digitalizadora"}, {"id": "513", "nome": "Mesa Digitalizadora Pequena"}, {"id": "514", "nome": "Mesa Digitalizadora Média"}, {"id": "515", "nome": "Mesa Digitalizadora Grande"}, {"id": "516", "nome": "Caixa de Som para Computador"}, {"id": "517", "nome": "Caixa de Som Gamer"}, {"id": "518", "nome": "Webcam"}, {"id": "519", "nome": "Subwoofer Gamer"}, {"id": "520", "nome": "Soundbar Gamer"}, {"id": "521", "nome": "Gabinete Mini Tower"}, {"id": "522", "nome": "Gabinete Mid Tower"}, {"id": "523", "nome": "Gabinete Full Tower"}, {"id": "524", "nome": "Gabinete Super Tower"}, {"id": "525", "nome": "Gabinete Slim"}, {"id": "526", "nome": "Gabinete Cube"}, {"id": "527", "nome": "Gabinete Open Frame"}, {"id": "528", "nome": "Pasta Térmica"}, {"id": "529", "nome": "Kit de Coolers"}, {"id": "530", "nome": "Cooler FAN"}, {"id": "531", "nome": "Filtro"}, {"id": "532", "nome": "Notepal"}, {"id": "533", "nome": "Cooler para Processador"}, {"id": "534", "nome": "Water Cooler"}, {"id": "536", "nome": "Gravador Externo"}, {"id": "537", "nome": "Gravador Interno"}, {"id": "538", "nome": "GeForce RTX 20 Series"}, {"id": "539", "nome": "GeForce GTX 16 Series"}, {"id": "540", "nome": "GeForce GTX 10 Series"}, {"id": "541", "nome": "Radeon RX 500 Series"}, {"id": "542", "nome": "Nvidia Quadro"}, {"id": "543", "nome": "Processador Intel Pentium"}, {"id": "544", "nome": "Processador Intel Celeron"}, {"id": "545", "nome": "Processador Intel i3"}, {"id": "546", "nome": "Processador Intel i5"}, {"id": "547", "nome": "Processador Intel i7"}, {"id": "548", "nome": "Processador Intel i9"}, {"id": "549", "nome": "Processador AMD A-Series"}, {"id": "550", "nome": "Processador AMD Athlon"}, {"id": "551", "nome": "Processador AMD FX- Series"}, {"id": "552", "nome": "Processador AMD Ryzen"}, {"id": "558", "nome": "Memória para Notebook DDR3"}, {"id": "559", "nome": "Memória para Notebook DDR4"}, {"id": "560", "nome": "Memória DDR2"}, {"id": "561", "nome": "Memória DDR3"}, {"id": "562", "nome": "Memória DDR4"}, {"id": "566", "nome": "HD para Desktop"}, {"id": "567", "nome": "HD para Notebook"}, {"id": "568", "nome": "HD para Servidor"}, {"id": "569", "nome": "HD para Segurança"}, {"id": "570", "nome": "Storage"}, {"id": "571", "nome": "Personal Cloud"}, {"id": "572", "nome": "HD Portátil"}, {"id": "573", "nome": "HD Externo"}, {"id": "575", "nome": "Fonte 300W a 399W"}, {"id": "576", "nome": "Fonte 400W a 499W"}, {"id": "577", "nome": "Fonte 500W a 599W"}, {"id": "578", "nome": "Fonte 600W a 699W"}, {"id": "579", "nome": "Fonte 700W a 799W"}, {"id": "580", "nome": "Fonte 800W a 899W"}, {"id": "581", "nome": "Fonte 900W a 999W"}, {"id": "584", "nome": "Adaptador de Fonte"}, {"id": "585", "nome": "Adaptador de Rede"}, {"id": "586", "nome": "Adaptador de Vídeo"}, {"id": "591", "nome": "Estabilizador Mono"}, {"id": "592", "nome": "Estabilizador Bivolt"}, {"id": "593", "nome": "Filtro de Linha"}, {"id": "594", "nome": "NoBreak"}, {"id": "595", "nome": "Extensão"}, {"id": "596", "nome": "Plug"}, {"id": "597", "nome": "Pilha"}, {"id": "598", "nome": "Bateria"}, {"id": "604", "nome": "Cabo SATA"}, {"id": "605", "nome": "Cabo HDMI"}, {"id": "609", "nome": "Acessórios Fones"}, {"id": "614", "nome": "Acessórios SSD"}, {"id": "615", "nome": "Acessórios HD"}, {"id": "617", "nome": "Suporte para Monitor"}, {"id": "618", "nome": "Suporte para Notebook"}, {"id": "621", "nome": "Suporte para pés"}, {"id": "622", "nome": "Controle para Drone"}, {"id": "623", "nome": "Bateria para Drone"}, {"id": "628", "nome": "Mochila"}, {"id": "629", "nome": "Maleta"}, {"id": "630", "nome": "Capas"}, {"id": "631", "nome": "Pendrive para Apple"}, {"id": "632", "nome": "Pendrive para Smartphone"}, {"id": "634", "nome": "Mesa Gamer"}, {"id": "635", "nome": "Cadeira Gamer"}, {"id": "636", "nome": "Acessórios para Cameras"}, {"id": "637", "nome": "Switch"}, {"id": "638", "nome": "Access Point"}, {"id": "639", "nome": "Adaptador USB"}, {"id": "640", "nome": "Antenas"}, {"id": "642", "nome": "Placas PCI"}, {"id": "643", "nome": "Placas PCI Express"}, {"id": "644", "nome": "Repetidor"}, {"id": "646", "nome": "Roteador"}, {"id": "647", "nome": "Fechaduras"}, {"id": "648", "nome": "Iluminação"}, {"id": "649", "nome": "Acessório CFTV"}, {"id": "650", "nome": "Alarmes"}, {"id": "651", "nome": "Câmeras de Segurança"}, {"id": "652", "nome": "Controle de Acesso"}, {"id": "653", "nome": "Kit Monitoramento"}, {"id": "654", "nome": "Porteiro Eletrônico"}, {"id": "655", "nome": "Impressora de Etiqueta"}, {"id": "656", "nome": "Impressora Não Fiscal"}, {"id": "657", "nome": "Impressora Térmica"}, {"id": "659", "nome": "Leitor de Código de Barras"}, {"id": "668", "nome": "Antivírus"}, {"id": "669", "nome": "Office"}, {"id": "670", "nome": "Windows"}, {"id": "671", "nome": "Acessórios para Tablet"}, {"id": "672", "nome": "E-Reader"}, {"id": "673", "nome": "Tablet"}, {"id": "674", "nome": "Notebook Gamer"}, {"id": "675", "nome": "Notebook 2 em 1"}, {"id": "676", "nome": "Notebook"}, {"id": "677", "nome": "PC Gamer"}, {"id": "678", "nome": "Desktop"}, {"id": "679", "nome": "All in One"}, {"id": "680", "nome": "Tower"}, {"id": "681", "nome": "Câmeras E Filmadoras"}, {"id": "682", "nome": "Câmera de Ação"}, {"id": "683", "nome": "Câmera Instantânea"}, {"id": "687", "nome": "Leitores de Cartão"}, {"id": "688", "nome": "MicroSD Card"}, {"id": "690", "nome": "Drone"}, {"id": "692", "nome": "Monitor Gamer"}, {"id": "693", "nome": "Monitor LCD"}, {"id": "694", "nome": "Monitor LED"}, {"id": "695", "nome": "Projetor"}, {"id": "696", "nome": "Telas de Projeção"}, {"id": "697", "nome": "Apresentador"}, {"id": "698", "nome": "Impressora 3D"}, {"id": "699", "nome": "Impressora Fotográfica"}, {"id": "700", "nome": "Impressora Jato de tinta"}, {"id": "701", "nome": "Impressora Laser Colorida"}, {"id": "702", "nome": "Impressora Laser Monocromáticas"}, {"id": "703", "nome": "Impressora Portátil"}, {"id": "704", "nome": "Plotter"}, {"id": "705", "nome": "Multifuncionais"}, {"id": "706", "nome": "Multifuncional com Fax"}, {"id": "707", "nome": "Multifuncional sem Fax"}, {"id": "709", "nome": "Scanner de Mesa"}, {"id": "710", "nome": "Scanner Portátil"}, {"id": "716", "nome": "Placas-Mãe"}, {"id": "717", "nome": "Placa-Mãe Intel Socket 1151 v2"}, {"id": "718", "nome": "Placa-Mãe Intel Socket 1151"}, {"id": "719", "nome": "Placa-Mãe Intel Socket 1155"}, {"id": "720", "nome": "Placa-Mãe AMD Socket AM3+"}, {"id": "721", "nome": "Placa-Mãe AMD Socket AM4"}, {"id": "723", "nome": "Microfone Gamer"}, {"id": "724", "nome": "SSD SATA"}, {"id": "725", "nome": "SSD M.2"}, {"id": "726", "nome": "SSD mSATA"}, {"id": "738", "nome": "Monitores e Projetores"}, {"id": "766", "nome": "Hardware"}, {"id": "774", "nome": "Impressora Automação"}, {"id": "778", "nome": "Monitor Touch Screen"}, {"id": "779", "nome": "SAT Fiscal"}, {"id": "780", "nome": "Balança"}, {"id": "781", "nome": "Computadores e Notebook"}, {"id": "788", "nome": "Games"}, {"id": "789", "nome": "Console"}, {"id": "790", "nome": "Jogos"}, {"id": "791", "nome": "Acessórios para Games"}, {"id": "792", "nome": "Joystick"}, {"id": "794", "nome": "Cadeiras & Mesas Gamer"}, {"id": "795", "nome": "Drones e Cameras"}, {"id": "800", "nome": "Acessórios para Drone"}, {"id": "801", "nome": "Impressão e Scanner"}, {"id": "805", "nome": "Rede e Segurança"}, {"id": "809", "nome": "Radeon RX 5000 Series"}, {"id": "810", "nome": "Relógio"}, {"id": "811", "nome": "Relógio de Parede"}, {"id": "812", "nome": "Gaveta de Dinheiro"}, {"id": "813", "nome": "Beleza e Saúde"}, {"id": "815", "nome": "Barbeador Elétrico"}, {"id": "816", "nome": "Lâmina"}, {"id": "817", "nome": "Rádios Comunicadores"}, {"id": "818", "nome": "GeForce GT Series"}, {"id": "820", "nome": "Fita de LED"}, {"id": "821", "nome": "Teclado + Suporte"}, {"id": "822", "nome": "Celular eTelefone"}, {"id": "823", "nome": "Telefone"}, {"id": "824", "nome": "Celular"}, {"id": "825", "nome": "TVs"}, {"id": "826", "nome": "Até 24.5"}, {"id": "827", "nome": "25 - 39"}, {"id": "828", "nome": "40 - 49"}, {"id": "829", "nome": "50 - 59"}, {"id": "830", "nome": "Acima de 60"}, {"id": "833", "nome": "Processador Intel Xeon"}, {"id": "836", "nome": "Papelaria"}, {"id": "837", "nome": "Calculadoras"}, {"id": "838", "nome": "Suprimentos"}, {"id": "839", "nome": "Réplica"}, {"id": "840", "nome": "Rack"}, {"id": "841", "nome": "Blade"}, {"id": "845", "nome": "Acessórios Outros"}, {"id": "846", "nome": "Acessórios LED"}, {"id": "847", "nome": "Keycaps"}, {"id": "848", "nome": "Placa-Mãe Intel Socket 2066"}, {"id": "849", "nome": "Radeon R7 200 Series"}, {"id": "850", "nome": "Conversor"}, {"id": "851", "nome": "Baterias"}, {"id": "852", "nome": "Placa-Mãe Intel Socket 1200"}, {"id": "853", "nome": "SSD Portátil"}, {"id": "854", "nome": "Video Game"}, {"id": "855", "nome": "Brinquedos e Hobbies"}, {"id": "856", "nome": "Bonecos e Bonecas"}, {"id": "857", "nome": "Carrinhos e Pistas"}, {"id": "858", "nome": "Cartas e Tabuleiros"}, {"id": "859", "nome": "Powered by ASUS"}, {"id": "860", "nome": "GeForce RTX 30 Series"}, {"id": "861", "nome": "Travas"}, {"id": "862", "nome": "Eletrodomésticos"}, {"id": "863", "nome": "Aspirador"}, {"id": "864", "nome": "Utensílio Doméstico"}, {"id": "865", "nome": "Fritadeira Elétrica"}, {"id": "866", "nome": "Acessórios Cabos"}, {"id": "867", "nome": "Roteador Gamer"}, {"id": "868", "nome": "Placa de som"}, {"id": "873", "nome": "Placa-Mãe AMD Socket TRX40"}, {"id": "874", "nome": "Geladeira"}, {"id": "875", "nome": "Suprimentos de Impressão"}, {"id": "876", "nome": "Tinta Sublimática"}, {"id": "877", "nome": "Transformador"}, {"id": "880", "nome": "Controle com fio"}, {"id": "881", "nome": "Controle sem fio"}, {"id": "882", "nome": "Estabilizador Trifásico"}, {"id": "884", "nome": "Xbox One S"}, {"id": "885", "nome": "Nintendo Switch"}, {"id": "886", "nome": "Xbox Series S"}, {"id": "887", "nome": "Playstation 4"}, {"id": "888", "nome": "Tinta Corante"}, {"id": "889", "nome": "Radeon R5 200 Series"}, {"id": "890", "nome": "Secadores De Cabelo"}, {"id": "891", "nome": "Vaporizador"}, {"id": "892", "nome": "DVR"}, {"id": "893", "nome": "NVR"}, {"id": "894", "nome": "Sanduicheira"}, {"id": "895", "nome": "Escova Secadora"}, {"id": "896", "nome": "Prancha Modeladora"}, {"id": "897", "nome": "Acessórios para TV"}, {"id": "898", "nome": "Streaming"}, {"id": "899", "nome": "Patinete Elétrico"}, {"id": "935", "nome": "Linha 900W"}, {"id": "937", "nome": "Acessórios para Veículos"}, {"id": "938", "nome": "Móveis"}];
+
+const state = { source: 'todas', query: '', nivel: 'all', ordem: 'alpha', hierCopyMode: localStorage.getItem('sapCatalogHierCopyMode') || 'caminho' };
+
+const totalRecords = HIERARQUIA.length + MARCA.length + CATEGORIA.length;
+document.getElementById('totalCount').textContent = totalRecords.toLocaleString('pt-BR');
+document.getElementById('cnt-todas').textContent = totalRecords.toLocaleString('pt-BR');
+document.getElementById('cnt-hierarquia').textContent = HIERARQUIA.length.toLocaleString('pt-BR');
+document.getElementById('cnt-marca').textContent = MARCA.length.toLocaleString('pt-BR');
+document.getElementById('cnt-categoria').textContent = CATEGORIA.length.toLocaleString('pt-BR');
+
+// popular filtro de nível dinamicamente
+const niveis = [...new Set(HIERARQUIA.map(n => n.nivel))].sort((a,b) => a-b);
+const levelSelect = document.getElementById('levelFilter');
+niveis.forEach(n => {
+  const opt = document.createElement('option');
+  opt.value = n;
+  opt.textContent = 'Nível ' + n;
+  levelSelect.appendChild(opt);
+});
+
+function normalize(str){
+  return String(str)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+}
+
+function escapeHtml(str){
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function highlight(text, query){
+  const safe = escapeHtml(text);
+  if(!query) return safe;
+  const normText = normalize(text);
+  const normQuery = normalize(query);
+  const idx = normText.indexOf(normQuery);
+  if(idx === -1) return safe;
+  // encontra o trecho correspondente no texto original (mesmo comprimento)
+  const before = escapeHtml(text.slice(0, idx));
+  const match = escapeHtml(text.slice(idx, idx + query.length));
+  const after = escapeHtml(text.slice(idx + query.length));
+  return before + '<mark>' + match + '</mark>' + after;
+}
+
+function matchesQuery(item, query, fields){
+  if(!query) return true;
+  const nq = normalize(query);
+  return fields.some(f => normalize(item[f] ?? '').includes(nq));
+}
+
+function sortRows(rows, nameField){
+  const sorted = rows.slice();
+  if(state.ordem === 'id'){
+    sorted.sort((a, b) => Number(a.id) - Number(b.id));
+  } else {
+    sorted.sort((a, b) => normalize(a[nameField] ?? '').localeCompare(normalize(b[nameField] ?? ''), 'pt-BR'));
+  }
+  return sorted;
+}
+
+function filterData(){
+  const q = state.query.trim();
+  let hier = HIERARQUIA;
+  if(state.nivel !== 'all'){
+    hier = hier.filter(h => String(h.nivel) === String(state.nivel));
+  }
+  hier = hier.filter(h => matchesQuery(h, q, ['id','nome','caminho']));
+  const marca = MARCA.filter(m => matchesQuery(m, q, ['id','nome']));
+  const categoria = CATEGORIA.filter(c => matchesQuery(c, q, ['id','nome']));
+  hier = sortRows(hier, 'caminho');
+  return { hier, marca: sortRows(marca, 'nome'), categoria: sortRows(categoria, 'nome') };
+}
+
+function buildTrail(caminho, query){
+  const parts = caminho.split(' > ');
+  return '<div class="trail">' + parts.map((p, i) => {
+    const isLast = i === parts.length - 1;
+    const sep = i > 0 ? '<span class="sep">›</span>' : '';
+    return sep + '<span class="crumb' + (isLast ? ' last' : '') + '">' + highlight(p, query) + '</span>';
+  }).join('') + '</div>';
+}
+
+function renderHierTable(rows, query){
+  if(rows.length === 0) return '';
+  let html = '<div class="card"><table><thead><tr>';
+  html += '<th style="width:70px">ID</th><th style="width:70px">Nível</th><th>Caminho na hierarquia</th>';
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr data-id="' + escapeHtml(r.id) + '" data-caminho="' + escapeHtml(r.caminho) + '">';
+    html += '<td class="col-id">' + escapeHtml(r.id) + '</td>';
+    html += '<td class="col-nivel">N' + r.nivel + '</td>';
+    html += '<td>' + buildTrail(r.caminho, query) + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function renderSimpleTable(rows, query, labelCol){
+  if(rows.length === 0) return '';
+  let html = '<div class="card"><table><thead><tr>';
+  html += '<th style="width:90px">ID</th><th>' + labelCol + '</th>';
+  html += '</tr></thead><tbody>';
+  rows.forEach(r => {
+    html += '<tr data-id="' + escapeHtml(r.id) + '">';
+    html += '<td class="col-id">' + escapeHtml(r.id) + '</td>';
+    html += '<td>' + highlight(r.nome, query) + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table></div>';
+  return html;
+}
+
+function sectionHeader(tagClass, label, n, extraHtml){
+  return '<div class="table-section-head"><span class="tag ' + tagClass + '">' + label + '</span><span class="n">' + n.toLocaleString('pt-BR') + ' registro(s)</span>' + (extraHtml || '') + '</div>';
+}
+
+function hierCopyToggleHtml(){
+  return '<div class="copy-toggle" id="hierCopyToggle">' +
+    '<span class="lbl">Copiar:</span>' +
+    '<button type="button" class="copy-toggle-btn' + (state.hierCopyMode === 'caminho' ? ' active' : '') + '" data-mode="caminho">Caminho</button>' +
+    '<button type="button" class="copy-toggle-btn' + (state.hierCopyMode === 'id' ? ' active' : '') + '" data-mode="id">ID</button>' +
+    '</div>';
+}
+
+function render(){
+  const { hier, marca, categoria } = filterData();
+  const container = document.getElementById('resultsContainer');
+  const q = state.query.trim();
+  let total = 0;
+  let html = '';
+
+  if(state.source === 'todas' || state.source === 'hierarquia'){
+    if(hier.length){
+      total += hier.length;
+      html += '<div class="table-section">' + sectionHeader('hierarquia', 'Hierarquia de Grupo de Item', hier.length, hierCopyToggleHtml()) + renderHierTable(hier.slice(0, 300), q) + '</div>';
+    }
+  }
+  if(state.source === 'todas' || state.source === 'marca'){
+    if(marca.length){
+      total += marca.length;
+      html += '<div class="table-section">' + sectionHeader('marca', 'Marca', marca.length) + renderSimpleTable(marca.slice(0, 300), q, 'Nome da marca') + '</div>';
+    }
+  }
+  if(state.source === 'todas' || state.source === 'categoria'){
+    if(categoria.length){
+      total += categoria.length;
+      html += '<div class="table-section">' + sectionHeader('categoria', 'Categoria', categoria.length) + renderSimpleTable(categoria.slice(0, 300), q, 'Nome da categoria') + '</div>';
+    }
+  }
+
+  if(total === 0){
+    html = '<div class="empty-state"><div class="big">Nenhum resultado encontrado</div>Tente outro termo ou verifique a tabela selecionada.</div>';
+  }
+
+  container.innerHTML = html;
+  document.getElementById('resultCount').textContent = total.toLocaleString('pt-BR');
+
+  container.querySelectorAll('tbody tr').forEach(tr => {
+    tr.addEventListener('click', () => {
+      const id = tr.getAttribute('data-id');
+      const caminhoCompleto = tr.getAttribute('data-caminho');
+      
+      // Lógica atualizada para copiar apenas o último termo da árvore
+      if(caminhoCompleto !== null && state.hierCopyMode === 'caminho'){
+        const ultimoTermo = caminhoCompleto.split(' > ').pop().trim();
+        copyToClipboard(ultimoTermo, 'Caminho');
+      } else {
+        copyToClipboard(id, 'ID');
+      }
+    });
+  });
+
+  const hierToggle = document.getElementById('hierCopyToggle');
+  if(hierToggle){
+    hierToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const btn = e.target.closest('.copy-toggle-btn');
+      if(!btn) return;
+      state.hierCopyMode = btn.getAttribute('data-mode');
+      localStorage.setItem('sapCatalogHierCopyMode', state.hierCopyMode);
+      render();
+    });
+  }
+}
+
+function copyToClipboard(text, label){
+  label = label || 'ID';
+  const showToast = () => {
+    const toast = document.getElementById('toast');
+    toast.textContent = label + ' copiado: ' + text;
+    toast.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 1600);
+  };
+  if(navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(text).then(showToast).catch(showToast);
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+    showToast();
+  }
+}
+
+document.getElementById('searchInput').addEventListener('input', (e) => {
+  state.query = e.target.value;
+  document.getElementById('clearBtn').style.display = state.query ? 'block' : 'none';
+  render();
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  state.query = '';
+  document.getElementById('clearBtn').style.display = 'none';
+  input.focus();
+  render();
+});
+
+document.getElementById('segmented').addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if(!btn) return;
+  document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  state.source = btn.getAttribute('data-src');
+  document.getElementById('levelFilterWrap').style.display =
+    (state.source === 'hierarquia' || state.source === 'todas') ? 'flex' : 'none';
+  render();
+});
+
+document.getElementById('levelFilter').addEventListener('change', (e) => {
+  state.nivel = e.target.value;
+  render();
+});
+
+document.getElementById('sortFilter').addEventListener('change', (e) => {
+  state.ordem = e.target.value;
+  render();
+});
+
+// modo escuro
+const themeToggleBtn = document.getElementById('themeToggle');
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+}
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+themeToggleBtn.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem('sapCatalogTheme', next);
+});
+
+// estado inicial
+document.getElementById('levelFilterWrap').style.display = 'flex';
+render();
+</script>
+</body>
+</html>

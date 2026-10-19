@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formatador de Anúncios</title>
+<style>
+  :root{
+    --bg: #EEF0EF;
+    --paper: #FFFFFF;
+    --ink: #17211D;
+    --ink-soft: #576159;
+    --line: #DADFDA;
+    --line-soft: #E7EAE6;
+    --teal: #1F6F5C;
+    --teal-dark: #164F42;
+    --teal-wash: #E4F0EC;
+    --plum: #5B4B8A;
+    --plum-wash: #ECE8F5;
+    --amber: #B9762D;
+    --amber-wash: #F7ECDE;
+    --red: #D93025;
+    --red-wash: #FCE8E6;
+    --radius: 10px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  }
+  :root[data-theme="dark"]{
+    --bg: #11201B;
+    --paper: #16231E;
+    --ink: #E8EEEC;
+    --ink-soft: #92A49C;
+    --line: #233830;
+    --line-soft: #1D2D27;
+    --teal: #3FB492;
+    --teal-dark: #7FDDBE;
+    --teal-wash: #1B3830;
+    --plum: #C2B0EC;
+    --plum-wash: #2B2440;
+    --amber: #E3A95D;
+    --amber-wash: #39301A;
+    --red: #F28B82;
+    --red-wash: #3C1E1A;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background .15s ease, color .15s ease;
+  }
+
+  /* ---------- Header ---------- */
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
+  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; transition: color 0.15s ease; }
+  .nav-back:hover { color: var(--amber); }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 600; margin: 0 0 6px; }
+  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 520px; }
+
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+  .theme-toggle:hover{ border-color: var(--amber); color: var(--ink); }
+
+  /* ---------- Layout Grid ---------- */
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 24px 60px; }
+  .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
+  @media (max-width: 850px){ .split-view { grid-template-columns: 1fr; } }
+
+  /* ---------- Formulário ---------- */
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .form-group .hint { font-size: 12px; color: var(--ink-soft); margin-top: 4px; display: block; }
+  
+  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  input[type="text"], textarea {
+    width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: var(--bg); font-size: 14.5px; font-family: var(--sans); color: var(--ink);
+    outline: none; transition: border-color .15s ease, background .15s ease;
+  }
+  input[type="text"]:focus, textarea:focus { border-color: var(--amber); background: var(--paper); }
+  textarea { resize: vertical; min-height: 100px; }
+  textarea.large { min-height: 140px; }
+
+  /* Segmented Control */
+  .segmented { display: flex; gap: 6px; background: var(--bg); padding: 4px; border-radius: 999px; border: 1px solid var(--line); width: fit-content; }
+  .seg-btn { border: none; background: transparent; padding: 8px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all .15s ease; }
+  .seg-btn.active { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+  .seg-btn.active[data-val="novo"] { color: var(--teal-dark); }
+  .seg-btn.active[data-val="recondicionado"] { color: var(--amber); }
+
+  /* Botões de Ação */
+  .actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line-soft); }
+  .btn-primary { flex: 1; padding: 12px 24px; font-size: 14.5px; background-color: var(--amber); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; text-align: center; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+  .btn-secondary:hover { background: var(--line-soft); }
+
+  /* ---------- Resultados ---------- */
+  .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  .tab-btn { background: none; border: none; padding: 0 0 10px 0; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn:hover { color: var(--ink); }
+  .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  
+  #htmlOutput { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink-soft); background: var(--bg); height: 600px; }
+  
+  .preview-box {
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 20px; background: var(--paper);
+    min-height: 600px; font-family: Arial, sans-serif;
+  }
+  
+  .aviso-validacao { display: none; margin-top: 16px; padding: 12px 16px; border-radius: 8px; background: var(--amber-wash); border: 1px solid var(--amber); color: var(--amber); font-size: 13.5px; font-weight: 600; }
+
+  /* Toast Notification */
+  .toast{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #17211D; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; z-index: 100; }
+  .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <a href="index.html" class="nav-back">← Voltar ao Hub</a>
+      <p class="brand-eyebrow">Operacional</p>
+      <h1>Formatador de Anúncios</h1>
+      <p class="subtitle">Padronização automática de descrições HTML para plataformas ERP e E-commerce.</p>
+    </div>
+    <div>
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="split-view">
+    <!-- COLUNA 1: ENTRADA DE DADOS -->
+    <div class="card">
+      
+      <!-- 1. Título -->
+      <div class="form-group">
+        <label>Título do Produto</label>
+        <input type="text" id="tituloOrig" placeholder="Ex: PLACA MÃE ASUS PRIME A520M-E AM4 MATX DDR4">
+      </div>
+
+      <!-- 2. Condição do Produto -->
+      <div class="form-group">
+        <label>Condição do Produto</label>
+        <div class="segmented" id="condicaoSeg">
+          <button type="button" class="seg-btn active" data-val="novo">Novo</button>
+          <button type="button" class="seg-btn" data-val="recondicionado">Recondicionado</button>
+        </div>
+      </div>
+
+      <!-- 3. Descrição -->
+      <div class="form-group">
+        <label>Descrição</label>
+        <textarea id="descOrig" class="large" placeholder="Cole o texto descritivo e comercial do produto..."></textarea>
+      </div>
+
+      <!-- 4. Especificações -->
+      <div class="form-group">
+        <label>Especificações</label>
+        <textarea id="specsOrig" class="large" placeholder="Marca: Asus&#10;Modelo: Prime A520M-E&#10;Chipset: AMD A520..."></textarea>
+        <span class="hint">Adicione os dados técnicos. O formato "Chave: Valor" aplicará negrito automaticamente na chave.</span>
+      </div>
+
+      <!-- 5. Dimensões -->
+      <div class="form-group">
+        <label>Dimensões e Peso</label>
+        <div class="input-grid">
+          <input type="text" id="dimAltura" placeholder="Altura (Ex: 5)">
+          <input type="text" id="dimLargura" placeholder="Largura (Ex: 22)">
+          <input type="text" id="dimCompri" placeholder="Comprimento (Ex: 22)">
+          <input type="text" id="dimPeso" placeholder="Peso (Ex: 0,85)">
+        </div>
+        <span class="hint">As unidades "cm" e "kg" serão adicionadas automaticamente.</span>
+      </div>
+
+      <!-- 6. Itens Inclusos -->
+      <div class="form-group">
+        <label>Itens Inclusos</label>
+        <textarea id="itensOrig" placeholder="1 Placa-mãe&#10;2 Cabos SATA&#10;Manual do usuário..."></textarea>
+        <span class="hint">Um item por linha. Marcadores (-, *, •) são removidos automaticamente.</span>
+      </div>
+
+      <!-- 7. Garantia -->
+      <div class="form-group" id="garantiaWrap">
+        <label>Garantia (Meses/Dias)</label>
+        <input type="text" id="garantiaOrig" placeholder="Ex: 12 meses" value="12 meses">
+        <span class="hint">Ignorado automaticamente para produtos recondicionados.</span>
+      </div>
+
+      <!-- 8. Identificação (NAC e EAN) -->
+      <div class="form-group">
+        <label>Identificação (NAC e EAN)</label>
+        <div class="input-grid">
+          <input type="text" id="nacOrig" placeholder="Número NAC (Ex: 015787)">
+          <input type="text" id="eanOrig" placeholder="Código EAN (Ex: 7891234567890)">
+        </div>
+        <span class="hint">O prefixo "NAC" é adicionado automaticamente na formatação.</span>
+      </div>
+
+      <div class="actions">
+        <button type="button" class="btn-primary" onclick="processarHTML()">Formatar Descrição</button>
+        <button type="button" class="btn-secondary" onclick="limparCampos()">Limpar</button>
+      </div>
+      
+      <div class="aviso-validacao" id="avisoValidacao"></div>
+    </div>
+
+    <!-- COLUNA 2: RESULTADOS -->
+    <div class="card" style="display: flex; flex-direction: column;">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('html')">&lt;/&gt; Código HTML</button>
+        <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização Real</button>
+      </div>
+
+      <div id="tab-html" class="tab-content active" style="flex-grow: 1;">
+        <textarea id="htmlOutput" readonly placeholder="O HTML formatado aparecerá aqui..."></textarea>
+      </div>
+      <div id="tab-preview" class="tab-content" style="flex-grow: 1;">
+        <div class="preview-box" id="previewOutput">
+          <span style="color: var(--ink-soft); font-size: 14px;">Nenhuma pré-visualização disponível.</span>
+        </div>
+      </div>
+
+      <div class="actions" style="margin-top: auto;">
+        <button type="button" class="btn-primary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
+        <button type="button" class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto s/ HTML</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>Lógica puramente estrutural. Os dados não são enviados para nenhum servidor.</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// --- GESTÃO DE TEMA ---
+const themeToggleBtn = document.getElementById('themeToggle');
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+}
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+themeToggleBtn.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem('sapCatalogTheme', next);
+});
+
+// --- GESTÃO DE UI ---
+let condicaoAtual = 'novo';
+
+document.getElementById('condicaoSeg').addEventListener('click', (e) => {
+  const btn = e.target.closest('.seg-btn');
+  if(!btn) return;
+  document.querySelectorAll('#condicaoSeg .seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  condicaoAtual = btn.getAttribute('data-val');
+  
+  const garWrap = document.getElementById('garantiaWrap');
+  if(condicaoAtual === 'recondicionado') {
+    garWrap.style.opacity = '0.5';
+    document.getElementById('garantiaOrig').disabled = true;
+  } else {
+    garWrap.style.opacity = '1';
+    document.getElementById('garantiaOrig').disabled = false;
+  }
+});
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  
+  if(tab === 'html') {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    document.getElementById('tab-html').classList.add('active');
+  } else {
+    document.querySelectorAll('.tab-btn')[1].classList.add('active');
+    document.getElementById('tab-preview').classList.add('active');
+  }
+}
+
+// --- LÓGICA DE FORMATAÇÃO ---
+function formatarTituloCase(texto) {
+  const excecoes = ['e', 'de', 'da', 'do', 'das', 'dos', 'a', 'o', 'em', 'para', 'com'];
+  const pular = ['USB', 'HDMI', 'SSD', 'NVME', 'DDR4', 'DDR5', 'WIFI', 'WI-FI', 'PC', 'MATX', 'ATX', 'AM4', 'AM5', 'RGB', 'LED'];
+  
+  return texto.toLowerCase().split(' ').map((palavra, index) => {
+    if (pular.includes(palavra.toUpperCase())) return palavra.toUpperCase();
+    if (index !== 0 && excecoes.includes(palavra)) return palavra;
+    return palavra.charAt(0).toUpperCase() + palavra.slice(1);
+  }).join(' ');
+}
+
+function processarHTML() {
+  const tituloInput = document.getElementById('tituloOrig').value.trim();
+  const descInput = document.getElementById('descOrig').value;
+  const specsInput = document.getElementById('specsOrig').value;
+  
+  const dimAltura = document.getElementById('dimAltura').value.trim();
+  const dimLargura = document.getElementById('dimLargura').value.trim();
+  const dimCompri = document.getElementById('dimCompri').value.trim();
+  const dimPeso = document.getElementById('dimPeso').value.trim();
+  
+  const itensInput = document.getElementById('itensOrig').value;
+  const garantiaInput = document.getElementById('garantiaOrig').value.trim();
+  const nacInput = document.getElementById('nacOrig').value.trim();
+  const eanInput = document.getElementById('eanOrig').value.trim();
+  const aviso = document.getElementById('avisoValidacao');
+
+  if(!tituloInput) {
+    aviso.textContent = "⚠️ O Título do produto é obrigatório.";
+    aviso.style.display = 'block';
+    return;
+  }
+  aviso.style.display = 'none';
+
+  // 1. Título
+  let tituloFormatado = formatarTituloCase(tituloInput);
+  if (condicaoAtual === 'recondicionado') {
+    tituloFormatado += " - Recondicionado";
+  }
+
+  // 2. Processar Listas
+  let blocoDescricao = descInput.split('\n').map(l => l.trim()).filter(l => l !== '');
+  let blocoSpecs = specsInput.split('\n').map(l => l.trim()).filter(l => l !== '');
+  
+  // 3. Processar Itens Inclusos (limpa bullets)
+  let blocoItens = itensInput.split('\n')
+    .map(l => l.replace(/^[-*•]\s*/, '').trim())
+    .filter(l => l !== '');
+
+  // 4. Formatar Dimensões (limpa 'cm' ou 'kg' se o usuário digitou e adiciona no final)
+  const alturaFormatada = dimAltura ? dimAltura.replace(/cm/i, '').trim() + ' cm' : 'Não informada';
+  const larguraFormatada = dimLargura ? dimLargura.replace(/cm/i, '').trim() + ' cm' : 'Não informada';
+  const compriFormatada = dimCompri ? dimCompri.replace(/cm/i, '').trim() + ' cm' : 'Não informada';
+  const pesoFormatado = dimPeso ? dimPeso.replace(/kg/i, '').trim() + ' kg' : 'Não informado';
+
+  // --- MONTAGEM DO HTML ---
+  let html = `<span style="font-size:14px;"><strong>${tituloFormatado}</strong></span><br><br>\n`;
+  
+  // Bloco Descrição
+  html += `<span style="font-size:12px;">\n`;
+  if(blocoDescricao.length > 0) {
+    html += blocoDescricao.join('<br>\n') + `<br>\n`;
+  } else {
+    html += `(Descrição não fornecida)<br>\n`;
+  }
+  html += `</span><br>\n`;
+
+  // Bloco Especificações
+  html += `<span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br>\n`;
+  html += `<span style="font-size:12px;">\n`;
+  if(blocoSpecs.length > 0) {
+    blocoSpecs.forEach(spec => {
+      if(spec.includes(':')) {
+        const parts = spec.split(':');
+        const chave = parts.shift().trim();
+        const valor = parts.join(':').trim();
+        html += `<strong>${chave}:</strong> ${valor}<br>\n`;
+      } else {
+        html += `${spec}<br>\n`;
+      }
+    });
+  } else {
+    html += `(Especificações não fornecidas)<br>\n`;
+  }
+  html += `</span><br>\n`;
+
+  // Bloco Dimensões
+  html += `<span style="font-size:14px;"><strong>DIMENSÕES</strong></span><br>\n`;
+  html += `<span style="font-size:12px;">\n`;
+  html += `<strong>Altura:</strong> ${alturaFormatada}<br>\n`;
+  html += `<strong>Largura:</strong> ${larguraFormatada}<br>\n`;
+  html += `<strong>Comprimento:</strong> ${compriFormatada}<br>\n`;
+  html += `<strong>Peso:</strong> ${pesoFormatado}<br>\n`;
+  html += `</span><br>\n`;
+
+  // Bloco Itens Inclusos (Sem traço)
+  html += `<span style="font-size:14px;"><strong>ITENS INCLUSOS</strong></span><br>\n`;
+  html += `<span style="font-size:12px;">\n`;
+  if(blocoItens.length > 0) {
+    blocoItens.forEach(item => {
+      html += `${item}<br>\n`;
+    });
+  } else {
+    html += `O produto e seus acessórios padrão de fábrica.<br>\n`;
+  }
+  html += `</span><br>\n`;
+
+  // Bloco Rodapé
+  html += `<span style="font-size:12px;">\n`;
+  if (condicaoAtual === 'recondicionado') {
+    html += `ATENÇÃO - PRODUTO RECONDICIONADO<br>\n`;
+    html += `Produto recondicionado com garantia de 3 meses. Todos os itens passam por testes rigorosos de funcionamento. As embalagens podem apresentar avarias, sem impacto no funcionamento do produto.<br>\n`;
+  } else {
+    const gar = garantiaInput ? garantiaInput : "prazo confirmado";
+    html += `Imagens de caráter ilustrativo.<br>\n`;
+    html += `Informações divulgadas de acordo com o manual do fabricante.<br>\n`;
+    html += `Produto novo na caixa, lacrado com NF e garantia do fabricante de ${gar}.<br>\n`;
+    html += `Em caso de dúvidas sobre informações técnicas, utilização, limitações e manuseio do produto, verifique o manual do fabricante.<br>\n`;
+  }
+  
+  // Identificação NAC e EAN (Negrito conforme solicitado)
+  if (nacInput || eanInput) {
+    html += `<br>\n`; 
+    if (nacInput) html += `<strong>NAC${nacInput}</strong><br>\n`;
+    if (eanInput) html += `<strong>EAN:</strong> ${eanInput}<br>\n`;
+  }
+
+  html += `</span>`;
+
+  // Saída
+  document.getElementById('htmlOutput').value = html;
+  document.getElementById('previewOutput').innerHTML = html;
+}
+
+// --- FUNÇÕES UTILITÁRIAS ---
+function limparCampos() {
+  document.getElementById('tituloOrig').value = '';
+  document.getElementById('descOrig').value = '';
+  document.getElementById('specsOrig').value = '';
+  document.getElementById('dimAltura').value = '';
+  document.getElementById('dimLargura').value = '';
+  document.getElementById('dimCompri').value = '';
+  document.getElementById('dimPeso').value = '';
+  document.getElementById('itensOrig').value = '';
+  document.getElementById('garantiaOrig').value = '12 meses';
+  document.getElementById('nacOrig').value = '';
+  document.getElementById('eanOrig').value = '';
+  document.getElementById('htmlOutput').value = '';
+  document.getElementById('previewOutput').innerHTML = '<span style="color: var(--ink-soft); font-size: 14px;">Nenhuma pré-visualização disponível.</span>';
+  document.getElementById('avisoValidacao').style.display = 'none';
+  condicaoAtual = 'novo';
+  document.querySelectorAll('#condicaoSeg .seg-btn')[0].click();
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function copiarTexto(elementId, label) {
+  const el = document.getElementById(elementId);
+  if(!el.value) {
+    showToast('Nenhum conteúdo para copiar.');
+    return;
+  }
+  el.select();
+  document.execCommand('copy');
+  showToast(label + ' copiado para a área de transferência!');
+}
+
+function copiarRenderizado() {
+  const prev = document.getElementById('previewOutput');
+  if(!prev.innerText.trim() || prev.innerText.includes('Nenhuma pré-visualização')) {
+    showToast('Nenhum conteúdo para copiar.');
+    return;
+  }
+  
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(prev.innerText).then(() => {
+      showToast('Texto simples copiado!');
+    });
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = prev.innerText;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('Texto simples copiado!');
+  }
+}
+</script>
+</body>
+</html>

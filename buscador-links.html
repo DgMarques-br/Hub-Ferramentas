@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validador de Links</title>
+<style>
+  :root{
+    --bg: #EEF0EF;
+    --paper: #FFFFFF;
+    --ink: #17211D;
+    --ink-soft: #576159;
+    --line: #DADFDA;
+    --line-soft: #E7EAE6;
+    --teal: #1F6F5C;
+    --teal-dark: #164F42;
+    --teal-wash: #E4F0EC;
+    --plum: #5B4B8A;
+    --plum-wash: #ECE8F5;
+    --red: #D93025;
+    --red-wash: #FCE8E6;
+    --amber: #B9762D;
+    --amber-wash: #FDF6EC;
+    --radius: 10px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  }
+  :root[data-theme="dark"]{
+    --bg: #11201B;
+    --paper: #16231E;
+    --ink: #E8EEEC;
+    --ink-soft: #92A49C;
+    --line: #233830;
+    --line-soft: #1D2D27;
+    --teal: #3FB492;
+    --teal-dark: #7FDDBE;
+    --teal-wash: #1B3830;
+    --plum: #C2B0EC;
+    --plum-wash: #2B2440;
+    --red: #F28B82;
+    --red-wash: #3C1E1A;
+    --amber: #F6AD55;
+    --amber-wash: #3A2E1B;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background .15s ease, color .15s ease;
+  }
+
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
+  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; transition: color 0.15s ease; }
+  .nav-back:hover { color: var(--teal); }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--plum); font-weight: 600; margin: 0 0 6px; }
+  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 480px; }
+
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
+
+  .controls-wrap{ background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+  .controls{ max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .search-box{ position: relative; flex: 1 1 320px; min-width: 240px; display: flex; gap: 10px; }
+  .search-box input{ flex-grow: 1; padding: 11px 16px 11px 40px; border-radius: var(--radius); border: 1.5px solid var(--line); background: var(--bg); font-size: 15px; font-family: var(--sans); color: var(--ink); outline: none; transition: border-color .15s ease, background .15s ease; }
+  .search-box input:focus{ border-color: var(--plum); background: var(--paper); }
+  .search-box svg.icon-search{ position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--ink-soft); }
+  .btn-buscar { padding: 11px 24px; font-size: 14px; background-color: var(--plum); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
+  .btn-buscar:hover { opacity: 0.9; }
+  .btn-buscar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  main{ max-width: 1180px; margin: 0 auto; padding: 24px 24px 60px; }
+  #resultado { display: none; margin-top: 10px; }
+  .mensagem-global { padding: 16px; border-radius: var(--radius); font-size: 14.5px; margin-bottom: 24px; border: 1px solid var(--line); }
+  .msg-info { background: var(--teal-wash); color: var(--teal-dark); border-color: var(--teal); }
+  .msg-erro { background: var(--red-wash); color: var(--red); border-color: var(--red); }
+  
+  /* Grelha Tela 1 */
+  .mkt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+  .mkt-card {
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center;
+    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;
+  }
+  .mkt-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.06); border-color: var(--teal); }
+  .mkt-card.static { cursor: default; transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-color: var(--line); }
+  
+  .mkt-icon { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; background: var(--bg); color: var(--ink); margin-bottom: 16px; }
+  .mkt-title { font-size: 18px; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; }
+  .mkt-count { font-size: 13.5px; color: var(--ink-soft); background: var(--line-soft); padding: 4px 12px; border-radius: 999px; }
+
+  /* Toggles SP/MG */
+  .region-toggles { display: flex; gap: 8px; justify-content: center; margin-top: 18px; width: 100%; border-top: 1px solid var(--line-soft); padding-top: 16px;}
+  .btn-region { background: var(--bg); border: 1px solid var(--line); color: var(--ink-soft); padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: var(--sans); letter-spacing: 0.05em; }
+  .btn-region:hover { background: var(--line-soft); }
+  .btn-region.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .mkt-card[data-loja*="mercado"] { border-top: 4px solid #F3C300; }
+  .mkt-card[data-loja*="amazon"] { border-top: 4px solid #FF9900; }
+  .mkt-card[data-loja*="shopee"] { border-top: 4px solid #EE4D2D; }
+  .mkt-card[data-loja*="magalu"] { border-top: 4px solid #0086FF; }
+  .mkt-card[data-loja*="tiktok"] { border-top: 4px solid #000000; }
+  .mkt-card[data-loja*="inpower"] { border-top: 4px solid var(--teal); }
+
+  /* Tela 2: Split View */
+  .mkt-split { display: flex; gap: 32px; align-items: flex-start; }
+  .mkt-left { flex: 0 0 300px; position: sticky; top: 120px; }
+  .mkt-right { flex: 1; }
+  
+  .btn-voltar { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1.5px solid var(--line); color: var(--ink); padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; font-family: var(--sans); width: 100%; justify-content: center; }
+  .btn-voltar:hover { background: var(--line-soft); }
+
+  /* Filtros */
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; background: var(--paper); padding: 14px; border-radius: var(--radius); border: 1px solid var(--line); }
+  .filter-btn { padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-soft); font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .filter-btn:hover { border-color: var(--teal); color: var(--ink); }
+  .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  /* Cartões de Produtos */
+  .card-produto { background: var(--paper); border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 8px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .card-produto.quebrado { border-left-color: var(--red); }
+  .card-produto.sem-link { border-left-color: var(--amber); background: var(--amber-wash); }
+  
+  .card-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap;}
+  .card-aba { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;}
+  .card-nac { font-family: var(--mono); font-size: 11.5px; background: var(--line-soft); color: var(--ink); padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid var(--line); }
+  
+  .card-titulo { font-size: 15.5px; font-weight: 600; color: var(--ink); margin-bottom: 18px; line-height: 1.4; }
+  
+  .card-rodape { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-soft); padding-top: 14px; flex-wrap: wrap; gap: 10px; }
+  .status-badge { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .status-badge.ativo { color: var(--teal-dark); }
+  .status-badge.erro { color: var(--red); }
+  .status-badge.aviso { color: var(--amber); }
+  
+  .btn-abrir { display: inline-block; background: var(--plum-wash); color: var(--plum); font-weight: 600; text-decoration: none; font-size: 13.5px; padding: 8px 16px; border-radius: 6px; transition: background 0.2s; white-space: nowrap;}
+  .btn-abrir:hover { background: var(--line); }
+
+  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
+
+  @media (max-width: 850px){
+    .mkt-split { flex-direction: column; }
+    .mkt-left { flex: none; width: 100%; position: relative; top: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <a href="index.html" class="nav-back">← Voltar ao Hub</a>
+      <p class="brand-eyebrow">Operacional</p>
+      <h1>Validador de Links</h1>
+      <p class="subtitle">Pesquisa unificada em múltiplas abas de e-commerce e verificação de integridade de URLs na hora.</p>
+    </div>
+    <div>
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+    </div>
+  </div>
+</header>
+
+<div class="controls-wrap">
+  <div class="controls">
+    <div class="search-box">
+      <svg class="icon-search" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+      <input type="text" id="termo" placeholder="Digite o Nº do item (NAC), Descrição ou SKU..." onkeydown="if(event.key === 'Enter') realizarBusca()">
+      <button id="btn" class="btn-buscar" onclick="realizarBusca()">Pesquisar</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div id="resultado"></div>
+</main>
+
+<footer>Integração via Google Apps Script · Interface Padrão</footer>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbz5kTwF8w0lqElldwuJ-9J-11ouyLGwuyQ4f3GtKy2AnP6nJhsJN6e0Le2qasgQPeTjKQ/exec";
+    
+    let dadosAgrupados = {};
+    let regiaoSelecionada = {};
+
+    function extrairBaseERegiao(abaNome) {
+        let base = abaNome.trim();
+        let region = 'GERAL';
+        if (base.toUpperCase().endsWith(' SP') && base.length > 3) {
+            base = base.substring(0, base.length - 3).trim();
+            region = 'SP';
+        } else if (base.toUpperCase().endsWith(' MG') && base.length > 3) {
+            base = base.substring(0, base.length - 3).trim();
+            region = 'MG';
+        }
+        return { base, region };
+    }
+
+    async function realizarBusca() {
+        const termo = document.getElementById('termo').value.trim();
+        const divResultado = document.getElementById('resultado');
+        const botao = document.getElementById('btn');
+
+        if (!termo) {
+            mostrarMensagemGlobal('msg-erro', 'Por favor, digite algo para buscar.');
+            return;
+        }
+
+        botao.disabled = true;
+        botao.innerText = 'A Pesquisar...';
+        mostrarMensagemGlobal('msg-info', '⚡ A varrer as lojas. Aguarde...');
+        dadosAgrupados = {};
+        regiaoSelecionada = {};
+
+        try {
+            const resposta = await fetch(`${API_URL}?busca=${encodeURIComponent(termo)}`);
+            const dados = await resposta.json();
+
+            if (dados.erro) {
+                mostrarMensagemGlobal('msg-erro', dados.erro);
+            } else if (dados.encontrado && dados.itens.length > 0) {
+                
+                dados.itens.forEach(item => {
+                    const info = extrairBaseERegiao(item.aba);
+                    if (!dadosAgrupados[info.base]) dadosAgrupados[info.base] = {};
+                    if (!dadosAgrupados[info.base][info.region]) dadosAgrupados[info.base][info.region] = [];
+                    dadosAgrupados[info.base][info.region].push(item);
+                });
+
+                for (const base in dadosAgrupados) {
+                    if (dadosAgrupados[base]['SP']) regiaoSelecionada[base] = 'SP';
+                    else regiaoSelecionada[base] = Object.keys(dadosAgrupados[base])[0];
+                }
+
+                renderizarGrelha();
+            } else {
+                mostrarMensagemGlobal('msg-erro', '❌ Este item não foi localizado em nenhuma aba.');
+            }
+        } catch (erro) {
+            mostrarMensagemGlobal('msg-erro', '❌ Erro de conexão com a planilha. Tente novamente.');
+            console.error(erro);
+        } finally {
+            botao.disabled = false;
+            botao.innerText = 'Pesquisar';
+        }
+    }
+
+    function obterIcone(nomeLojaCSS) {
+        if(nomeLojaCSS.includes('amazon')) return 'A';
+        if(nomeLojaCSS.includes('mercado')) return '🤝';
+        if(nomeLojaCSS.includes('shopee')) return 'S';
+        if(nomeLojaCSS.includes('magalu')) return 'M';
+        if(nomeLojaCSS.includes('tiktok')) return 'T';
+        if(nomeLojaCSS.includes('inpower')) return 'IP';
+        return '🛍️';
+    }
+
+    function mudarRegiaoGrelha(event, base, novaRegiao) {
+        event.stopPropagation();
+        regiaoSelecionada[base] = novaRegiao;
+        renderizarGrelha();
+    }
+
+    function mudarRegiaoLista(base, novaRegiao) {
+        regiaoSelecionada[base] = novaRegiao;
+        abrirLoja(base);
+    }
+
+    function renderizarGrelha() {
+        const divResultado = document.getElementById('resultado');
+        const totalBases = Object.keys(dadosAgrupados).length;
+        
+        let html = `<div class="mensagem-global msg-info" style="background:transparent; border:none; padding:0; margin-bottom: 24px;">
+            <strong style="font-size: 16px;">🔍 Agrupado em ${totalBases} Marketplace(s). Selecione para ver os anúncios:</strong>
+        </div>`;
+        
+        html += `<div class="mkt-grid">`;
+        
+        for (const base in dadosAgrupados) {
+            const idBuscaCSS = base.toLowerCase().replace(/\s+/g, '');
+            const icone = obterIcone(idBuscaCSS);
+            const regiaoAtual = regiaoSelecionada[base];
+            const itensLoja = dadosAgrupados[base][regiaoAtual];
+            const regioesDisponiveis = Object.keys(dadosAgrupados[base]);
+
+            let togglesHtml = '';
+            if (regioesDisponiveis.length > 1 || (regioesDisponiveis[0] !== 'GERAL')) {
+                togglesHtml = `<div class="region-toggles">`;
+                regioesDisponiveis.forEach(r => {
+                    const active = (r === regiaoAtual) ? 'active' : '';
+                    togglesHtml += `<button class="btn-region ${active}" onclick="mudarRegiaoGrelha(event, '${base}', '${r}')">${r}</button>`;
+                });
+                togglesHtml += `</div>`;
+            }
+
+            html += `
+            <div class="mkt-card" data-loja="${idBuscaCSS}" onclick="abrirLoja('${base}')">
+                <div class="mkt-icon">${icone}</div>
+                <div class="mkt-title">${base}</div>
+                <div class="mkt-count">${itensLoja.length} registo(s) ${regiaoAtual !== 'GERAL' ? 'em '+regiaoAtual : ''}</div>
+                ${togglesHtml}
+            </div>`;
+        }
+        
+        html += `</div>`;
+        divResultado.style.display = 'block';
+        divResultado.innerHTML = html;
+        window.scrollTo(0, 0);
+    }
+
+    function abrirLoja(base) {
+        const divResultado = document.getElementById('resultado');
+        const regiaoAtual = regiaoSelecionada[base];
+        const itensLoja = dadosAgrupados[base][regiaoAtual];
+        const idBuscaCSS = base.toLowerCase().replace(/\s+/g, '');
+        const icone = obterIcone(idBuscaCSS);
+        const regioesDisponiveis = Object.keys(dadosAgrupados[base]);
+
+        let counts = { ativos: 0, quebrados: 0, semlink: 0 };
+        itensLoja.forEach(item => {
+            if (!item.temLink) counts.semlink++;
+            else if (item.quebrado) counts.quebrados++;
+            else counts.ativos++;
+        });
+
+        let togglesHtml = '';
+        if (regioesDisponiveis.length > 1 || (regioesDisponiveis[0] !== 'GERAL')) {
+            togglesHtml = `<div class="region-toggles" style="padding-top: 10px;">`;
+            regioesDisponiveis.forEach(r => {
+                const active = (r === regiaoAtual) ? 'active' : '';
+                togglesHtml += `<button class="btn-region ${active}" onclick="mudarRegiaoLista('${base}', '${r}')">${r}</button>`;
+            });
+            togglesHtml += `</div>`;
+        }
+
+        let tituloLateral = regiaoAtual !== 'GERAL' ? `${base} - ${regiaoAtual}` : base;
+
+        let html = `
+        <div class="mkt-split">
+            <div class="mkt-left">
+                <button class="btn-voltar" onclick="renderizarGrelha()">← Voltar às Lojas</button>
+                <div class="mkt-card static" data-loja="${idBuscaCSS}">
+                    <div class="mkt-icon">${icone}</div>
+                    <div class="mkt-title" style="font-size: 16px;">${tituloLateral}</div>
+                    <div class="mkt-count">${itensLoja.length} registo(s) listado(s)</div>
+                    ${togglesHtml}
+                </div>
+            </div>
+            
+            <div class="mkt-right">
+                <!-- Barra de Filtros Adicionada Aqui -->
+                <div class="filter-bar">
+                    <button class="filter-btn active" onclick="filtrarCards('todos', this)">Todos (${itensLoja.length})</button>
+                    <button class="filter-btn" onclick="filtrarCards('ativo', this)">✅ Ativos (${counts.ativos})</button>
+                    <button class="filter-btn" onclick="filtrarCards('semlink', this)">⚠️ Sem Link (${counts.semlink})</button>
+                    <button class="filter-btn" onclick="filtrarCards('quebrado', this)">❌ Quebrados (${counts.quebrados})</button>
+                </div>
+                <div id="lista-cards-produtos">
+        `;
+        
+        itensLoja.forEach(item => {
+            let classCard = '';
+            let labelStatus = '';
+            let tipoFiltro = '';
+
+            if (!item.temLink) {
+                classCard = 'sem-link';
+                tipoFiltro = 'semlink';
+                labelStatus = `<span class="status-badge aviso">⚠️ AVISO: Link em falta na planilha</span>`;
+            } else if (item.quebrado) {
+                classCard = 'quebrado';
+                tipoFiltro = 'quebrado';
+                labelStatus = `<span class="status-badge erro">❌ Link Quebrado (404)</span>`;
+            } else {
+                classCard = '';
+                tipoFiltro = 'ativo';
+                labelStatus = `<span class="status-badge ativo">✅ Ativo no E-commerce</span>`;
+            }
+
+            const botaoAcao = item.temLink 
+                ? `<a href="${item.link}" target="_blank" class="btn-abrir">Abrir Anúncio ↗</a>` 
+                : `<span style="font-size:13px; color: var(--ink-soft); font-weight:600;">Sem link registado</span>`;
+
+            html += `
+                <div class="card-produto ${classCard}" data-status="${tipoFiltro}">
+                    <div class="card-topo">
+                        <span class="card-aba">${item.aba} (LINHA ${item.linha})</span>
+                        <span class="card-nac">${item.nac}</span>
+                    </div>
+                    <div class="card-titulo">${item.descricao}</div>
+                    <div class="card-rodape">
+                        ${labelStatus}
+                        ${botaoAcao}
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div></div></div>`;
+        divResultado.innerHTML = html;
+        window.scrollTo(0, 0);
+    }
+
+    // Função de Filtro Visual
+    function filtrarCards(statusEscolhido, btnElemento) {
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        btnElemento.classList.add('active');
+
+        const todosCards = document.querySelectorAll('.card-produto');
+        todosCards.forEach(card => {
+            if (statusEscolhido === 'todos' || card.getAttribute('data-status') === statusEscolhido) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    function mostrarMensagemGlobal(classe, texto) {
+        const div = document.getElementById('resultado');
+        div.style.display = 'block';
+        div.innerHTML = `<div class="mensagem-global ${classe}">${texto}</div>`;
+    }
+
+    const themeToggleBtn = document.getElementById('themeToggle');
+    function applyTheme(theme){
+      document.documentElement.setAttribute('data-theme', theme);
+      themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+    }
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+    
+    themeToggleBtn.addEventListener('click', () => {
+      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('sapCatalogTheme', next);
+    });
+</script>
+</body>
+</html>

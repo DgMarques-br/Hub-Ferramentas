@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub · Ferramentas Internas</title>
+<style>
+  /* Variáveis originais do projeto Catálogo SAP */
+  :root{
+    --bg: #EEF0EF;
+    --paper: #FFFFFF;
+    --ink: #17211D;
+    --ink-soft: #576159;
+    --line: #DADFDA;
+    --line-soft: #E7EAE6;
+    --teal: #1F6F5C;
+    --teal-dark: #164F42;
+    --teal-wash: #E4F0EC;
+    --amber: #B9762D;
+    --amber-wash: #F7ECDE;
+    --plum: #5B4B8A;
+    --plum-wash: #ECE8F5;
+    --mark: #FCE6A6;
+    --radius: 10px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  }
+  :root[data-theme="dark"]{
+    --bg: #11201B;
+    --paper: #16231E;
+    --ink: #E8EEEC;
+    --ink-soft: #92A49C;
+    --line: #233830;
+    --line-soft: #1D2D27;
+    --teal: #3FB492;
+    --teal-dark: #7FDDBE;
+    --teal-wash: #1B3830;
+    --amber: #E3A95D;
+    --amber-wash: #39301A;
+    --plum: #C2B0EC;
+    --plum-wash: #2B2440;
+    --mark: #4F3C14;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background .15s ease, color .15s ease;
+  }
+
+  /* Botão de Tema */
+  .theme-toggle{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    color: var(--ink-soft);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--sans);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
+
+  /* ---------- Header ---------- */
+  header.top{
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .top-inner{
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 38px 24px 32px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .brand-eyebrow{
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--teal-dark);
+    font-weight: 600;
+    margin: 0 0 8px;
+  }
+  h1{
+    font-family: var(--serif);
+    font-size: 38px;
+    line-height: 1.1;
+    margin: 0 0 10px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+  .subtitle{
+    margin:0;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    max-width: 520px;
+    line-height: 1.5;
+  }
+
+  /* ---------- Main Grid ---------- */
+  main{
+    max-width: 1180px;
+    margin: 40px auto;
+    padding: 0 24px 60px;
+  }
+  .hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
+  }
+
+  /* ---------- Cards ---------- */
+  .card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+  .card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .card-link:hover .card {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    border-color: var(--teal);
+  }
+  
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .card-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    background: var(--teal-wash);
+    color: var(--teal-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-icon svg {
+    width: 22px;
+    height: 22px;
+    stroke: currentColor;
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  
+  .tag {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-weight: 700;
+  }
+  .tag.active { background: var(--teal-wash); color: var(--teal-dark); }
+  .tag.pending { background: var(--amber-wash); color: var(--amber); }
+  .tag.locked { background: var(--line-soft); color: var(--ink-soft); }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: var(--ink);
+  }
+  .card-desc {
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0;
+    flex-grow: 1;
+  }
+
+  /* Card Inativo/Em breve */
+  .card.disabled {
+    opacity: 0.6;
+    background: transparent;
+    border-style: dashed;
+    pointer-events: none;
+  }
+  .card.disabled .card-icon {
+    background: var(--line-soft);
+    color: var(--ink-soft);
+  }
+
+  footer{
+    text-align: center;
+    padding: 18px 24px 34px;
+    color: var(--ink-soft);
+    font-size: 12px;
+  }
+
+  @media (max-width: 640px){
+    h1{ font-size: 30px; }
+    .top-inner{ flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <p class="brand-eyebrow">Hub Operacional</p>
+      <h1>Central de Ferramentas</h1>
+      <p class="subtitle">Acessa rapidamente a todos os sistemas internos para cadastro, formatação e validação de produtos.</p>
+    </div>
+    <div>
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="hub-grid">
+    
+    <!-- 1. Catálogo SAP -->
+    <a href="catalogo-busca-sap.html" class="card-link">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
+          </div>
+          <span class="tag active">Operacional</span>
+        </div>
+        <h2 class="card-title">Catálogo SAP</h2>
+        <p class="card-desc">Consulta offline rápida de Hierarquia de Grupos de Item, Marca e Categoria para preenchimento no SAP.</p>
+      </div>
+    </a>
+
+    <!-- 2. Buscador de Links -->
+    <a href="buscador-links.html" class="card-link">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background: var(--plum-wash); color: var(--plum);">
+            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+          </div>
+          <span class="tag active">Operacional</span>
+        </div>
+        <h2 class="card-title">Validador de Links</h2>
+        <p class="card-desc">Pesquisa unificada em múltiplas abas de e-commerce e verificação de integridade de URLs (ativos/quebrados).</p>
+      </div>
+    </a>
+
+    <!-- 3. Formatador de Anúncios -->
+    <a href="formatador-anuncios.html" class="card-link">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);">
+            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <span class="tag active">Operacional</span>
+        </div>
+        <h2 class="card-title">Formatador de Anúncios</h2>
+        <p class="card-desc">Gerador de descrições HTML com extração de especificações, dimensões e termos de garantia do fabricante.</p>
+      </div>
+    </a>
+
+    <!-- 4. Métricas -->
+    <a href="#" class="card-link">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <span class="tag pending">Em Breve</span>
+        </div>
+        <h2 class="card-title">Dashboard de Métricas</h2>
+        <p class="card-desc">Visualização de dados analíticos, acompanhamento de KPIs e métricas de desempenho da equipa.</p>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>Interface baseada no padrão visual interno.</footer>
+
+<script>
+// Gestão de Modo Escuro (partilhado com as outras ferramentas via localStorage)
+const themeToggleBtn = document.getElementById('themeToggle');
+
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+}
+
+// Verifica preferência guardada ou preferência do sistema
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+
+themeToggleBtn.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem('sapCatalogTheme', next);
+});
+</script>
+</body>
+</html>
