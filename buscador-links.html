@@ -67,11 +67,36 @@
 
   .controls-wrap{ background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
   .controls{ max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  
+  /* Novo container Flex para o campo de busca e o seletor */
   .search-box{ position: relative; flex: 1 1 320px; min-width: 240px; display: flex; gap: 10px; }
-  .search-box input{ flex-grow: 1; padding: 11px 16px 11px 40px; border-radius: var(--radius); border: 1.5px solid var(--line); background: var(--bg); font-size: 15px; font-family: var(--sans); color: var(--ink); outline: none; transition: border-color .15s ease, background .15s ease; }
-  .search-box input:focus{ border-color: var(--plum); background: var(--paper); }
-  .search-box svg.icon-search{ position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--ink-soft); }
-  .btn-buscar { padding: 11px 24px; font-size: 14px; background-color: var(--plum); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-weight: bold; transition: opacity 0.3s; }
+  
+  /* Estilos do Select (Filtro) */
+  .search-box select {
+    padding: 11px 16px;
+    border-radius: var(--radius);
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    font-size: 14px;
+    font-weight: 600;
+    font-family: var(--sans);
+    color: var(--ink);
+    outline: none;
+    cursor: pointer;
+    transition: border-color .15s ease, background .15s ease;
+  }
+  .search-box select:focus { border-color: var(--plum); background: var(--paper); }
+  
+  /* Campo de texto de busca adaptado */
+  .search-input-wrapper {
+    position: relative;
+    flex-grow: 1;
+  }
+  .search-input-wrapper input{ width: 100%; padding: 11px 16px 11px 40px; border-radius: var(--radius); border: 1.5px solid var(--line); background: var(--bg); font-size: 15px; font-family: var(--sans); color: var(--ink); outline: none; transition: border-color .15s ease, background .15s ease; }
+  .search-input-wrapper input:focus{ border-color: var(--plum); background: var(--paper); }
+  .search-input-wrapper svg.icon-search{ position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--ink-soft); }
+  
+  .btn-buscar { padding: 11px 24px; font-size: 14px; background-color: var(--plum); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-weight: bold; transition: opacity 0.3s; white-space: nowrap; }
   .btn-buscar:hover { opacity: 0.9; }
   .btn-buscar:disabled { opacity: 0.5; cursor: not-allowed; }
 
@@ -124,9 +149,31 @@
   .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
   /* Cartões de Produtos */
-  .card-produto { background: var(--paper); border: 1px solid var(--line); border-left: 4px solid var(--teal); border-radius: 8px; padding: 18px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+  .card-produto { 
+    background: var(--paper); 
+    border: 1px solid var(--line); 
+    border-left: 4px solid var(--teal); 
+    border-radius: 8px; 
+    padding: 18px; 
+    margin-bottom: 16px; 
+    box-shadow: 0 1px 3px rgba(0,0,0,0.02); 
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+  .card-produto:hover {
+    border-color: var(--teal);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  }
   .card-produto.quebrado { border-left-color: var(--red); }
   .card-produto.sem-link { border-left-color: var(--amber); background: var(--amber-wash); }
+
+  /* Estado Expandido do Card */
+  .card-produto.expanded {
+    border-color: var(--teal);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding-bottom: 22px;
+  }
   
   .card-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap;}
   .card-aba { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;}
@@ -142,6 +189,59 @@
   
   .btn-abrir { display: inline-block; background: var(--plum-wash); color: var(--plum); font-weight: 600; text-decoration: none; font-size: 13.5px; padding: 8px 16px; border-radius: 6px; transition: background 0.2s; white-space: nowrap;}
   .btn-abrir:hover { background: var(--line); }
+
+  /* PAINEL DE INFORMAÇÕES EXTRAS (Colunas H, I, J) */
+  .card-detalhes {
+    display: none;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed var(--line);
+    animation: fadeIn 0.2s ease-in-out;
+  }
+  .card-produto.expanded .card-detalhes {
+    display: block;
+  }
+
+  .detalhes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .detalhe-box {
+    background: var(--bg);
+    border: 1px solid var(--line-soft);
+    padding: 12px 14px;
+    border-radius: 6px;
+  }
+
+  .detalhe-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+
+  .detalhe-valor {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink);
+    word-break: break-word;
+  }
+
+  .detalhe-valor.pendente {
+    color: var(--ink-soft);
+    font-weight: 400;
+    font-style: italic;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
 
@@ -170,8 +270,19 @@
 <div class="controls-wrap">
   <div class="controls">
     <div class="search-box">
-      <svg class="icon-search" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-      <input type="text" id="termo" placeholder="Digite o Nº do item (NAC), Descrição ou SKU..." onkeydown="if(event.key === 'Enter') realizarBusca()">
+      <!-- NOVO SELETOR DE FILTRO -->
+      <select id="tipoBusca">
+        <option value="geral">Em toda a linha (Geral)</option>
+        <option value="nac">Somente em NAC / SKU</option>
+        <option value="fabricante">Somente no Fabricante</option>
+      </select>
+      
+      <!-- CAMPO DE PESQUISA -->
+      <div class="search-input-wrapper">
+        <svg class="icon-search" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="termo" placeholder="Digite sua pesquisa..." onkeydown="if(event.key === 'Enter') realizarBusca()">
+      </div>
+      
       <button id="btn" class="btn-buscar" onclick="realizarBusca()">Pesquisar</button>
     </div>
   </div>
@@ -184,7 +295,8 @@
 <footer>Integração via Google Apps Script · Interface Padrão</footer>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbz5kTwF8w0lqElldwuJ-9J-11ouyLGwuyQ4f3GtKy2AnP6nJhsJN6e0Le2qasgQPeTjKQ/exec";
+    // IMPORTANTE: COLOQUE AQUI O SEU NOVO LINK GERADO!
+    const API_URL = "https://script.google.com/macros/s/AKfycbz3u-zNFBYMoJnqdAcb1Pio9-JcHhRSHtsNo3LjJxPPKV9mTusJE7zYv3-yURz8FbxQPw/exec"; 
     
     let dadosAgrupados = {};
     let regiaoSelecionada = {};
@@ -204,6 +316,7 @@
 
     async function realizarBusca() {
         const termo = document.getElementById('termo').value.trim();
+        const tipoBusca = document.getElementById('tipoBusca').value; // Pega o tipo de busca selecionado
         const divResultado = document.getElementById('resultado');
         const botao = document.getElementById('btn');
 
@@ -219,7 +332,8 @@
         regiaoSelecionada = {};
 
         try {
-            const resposta = await fetch(`${API_URL}?busca=${encodeURIComponent(termo)}`);
+            // Agora envia o termo e o tipoBusca (nac, fabricante ou geral) para o backend
+            const resposta = await fetch(`${API_URL}?busca=${encodeURIComponent(termo)}&tipo=${encodeURIComponent(tipoBusca)}&nocache=${Date.now()}`);
             const dados = await resposta.json();
 
             if (dados.erro) {
@@ -354,7 +468,6 @@
             </div>
             
             <div class="mkt-right">
-                <!-- Barra de Filtros Adicionada Aqui -->
                 <div class="filter-bar">
                     <button class="filter-btn active" onclick="filtrarCards('todos', this)">Todos (${itensLoja.length})</button>
                     <button class="filter-btn" onclick="filtrarCards('ativo', this)">✅ Ativos (${counts.ativos})</button>
@@ -384,11 +497,24 @@
             }
 
             const botaoAcao = item.temLink 
-                ? `<a href="${item.link}" target="_blank" class="btn-abrir">Abrir Anúncio ↗</a>` 
+                ? `<a href="${item.link}" target="_blank" class="btn-abrir" onclick="event.stopPropagation()">Abrir Anúncio ↗</a>` 
                 : `<span style="font-size:13px; color: var(--ink-soft); font-weight:600;">Sem link registado</span>`;
 
+            // Tratamento das colunas H, I, J
+            const valGarantia = item.garantia && item.garantia.toString().trim() !== '' 
+                ? item.garantia 
+                : '<span class="detalhe-valor pendente">Não cadastrado</span>';
+
+            const valData = item.dataAtualizacao && item.dataAtualizacao.toString().trim() !== '' 
+                ? item.dataAtualizacao 
+                : '<span class="detalhe-valor pendente">Não cadastrado</span>';
+
+            const valFiscal = item.validacaoFiscal && item.validacaoFiscal.toString().trim() !== '' 
+                ? item.validacaoFiscal 
+                : '<span class="detalhe-valor pendente">Pendente</span>';
+
             html += `
-                <div class="card-produto ${classCard}" data-status="${tipoFiltro}">
+                <div class="card-produto ${classCard}" data-status="${tipoFiltro}" onclick="toggleExpandCard(this)">
                     <div class="card-topo">
                         <span class="card-aba">${item.aba} (LINHA ${item.linha})</span>
                         <span class="card-nac">${item.nac}</span>
@@ -398,6 +524,24 @@
                         ${labelStatus}
                         ${botaoAcao}
                     </div>
+
+                    <!-- SEÇÃO EXPANSÍVEL (Colunas H, I, J) -->
+                    <div class="card-detalhes">
+                        <div class="detalhes-grid">
+                            <div class="detalhe-box">
+                                <div class="detalhe-label">Garantia</div>
+                                <div class="detalhe-valor">${valGarantia}</div>
+                            </div>
+                            <div class="detalhe-box">
+                                <div class="detalhe-label">Última Atualização</div>
+                                <div class="detalhe-valor">${valData}</div>
+                            </div>
+                            <div class="detalhe-box">
+                                <div class="detalhe-label">Validação Fiscal</div>
+                                <div class="detalhe-valor">${valFiscal}</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             `;
         });
@@ -405,6 +549,11 @@
         html += `</div></div></div>`;
         divResultado.innerHTML = html;
         window.scrollTo(0, 0);
+    }
+
+    // Função para alternar a expansão do card
+    function toggleExpandCard(cardElement) {
+        cardElement.classList.toggle('expanded');
     }
 
     // Função de Filtro Visual

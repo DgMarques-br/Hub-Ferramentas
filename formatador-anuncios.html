@@ -179,13 +179,8 @@
       <!-- 5. Dimensões -->
       <div class="form-group">
         <label>Dimensões e Peso</label>
-        <div class="input-grid">
-          <input type="text" id="dimAltura" placeholder="Altura (Ex: 5)">
-          <input type="text" id="dimLargura" placeholder="Largura (Ex: 22)">
-          <input type="text" id="dimCompri" placeholder="Comprimento (Ex: 22)">
-          <input type="text" id="dimPeso" placeholder="Peso (Ex: 0,85)">
-        </div>
-        <span class="hint">As unidades "cm" e "kg" serão adicionadas automaticamente.</span>
+        <textarea id="dimsOrig" class="large" placeholder="Altura: 5 cm&#10;Largura: 22 cm&#10;Comprimento: 22 cm&#10;Peso: 0,85 kg&#10;&#10;Ou para kits:&#10;Teclado - Altura: 13,75 cm&#10;Mouse - Peso: 70,5 g"></textarea>
+        <span class="hint">Aceita formato simples ("Altura: 5 cm") ou detalhado ("Item - Atributo: Valor").</span>
       </div>
 
       <!-- 6. Itens Inclusos -->
@@ -312,12 +307,7 @@ function processarHTML() {
   const tituloInput = document.getElementById('tituloOrig').value.trim();
   const descInput = document.getElementById('descOrig').value;
   const specsInput = document.getElementById('specsOrig').value;
-  
-  const dimAltura = document.getElementById('dimAltura').value.trim();
-  const dimLargura = document.getElementById('dimLargura').value.trim();
-  const dimCompri = document.getElementById('dimCompri').value.trim();
-  const dimPeso = document.getElementById('dimPeso').value.trim();
-  
+  const dimsInput = document.getElementById('dimsOrig').value;
   const itensInput = document.getElementById('itensOrig').value;
   const garantiaInput = document.getElementById('garantiaOrig').value.trim();
   const nacInput = document.getElementById('nacOrig').value.trim();
@@ -337,20 +327,15 @@ function processarHTML() {
     tituloFormatado += " - Recondicionado";
   }
 
-  // 2. Processar Listas
+  // 2. Processar Blocos de Texto (Descrição, Specs, Dims, Itens)
   let blocoDescricao = descInput.split('\n').map(l => l.trim()).filter(l => l !== '');
   let blocoSpecs = specsInput.split('\n').map(l => l.trim()).filter(l => l !== '');
+  let blocoDims = dimsInput.split('\n').map(l => l.trim()).filter(l => l !== '');
   
-  // 3. Processar Itens Inclusos (limpa bullets)
+  // Limpa bullets (-, *, •) dos itens inclusos
   let blocoItens = itensInput.split('\n')
     .map(l => l.replace(/^[-*•]\s*/, '').trim())
     .filter(l => l !== '');
-
-  // 4. Formatar Dimensões (limpa 'cm' ou 'kg' se o usuário digitou e adiciona no final)
-  const alturaFormatada = dimAltura ? dimAltura.replace(/cm/i, '').trim() + ' cm' : 'Não informada';
-  const larguraFormatada = dimLargura ? dimLargura.replace(/cm/i, '').trim() + ' cm' : 'Não informada';
-  const compriFormatada = dimCompri ? dimCompri.replace(/cm/i, '').trim() + ' cm' : 'Não informada';
-  const pesoFormatado = dimPeso ? dimPeso.replace(/kg/i, '').trim() + ' kg' : 'Não informado';
 
   // --- MONTAGEM DO HTML ---
   let html = `<span style="font-size:14px;"><strong>${tituloFormatado}</strong></span><br><br>\n`;
@@ -383,16 +368,26 @@ function processarHTML() {
   }
   html += `</span><br>\n`;
 
-  // Bloco Dimensões
-  html += `<span style="font-size:14px;"><strong>DIMENSÕES</strong></span><br>\n`;
+  // Bloco Dimensões (Agora processa como textarea flexível)
+  html += `<span style="font-size:14px;"><strong>DIMENSÕES E PESO</strong></span><br>\n`;
   html += `<span style="font-size:12px;">\n`;
-  html += `<strong>Altura:</strong> ${alturaFormatada}<br>\n`;
-  html += `<strong>Largura:</strong> ${larguraFormatada}<br>\n`;
-  html += `<strong>Comprimento:</strong> ${compriFormatada}<br>\n`;
-  html += `<strong>Peso:</strong> ${pesoFormatado}<br>\n`;
+  if(blocoDims.length > 0) {
+    blocoDims.forEach(dim => {
+      if(dim.includes(':')) {
+        const parts = dim.split(':');
+        const chave = parts.shift().trim();
+        const valor = parts.join(':').trim();
+        html += `<strong>${chave}:</strong> ${valor}<br>\n`;
+      } else {
+        html += `${dim}<br>\n`;
+      }
+    });
+  } else {
+    html += `(Dimensões não fornecidas)<br>\n`;
+  }
   html += `</span><br>\n`;
 
-  // Bloco Itens Inclusos (Sem traço)
+  // Bloco Itens Inclusos
   html += `<span style="font-size:14px;"><strong>ITENS INCLUSOS</strong></span><br>\n`;
   html += `<span style="font-size:12px;">\n`;
   if(blocoItens.length > 0) {
@@ -417,7 +412,7 @@ function processarHTML() {
     html += `Em caso de dúvidas sobre informações técnicas, utilização, limitações e manuseio do produto, verifique o manual do fabricante.<br>\n`;
   }
   
-  // Identificação NAC e EAN (Negrito conforme solicitado)
+  // Identificação NAC e EAN
   if (nacInput || eanInput) {
     html += `<br>\n`; 
     if (nacInput) html += `<strong>NAC${nacInput}</strong><br>\n`;
@@ -436,10 +431,7 @@ function limparCampos() {
   document.getElementById('tituloOrig').value = '';
   document.getElementById('descOrig').value = '';
   document.getElementById('specsOrig').value = '';
-  document.getElementById('dimAltura').value = '';
-  document.getElementById('dimLargura').value = '';
-  document.getElementById('dimCompri').value = '';
-  document.getElementById('dimPeso').value = '';
+  document.getElementById('dimsOrig').value = '';
   document.getElementById('itensOrig').value = '';
   document.getElementById('garantiaOrig').value = '12 meses';
   document.getElementById('nacOrig').value = '';
