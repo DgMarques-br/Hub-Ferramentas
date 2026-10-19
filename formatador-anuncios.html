@@ -95,6 +95,17 @@
   .seg-btn.active[data-val="novo"] { color: var(--teal-dark); }
   .seg-btn.active[data-val="recondicionado"] { color: var(--amber); }
 
+  /* Bloco Dinâmico de Dimensões */
+  .dims-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .btn-add-dim { background: var(--red); color: white; border: none; font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
+  .btn-add-dim:hover { opacity: 0.9; }
+  
+  .dim-bloco { background: var(--bg); border: 1px solid var(--line); padding: 14px; border-radius: 8px; margin-bottom: 12px; position: relative; }
+  .dim-bloco-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .dim-bloco-titulo { font-size: 12.5px; font-weight: 700; color: var(--amber); text-transform: uppercase; }
+  .btn-remover-bloco { background: transparent; border: none; color: var(--red); font-size: 12px; font-weight: bold; cursor: pointer; padding: 0; }
+  .btn-remover-bloco:hover { text-decoration: underline; }
+
   /* Botões de Ação */
   .actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line-soft); }
   .btn-primary { flex: 1; padding: 12px 24px; font-size: 14.5px; background-color: var(--amber); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; text-align: center; }
@@ -176,11 +187,34 @@
         <span class="hint">Adicione os dados técnicos. O formato "Chave: Valor" aplicará negrito automaticamente na chave.</span>
       </div>
 
-      <!-- 5. Dimensões -->
+      <!-- 5. Dimensões Dinâmicas -->
       <div class="form-group">
-        <label>Dimensões e Peso</label>
-        <textarea id="dimsOrig" class="large" placeholder="Altura: 5 cm&#10;Largura: 22 cm&#10;Comprimento: 22 cm&#10;Peso: 0,85 kg&#10;&#10;Ou para kits:&#10;Teclado - Altura: 13,75 cm&#10;Mouse - Peso: 70,5 g"></textarea>
-        <span class="hint">Aceita formato simples ("Altura: 5 cm") ou detalhado ("Item - Atributo: Valor").</span>
+        <div class="dims-header">
+          <label style="margin-bottom:0;">Dimensões e Peso</label>
+          <button type="button" class="btn-add-dim" onclick="adicionarBlocoDimensao()">1+</button>
+        </div>
+        <span class="hint" style="margin-bottom: 12px;">Clique no botão 1+ para adicionar múltiplos itens (ex: Kit Teclado e Mouse).</span>
+        
+        <!-- Contendor dos Blocos de Dimensão -->
+        <div id="containerDims">
+          <!-- Bloco Inicial Padrão (Item único) -->
+          <div class="dim-bloco" data-index="0">
+            <div class="dim-bloco-topo" style="display:none;">
+              <span class="dim-bloco-titulo">Item 1</span>
+              <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 10px; display:none;" class="wrap-nome-item">
+              <label style="font-size: 12px;">Nome do Item (Opcional p/ Kits)</label>
+              <input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse, Base...">
+            </div>
+            <div class="input-grid">
+              <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
+              <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
+              <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
+              <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 6. Itens Inclusos -->
@@ -291,6 +325,71 @@ function switchTab(tab) {
   }
 }
 
+// --- GESTÃO DE BLOCOS DINÂMICOS DE DIMENSÕES ---
+function adicionarBlocoDimensao() {
+  const container = document.getElementById('containerDims');
+  const blocos = container.querySelectorAll('.dim-bloco');
+  const novoIndice = blocos.length + 1;
+
+  const div = document.createElement('div');
+  div.className = 'dim-bloco';
+  div.setAttribute('data-index', novoIndice);
+  div.innerHTML = `
+    <div class="dim-bloco-topo">
+      <span class="dim-bloco-titulo">Item ${novoIndice}</span>
+      <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
+    </div>
+    <div class="form-group" style="margin-bottom: 10px;">
+      <label style="font-size: 12px;">Nome do Item</label>
+      <input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse, Receptor...">
+    </div>
+    <div class="input-grid">
+      <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
+      <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
+      <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
+      <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
+    </div>
+  `;
+  container.appendChild(div);
+  atualizarVisibilidadeBlocosDims();
+}
+
+function removerBlocoDimensao(btn) {
+  const bloco = btn.closest('.dim-bloco');
+  bloco.remove();
+  
+  // Reorganizar numeração dos títulos restantes
+  const container = document.getElementById('containerDims');
+  const blocos = container.querySelectorAll('.dim-bloco');
+  blocos.forEach((b, idx) => {
+    b.setAttribute('data-index', idx + 1);
+    const titulo = b.querySelector('.dim-bloco-titulo');
+    if(titulo) titulo.textContent = `Item ${idx + 1}`;
+  });
+
+  atualizarVisibilidadeBlocosDims();
+}
+
+function atualizarVisibilidadeBlocosDims() {
+  const container = document.getElementById('containerDims');
+  const blocos = container.querySelectorAll('.dim-bloco');
+  
+  blocos.forEach((b, idx) => {
+    const topo = b.querySelector('.dim-bloco-topo');
+    const inputNome = b.querySelector('.dim-nome').closest('.form-group');
+    
+    if (blocos.length === 1) {
+      // Se só houver 1 bloco, esconde o cabeçalho e o nome do item para manter limpo como no início
+      if(topo) topo.style.display = 'none';
+      if(inputNome) inputNome.style.display = 'none';
+    } else {
+      // Se houver mais de um, exibe o cabeçalho com o botão remover e o campo de título do item
+      if(topo) topo.style.display = 'flex';
+      if(inputNome) inputNome.style.display = 'block';
+    }
+  });
+}
+
 // --- LÓGICA DE FORMATAÇÃO ---
 function formatarTituloCase(texto) {
   const excecoes = ['e', 'de', 'da', 'do', 'das', 'dos', 'a', 'o', 'em', 'para', 'com'];
@@ -307,7 +406,6 @@ function processarHTML() {
   const tituloInput = document.getElementById('tituloOrig').value.trim();
   const descInput = document.getElementById('descOrig').value;
   const specsInput = document.getElementById('specsOrig').value;
-  const dimsInput = document.getElementById('dimsOrig').value;
   const itensInput = document.getElementById('itensOrig').value;
   const garantiaInput = document.getElementById('garantiaOrig').value.trim();
   const nacInput = document.getElementById('nacOrig').value.trim();
@@ -327,15 +425,35 @@ function processarHTML() {
     tituloFormatado += " - Recondicionado";
   }
 
-  // 2. Processar Blocos de Texto (Descrição, Specs, Dims, Itens)
+  // 2. Processar Blocos de Texto
   let blocoDescricao = descInput.split('\n').map(l => l.trim()).filter(l => l !== '');
   let blocoSpecs = specsInput.split('\n').map(l => l.trim()).filter(l => l !== '');
-  let blocoDims = dimsInput.split('\n').map(l => l.trim()).filter(l => l !== '');
   
-  // Limpa bullets (-, *, •) dos itens inclusos
   let blocoItens = itensInput.split('\n')
     .map(l => l.replace(/^[-*•]\s*/, '').trim())
     .filter(l => l !== '');
+
+  // 3. Processar Dimensões Dinâmicas
+  const blocosDimsDOM = document.querySelectorAll('.dim-bloco');
+  let dadosDimensoes = [];
+  
+  blocosDimsDOM.forEach(bloco => {
+    let nomeItem = bloco.querySelector('.dim-nome').value.trim();
+    let altura = bloco.querySelector('.dim-altura').value.trim();
+    let largura = bloco.querySelector('.dim-largura').value.trim();
+    let comprimento = bloco.querySelector('.dim-comprimento').value.trim();
+    let peso = bloco.querySelector('.dim-peso').value.trim();
+
+    if(altura || largura || comprimento || peso || nomeItem) {
+      dadosDimensoes.push({
+        nome: nomeItem,
+        altura: altura ? altura.replace(/cm/i, '').trim() + ' cm' : null,
+        largura: largura ? largura.replace(/cm/i, '').trim() + ' cm' : null,
+        comprimento: comprimento ? comprimento.replace(/cm/i, '').trim() + ' cm' : null,
+        peso: peso ? peso.replace(/kg|g/i, '').trim() + (peso.toLowerCase().includes('g') && !peso.toLowerCase().includes('kg') ? ' g' : ' kg') : null
+      });
+    }
+  });
 
   // --- MONTAGEM DO HTML ---
   let html = `<span style="font-size:14px;"><strong>${tituloFormatado}</strong></span><br><br>\n`;
@@ -368,19 +486,20 @@ function processarHTML() {
   }
   html += `</span><br>\n`;
 
-  // Bloco Dimensões (Agora processa como textarea flexível)
+  // Bloco Dimensões Dinâmicas
   html += `<span style="font-size:14px;"><strong>DIMENSÕES E PESO</strong></span><br>\n`;
   html += `<span style="font-size:12px;">\n`;
-  if(blocoDims.length > 0) {
-    blocoDims.forEach(dim => {
-      if(dim.includes(':')) {
-        const parts = dim.split(':');
-        const chave = parts.shift().trim();
-        const valor = parts.join(':').trim();
-        html += `<strong>${chave}:</strong> ${valor}<br>\n`;
-      } else {
-        html += `${dim}<br>\n`;
-      }
+  
+  if(dadosDimensoes.length > 0) {
+    const multiplos = dadosDimensoes.length > 1 || dadosDimensoes[0].nome !== "";
+    
+    dadosDimensoes.forEach(d => {
+      let prefixo = multiplos && d.nome ? `<strong>${d.nome}</strong> - ` : "";
+      
+      if(d.altura) html += `${prefixo}<strong>Altura:</strong> ${d.altura}<br>\n`;
+      if(d.largura) html += `${prefixo}<strong>Largura:</strong> ${d.largura}<br>\n`;
+      if(d.comprimento) html += `${prefixo}<strong>Comprimento:</strong> ${d.comprimento}<br>\n`;
+      if(d.peso) html += `${prefixo}<strong>Peso:</strong> ${d.peso}<br>\n`;
     });
   } else {
     html += `(Dimensões não fornecidas)<br>\n`;
@@ -431,7 +550,24 @@ function limparCampos() {
   document.getElementById('tituloOrig').value = '';
   document.getElementById('descOrig').value = '';
   document.getElementById('specsOrig').value = '';
-  document.getElementById('dimsOrig').value = '';
+  document.getElementById('containerDims').innerHTML = `
+    <div class="dim-bloco" data-index="0">
+      <div class="dim-bloco-topo" style="display:none;">
+        <span class="dim-bloco-titulo">Item 1</span>
+        <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
+      </div>
+      <div class="form-group" style="margin-bottom: 10px; display:none;">
+        <label style="font-size: 12px;">Nome do Item (Opcional p/ Kits)</label>
+        <input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse, Base...">
+      </div>
+      <div class="input-grid">
+        <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
+        <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
+        <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
+        <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
+      </div>
+    </div>
+  `;
   document.getElementById('itensOrig').value = '';
   document.getElementById('garantiaOrig').value = '12 meses';
   document.getElementById('nacOrig').value = '';
