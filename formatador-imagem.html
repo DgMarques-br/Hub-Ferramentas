@@ -65,7 +65,7 @@
   .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
   .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
 
-  main { max-width: 800px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
   
   .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
   
@@ -93,47 +93,83 @@
     background: var(--teal-wash);
   }
   
-  .drop-zone-text {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--ink-soft);
-    margin-bottom: 12px;
-    pointer-events: none;
-  }
-  
-  .btn-upload {
-    padding: 10px 20px;
-    font-size: 14px;
-    background-color: var(--ink-soft);
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    font-weight: bold;
-    pointer-events: none;
-  }
-
+  .drop-zone-text { font-size: 14px; font-weight: 600; color: var(--ink-soft); margin-bottom: 12px; pointer-events: none; }
+  .btn-upload { padding: 10px 20px; font-size: 14px; background-color: var(--ink-soft); color: #fff; border: none; border-radius: 6px; font-weight: bold; pointer-events: none; }
   #fileInput { display: none; }
 
   /* Pré-visualização do resultado */
-  .preview-container {
-    display: none;
-    margin-top: 30px;
-  }
+  .preview-container { display: none; margin-top: 20px; }
+  .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 24px; }
   
-  .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 16px; }
-  
-  .preview-image {
-    max-width: 100%;
-    width: 300px;
-    height: 300px;
-    border: 1px solid var(--line);
-    background-color: #fff; /* Fundo sempre branco para a pré-visualização da borda */
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-    object-fit: contain;
+  .preview-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
   }
 
-  .actions { display: flex; gap: 12px; justify-content: center; }
+  @media (min-width: 650px) {
+    .preview-layout { flex-direction: row; align-items: stretch; justify-content: center; text-align: left; }
+  }
+
+  /* Container xadrez para evidenciar transparência/bordas */
+  .image-wrapper {
+    width: 320px;
+    height: 320px;
+    border: 1px solid var(--line);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    background-image: repeating-linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), repeating-linear-gradient(45deg, #ccc 25%, #fff 25%, #fff 75%, #ccc 75%, #ccc);
+    background-position: 0 0, 10px 10px;
+    background-size: 20px 20px;
+    flex-shrink: 0;
+  }
+
+  .preview-image { width: 100%; height: 100%; object-fit: contain; }
+
+  /* Painel de Ajustes */
+  .ajustes-panel {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .ajuste-grupo { display: flex; flex-direction: column; gap: 6px; }
+  .ajuste-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
+  .ajuste-valor { color: var(--teal); font-family: var(--mono); }
+
+  /* Inputs Customizados */
+  .input-text {
+    width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 13.5px; font-family: var(--sans); outline: none;
+  }
+  .input-text:focus { border-color: var(--teal); }
+
+  /* Color Picker */
+  .color-picker-wrap { display: flex; align-items: center; gap: 12px; }
+  .input-color { width: 36px; height: 36px; padding: 0; border: none; border-radius: 6px; cursor: pointer; background: transparent; }
+  .input-color::-webkit-color-swatch-wrapper { padding: 0; }
+  .input-color::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 6px; }
+
+  /* Custom Range Slider */
+  input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+  input[type=range]:focus { outline: none; }
+  input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--line); border-radius: 99px; }
+  input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--teal); cursor: pointer; -webkit-appearance: none; margin-top: -5px; border: 2px solid var(--paper); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  input[type=range]:focus::-webkit-slider-runnable-track { background: var(--line-soft); }
+
+  .divider { height: 1px; background: var(--line); margin: 4px 0; }
+
+  .btn-resetar-ajustes { background: none; border: none; color: var(--ink-soft); font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: underline; align-self: flex-start; padding: 0; }
+  .btn-resetar-ajustes:hover { color: var(--red); }
+
+  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 32px; }
   .btn-primary { padding: 12px 24px; font-size: 14.5px; background-color: var(--teal); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
   .btn-primary:hover { opacity: 0.9; }
   .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
@@ -150,7 +186,7 @@
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
       <p class="brand-eyebrow">Mídia</p>
       <h1>Formatador de Imagem</h1>
-      <p class="subtitle">Enquadramento automático para 1200x1200px sem cortar a imagem, com preenchimento de fundo branco.</p>
+      <p class="subtitle">Enquadramento automático, estúdio de cor e correspondência de fundos.</p>
     </div>
     <div>
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
@@ -161,27 +197,83 @@
 <main>
   <div class="card">
     
-    <!-- Zona de Drop e Seleção de Arquivo -->
+    <!-- Zona de Drop -->
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="drop-zone-text">Arraste a imagem<br>desejada</div>
-      <button class="btn-upload">Pesquisar documentos</button>
+      <div class="drop-zone-text">coloque aqui a imagem<br>desejada</div>
+      <button class="btn-upload">pesquisar em Pc</button>
       <input type="file" id="fileInput" accept="image/*">
     </div>
 
-    <!-- Área de Resultado (Oculta inicialmente) -->
+    <!-- Área de Resultado e Edição -->
     <div class="preview-container" id="previewContainer">
-      <div class="preview-title">Resultado (1200 x 1200px)</div>
-      <img id="resultImage" class="preview-image" src="" alt="Pré-visualização">
+      <div class="preview-title">Resultado Final (1200 x 1200px)</div>
+      
+      <div class="preview-layout">
+        
+        <!-- Imagem -->
+        <div class="image-wrapper">
+          <img id="resultImage" class="preview-image" src="" alt="Pré-visualização">
+        </div>
+        
+        <!-- Painel de Ajustes -->
+        <div class="ajustes-panel">
+          
+          <!-- Nome do Arquivo -->
+          <div class="ajuste-grupo" style="margin-bottom: 4px;">
+            <label class="ajuste-header" for="inpNomeArquivo">Nome do Arquivo Final</label>
+            <input type="text" id="inpNomeArquivo" class="input-text" placeholder="Ex: JBL_Quantum">
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Cor de Fundo -->
+          <div class="ajuste-grupo">
+            <label class="ajuste-header">Preenchimento (Bordas)</label>
+            <div class="color-picker-wrap">
+              <input type="color" id="inpCorFundo" class="input-color" value="#FFFFFF" title="Escolha a cor para combinar com a imagem">
+              <span style="font-size: 12px; color: var(--ink-soft); line-height: 1.3;">Altere para disfarçar o recorte de imagens cinzas/coloridas.</span>
+            </div>
+          </div>
+
+          <!-- Sliders -->
+          <div class="ajuste-grupo">
+            <div class="ajuste-header">
+              <label for="inpBrilho">Brilho da Imagem</label>
+              <span class="ajuste-valor" id="valBrilho">100%</span>
+            </div>
+            <input type="range" id="inpBrilho" min="0" max="200" value="100">
+          </div>
+
+          <div class="ajuste-grupo">
+            <div class="ajuste-header">
+              <label for="inpContraste">Contraste</label>
+              <span class="ajuste-valor" id="valContraste">100%</span>
+            </div>
+            <input type="range" id="inpContraste" min="0" max="200" value="100">
+          </div>
+
+          <div class="ajuste-grupo">
+            <div class="ajuste-header">
+              <label for="inpSaturacao">Saturação</label>
+              <span class="ajuste-valor" id="valSaturacao">100%</span>
+            </div>
+            <input type="range" id="inpSaturacao" min="0" max="200" value="100">
+          </div>
+
+          <button class="btn-resetar-ajustes" onclick="resetarFiltros()">Resetar Ajustes de Cor</button>
+        </div>
+      </div>
+
       <div class="actions">
         <button class="btn-primary" id="btnDownload">Baixar Imagem</button>
-        <button class="btn-secondary" onclick="resetarFormatador()">Formatar Outra</button>
+        <button class="btn-secondary" onclick="formatarOutra()">Formatar Outra</button>
       </div>
     </div>
 
   </div>
 </main>
 
-<footer>Processamento local no navegador. A sua imagem não é enviada para nenhum servidor.</footer>
+<footer>Processamento local no navegador. Nenhuma inteligência artificial ou envio de dados externo.</footer>
 
 <script>
 // --- GESTÃO DE TEMA ---
@@ -198,17 +290,27 @@ themeToggleBtn.addEventListener('click', () => {
   localStorage.setItem('sapCatalogTheme', next);
 });
 
-// --- LÓGICA DO FORMATADOR ---
+// --- VARIÁVEIS ---
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const previewContainer = document.getElementById('previewContainer');
 const resultImage = document.getElementById('resultImage');
 const btnDownload = document.getElementById('btnDownload');
 
-let imagemFinalDataUrl = '';
-let nomeArquivoOriginal = '';
+const inpNomeArquivo = document.getElementById('inpNomeArquivo');
+const inpCorFundo = document.getElementById('inpCorFundo');
 
-// Eventos de Drag & Drop
+const inpBrilho = document.getElementById('inpBrilho');
+const inpContraste = document.getElementById('inpContraste');
+const inpSaturacao = document.getElementById('inpSaturacao');
+const valBrilho = document.getElementById('valBrilho');
+const valContraste = document.getElementById('valContraste');
+const valSaturacao = document.getElementById('valSaturacao');
+
+let imagemOriginalObjeto = null; 
+let imagemFinalDataUrl = '';
+
+// --- EVENTOS DRAG & DROP ---
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
   dropZone.addEventListener(eventName, preventDefaults, false);
 });
@@ -231,82 +333,126 @@ fileInput.addEventListener('change', function() {
   if (this.files && this.files[0]) processarArquivo(this.files[0]);
 });
 
+// --- PROCESSAMENTO DA IMAGEM ---
 function processarArquivo(file) {
   if (!file.type.match('image.*')) {
     alert("Por favor, selecione um arquivo de imagem válido.");
     return;
   }
   
-  nomeArquivoOriginal = file.name.split('.')[0];
+  // Puxa o nome do arquivo se o campo estiver vazio
+  if(inpNomeArquivo.value.trim() === "") {
+    inpNomeArquivo.value = file.name.split('.')[0];
+  }
+
   const reader = new FileReader();
-  
   reader.onload = function(e) {
     const img = new Image();
     img.onload = function() {
-      gerarImagem1200(img);
+      imagemOriginalObjeto = img;
+      resetarFiltrosInputs();
+      inpCorFundo.value = "#FFFFFF"; // Volta pro branco por padrão ao carregar nova foto
+      gerarImagemFinal(); 
+      
+      dropZone.style.display = 'none';
+      previewContainer.style.display = 'block';
     }
     img.src = e.target.result;
   }
   reader.readAsDataURL(file);
 }
 
-function gerarImagem1200(imgOriginal) {
+// --- DESENHO NO CANVAS ---
+function gerarImagemFinal() {
+  if (!imagemOriginalObjeto) return;
+
   const TAMANHO_ALVO = 1200;
-  
-  // Cria o Canvas
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   
   canvas.width = TAMANHO_ALVO;
   canvas.height = TAMANHO_ALVO;
   
-  // Preenche o fundo com branco
-  ctx.fillStyle = "#FFFFFF";
+  // 1. Pinta o fundo com a cor selecionada pelo usuário
+  ctx.fillStyle = inpCorFundo.value;
   ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
   
-  // Calcula proporções
-  const ratioOriginal = imgOriginal.width / imgOriginal.height;
+  // 2. Aplica os filtros (Brilho, Contraste, Saturação) APENAS na imagem
+  ctx.filter = `brightness(${inpBrilho.value}%) contrast(${inpContraste.value}%) saturate(${inpSaturacao.value}%)`;
+  
+  // 3. Centraliza mantendo proporção
+  const ratioOriginal = imagemOriginalObjeto.width / imagemOriginalObjeto.height;
   let drawWidth, drawHeight;
   
-  if (imgOriginal.width > imgOriginal.height) {
-    // Imagem horizontal (Paisagem)
+  if (imagemOriginalObjeto.width > imagemOriginalObjeto.height) {
     drawWidth = TAMANHO_ALVO;
     drawHeight = TAMANHO_ALVO / ratioOriginal;
   } else {
-    // Imagem vertical (Retrato) ou Quadrada
     drawHeight = TAMANHO_ALVO;
     drawWidth = TAMANHO_ALVO * ratioOriginal;
   }
   
-  // Calcula posição centralizada
   const x = (TAMANHO_ALVO - drawWidth) / 2;
   const y = (TAMANHO_ALVO - drawHeight) / 2;
   
-  // Desenha a imagem no canvas
-  ctx.drawImage(imgOriginal, x, y, drawWidth, drawHeight);
+  // 4. Desenha a imagem filtrada por cima do fundo
+  ctx.drawImage(imagemOriginalObjeto, x, y, drawWidth, drawHeight);
   
-  // Extrai o resultado como JPG (qualidade alta)
+  // 5. Salva para exibição e download
+  ctx.filter = 'none';
   imagemFinalDataUrl = canvas.toDataURL('image/jpeg', 0.95);
-  
-  // Exibe na interface
   resultImage.src = imagemFinalDataUrl;
-  dropZone.style.display = 'none';
-  previewContainer.style.display = 'block';
 }
 
+// --- EVENTOS EM TEMPO REAL ---
+function atualizarValoresTextuais() {
+  valBrilho.textContent = `${inpBrilho.value}%`;
+  valContraste.textContent = `${inpContraste.value}%`;
+  valSaturacao.textContent = `${inpSaturacao.value}%`;
+}
+
+// Atualiza ao mexer nos Sliders
+[inpBrilho, inpContraste, inpSaturacao].forEach(input => {
+  input.addEventListener('input', () => {
+    atualizarValoresTextuais();
+    gerarImagemFinal();
+  });
+});
+
+// Atualiza ao mexer na Cor do Fundo
+inpCorFundo.addEventListener('input', gerarImagemFinal);
+
+function resetarFiltrosInputs() {
+  inpBrilho.value = 100;
+  inpContraste.value = 100;
+  inpSaturacao.value = 100;
+  atualizarValoresTextuais();
+}
+
+function resetarFiltros() {
+  resetarFiltrosInputs();
+  gerarImagemFinal(); 
+}
+
+// --- AÇÕES FINAIS ---
 btnDownload.addEventListener('click', () => {
   if (!imagemFinalDataUrl) return;
+  
+  let nomeBase = inpNomeArquivo.value.trim() || "Imagem";
+  
   const a = document.createElement('a');
   a.href = imagemFinalDataUrl;
-  a.download = `${nomeArquivoOriginal}_1200x1200.jpg`;
+  a.download = `${nomeBase}.jpg`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
 });
 
-function resetarFormatador() {
+// Mantém o nome preenchido para não ter que digitar novamente em lotes
+function formatarOutra() {
   fileInput.value = "";
   imagemFinalDataUrl = '';
+  imagemOriginalObjeto = null;
   previewContainer.style.display = 'none';
   dropZone.style.display = 'flex';
 }
