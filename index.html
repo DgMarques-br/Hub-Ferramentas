@@ -199,18 +199,6 @@
     flex-grow: 1;
   }
 
-  /* Card Inativo/Em breve */
-  .card.disabled {
-    opacity: 0.6;
-    background: transparent;
-    border-style: dashed;
-    pointer-events: none;
-  }
-  .card.disabled .card-icon {
-    background: var(--line-soft);
-    color: var(--ink-soft);
-  }
-
   footer{
     text-align: center;
     padding: 18px 24px 34px;
@@ -231,7 +219,7 @@
     <div>
       <p class="brand-eyebrow">Hub Operacional</p>
       <h1>Central de Ferramentas</h1>
-      <p class="subtitle">Acessa rapidamente a todos os sistemas internos para cadastro, formatação e validação de produtos.</p>
+      <p class="subtitle">Acesse rapidamente a todos os sistemas internos para cadastro, formatação, validação e métricas.</p>
     </div>
     <div>
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
@@ -284,19 +272,33 @@
       </div>
     </a>
 
-    <!-- 4. Métricas -->
-    <a href="#" class="card-link">
+    <!-- 4. Formatador de Imagem -->
+    <a href="formatador-imagem.html" class="card-link">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+          </div>
+          <span class="tag active">Mídia</span>
+        </div>
+        <h2 class="card-title">Formatador de Imagem</h2>
+        <p class="card-desc">Enquadramento automático para 1200x1200px sem cortar a imagem, com preenchimento de fundo branco.</p>
+      </div>
+    </a>
+
+    <!-- 5. Métricas (Agora Ativo) -->
+    <a href="Dashboard_Marketplaces.html" class="card-link">
       <div class="card">
         <div class="card-header">
           <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);">
             <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          <span class="tag pending">Em Breve</span>
+          <span class="tag active" style="background: var(--amber-wash); color: var(--amber);">Analytics</span>
         </div>
         <h2 class="card-title">Dashboard de Métricas</h2>
-        <p class="card-desc">Visualização de dados analíticos, acompanhamento de KPIs e métricas de desempenho da equipa.</p>
+        <p class="card-desc">Visualização de dados analíticos, acompanhamento de KPIs e métricas de desempenho da equipe.</p>
       </div>
-    </div>
+    </a>
 
   </div>
 </main>

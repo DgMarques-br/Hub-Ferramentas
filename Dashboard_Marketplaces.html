@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Métricas</title>
+    <!-- Bibliotecas Externas -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Detetor de Tema do Sistema / Memória -->
+    <script>
+        (function() {
+            const temaSalvo = localStorage.getItem('temaCatalogo');
+            const prefereEscuro = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const temaInicial = temaSalvo ? temaSalvo : (prefereEscuro ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', temaInicial);
+        })();
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-body: #f9fafb; --bg-surface: #ffffff; --border: #e5e7eb;
+            --text-main: #111827; --text-muted: #6b7280;
+            --primary-dark: #0d4f48; --primary: #127a66; --primary-light: #e6f2f0;
+            --orange: #d97706; --danger: #dc2626; --gray-light: #f3f4f6;
+            --badge-bg: #f3f4f6; --chart-text: #6b7280;
+        }
+
+        [data-theme="dark"] {
+            --bg-body: #0f172a; --bg-surface: #1e293b; --border: #334155;
+            --text-main: #f8fafc; --text-muted: #94a3b8;
+            --primary-dark: #ccfbf1; --primary: #14b8a6; --primary-light: rgba(20, 184, 166, 0.1);
+            --orange: #f59e0b; --danger: #ef4444; --gray-light: #334155;
+            --badge-bg: #334155; --chart-text: #cbd5e1;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+        body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+        /* SIDEBAR */
+        .sidebar { width: 260px; background-color: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; z-index: 20; }
+        .sidebar-title { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 24px 12px; }
+        .nav-item { padding: 12px 24px; display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; border-left: 3px solid transparent; }
+        .nav-item:hover { background-color: var(--gray-light); color: var(--text-main); }
+        .nav-item.active { background-color: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
+        
+        .theme-toggle { margin: 0 24px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .theme-toggle:hover { border-color: var(--primary); }
+
+        /* BOTÕES DE FILTRO SP / MG */
+        .uf-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-surface);
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .uf-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-right: 4px;
+        }
+
+        .btn-uf {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-uf:hover {
+            border-color: var(--primary);
+        }
+
+        .btn-uf.active {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        /* MAIN CONTENT */
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .view-section { display: none; padding: 32px; overflow-y: auto; height: 100%; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .topbar { padding: 16px 32px; border-bottom: 1px solid var(--border); background-color: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
+        .btn-sync { background-color: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-sync:disabled { opacity: 0.6; cursor: wait; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+        .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .btn-link { background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; text-decoration: none; display: inline-block; }
+
+        .header { margin-bottom: 24px; }
+        .header h1 { font-size: 24px; margin-bottom: 4px; }
+        .header p { color: var(--text-muted); font-size: 14px; }
+        .card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+        
+        /* GRIDS & KPIS */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+        .kpi { background: var(--bg-surface); border: 1px solid var(--border); padding: 20px; border-radius: 12px; }
+        .kpi span { font-size: 12px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+        .kpi b { display: block; font-size: 32px; margin: 8px 0; line-height: 1; }
+        
+        .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .chart-container { position: relative; height: 300px; width: 100%; display: flex; justify-content: center; }
+        
+        /* TABELA */
+        .toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filter-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-surface); color: var(--text-main); font-size: 13px; outline: none; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        th { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
+        th.sortable:hover { color: var(--primary); background-color: var(--primary-light); border-radius: 6px; }
+        td { padding: 12px; border-bottom: 1px solid var(--border); }
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge.sim { background: var(--primary-light); color: var(--primary); }
+        .badge.nao { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+        .badge.vazio { background: var(--badge-bg); color: var(--text-muted); }
+
+        /* WIZARD */
+        .wizard-step { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+        .wizard-step h3 { font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .wizard-step h3 span { background: var(--primary); color: #fff; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; }
+        .checkbox-group { display: flex; gap: 16px; flex-wrap: wrap; }
+        .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; background: var(--gray-light); padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; }
+        .checkbox-label:hover { border-color: var(--primary); }
+
+        /* UPLOAD */
+        .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-muted); cursor: pointer; transition: 0.2s; background: var(--bg-surface); }
+        .dropzone:hover { border-color: var(--primary); background: var(--primary-light); }
+
+        #loadingState { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 50; color: white; }
+        .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 16px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div>
+            <div class="sidebar-title">Analytics</div>
+            <div class="nav-item active" onclick="switchView('resumo', this)">📊 Resumo Executivo</div>
+            <div class="nav-item admin-only" onclick="switchView('tabela', this)" style="display: none;">⚠️ Alertas & Catálogo</div>
+            
+            <div class="sidebar-title admin-only" style="margin-top: 32px; display: none;">Operacional</div>
+            <div class="nav-item admin-only" onclick="switchView('anymarket', this)" style="display: none;">📥 Auditoria Anymarket</div>
+            <div class="nav-item admin-only" onclick="switchView('relatorio', this)" style="display: none;">📄 Gerador de Relatórios</div>
+        </div>
+        
+        <div>
+            <button class="theme-toggle" id="btnTheme" onclick="toggleTheme()">🌗 Alternar Tema</button>
+            <div style="padding: 16px 24px; font-size: 11px; color: var(--text-muted); text-align: center; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <span>Live API Conectada</span>
+                <span id="lockTrigger" onclick="solicitarAcessoCadastro()" style="cursor: pointer; opacity: 0.5; font-size: 12px;" title="Acesso Restrito">🔒</span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MODAL DE ACESSO DISCRETO PARA CADASTRO -->
+    <div id="modalAcesso" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100;">
+        <div class="card" style="width: 320px; text-align: center; padding: 24px;">
+            <h3 style="margin-bottom: 8px; font-size: 16px;">Acesso Restrito</h3>
+            <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Digite a senha para acessar a área operacional de cadastro.</p>
+            <input type="password" id="inputSenhaCadastro" class="filter-input" style="width: 100%; margin-bottom: 12px; text-align: center;" placeholder="Senha" onkeyup="if(event.key==='Enter') verificarSenhaCadastro()">
+            <div style="display: flex; gap: 8px;">
+                <button class="btn-outline" style="flex: 1; justify-content: center;" onclick="fecharModalAcesso()">Cancelar</button>
+                <button class="btn-sync" style="flex: 1; justify-content: center;" onclick="verificarSenhaCadastro()">Entrar</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div id="loadingState">
+            <div class="spinner"></div>
+            <h2 id="loadingMsg">Sincronizando...</h2>
+        </div>
+
+        <div class="topbar">
+            <div style="display: flex; align-items: center; gap: 16px;">
+                <a href="./index.html" class="btn-outline">← Voltar</a>
+                <div style="font-size: 13px; color: var(--text-muted);">Sincronização: <strong id="syncTime">--</strong></div>
+            </div>
+            <button class="btn-sync" id="btnSync" onclick="buscarDadosAPI()">🔄 Atualizar Dados</button>
+        </div>
+
+        <!-- 1. RESUMO -->
+        <div id="view-resumo" class="view-section active">
+            <div class="header" style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h1>Resumo Executivo</h1>
+                    <p>Visão global de saúde do catálogo consolidando todas as abas.</p>
+                </div>
+                <!-- BOTÕES DE SEPARAÇÃO SP / MG -->
+                <div class="uf-container">
+                    <span class="uf-label">Estado:</span>
+                    <button class="btn-uf active" onclick="filtrarUF('TODOS', this)">🌐 Todos</button>
+                    <button class="btn-uf" onclick="filtrarUF('SP', this)">📍 SP</button>
+                    <button class="btn-uf" onclick="filtrarUF('MG', this)">📍 MG</button>
+                </div>
+            </div>
+            <div class="kpi-grid">
+                <div class="kpi" style="background: var(--primary); color: white; border: none;">
+                    <span style="color: white;">Total de SKUs</span>
+                    <b id="kpiTotal">0</b>
+                </div>
+                <div class="kpi"><span>Anunciados</span><b id="kpiSim" style="color: var(--primary);">0</b></div>
+                <div class="kpi"><span>Não Anunciados</span><b id="kpiNao" style="color: var(--orange);">0</b></div>
+                <div class="kpi"><span>Sem Informação</span><b id="kpiVazio" style="color: var(--text-muted);">0</b></div>
+            </div>
+            <div class="charts-grid">
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; font-size: 16px;">Distribuição Global (Status)</h3>
+                    <div class="chart-container"><canvas id="chartStatus"></canvas></div>
+                </div>
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; font-size: 16px;">Volume por Marketplace</h3>
+                    <div class="chart-container"><canvas id="chartMarketplaces"></canvas></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TABELA E ALERTAS -->
+        <div id="view-tabela" class="view-section">
+            <div class="header">
+                <h1>Catálogo & Alertas</h1>
+                <p>Pesquise, filtre por Curva e acesse os links dos anúncios. Clique na coluna Estoque para ordenar.</p>
+            </div>
+
+            <div class="card" style="background: rgba(245, 158, 11, 0.05); border-color: rgba(245, 158, 11, 0.3);">
+                <div style="font-size: 24px; font-weight: 700; color: var(--orange);" id="alertaEstoqueNao">0</div>
+                <strong style="color: var(--orange);">Alerta de Estoque Parado:</strong> Itens com estoque > 0 mas que não estão anunciados.
+            </div>
+
+            <div class="card">
+                <div class="toolbar">
+                    <select id="filtroAba" class="filter-input"><option value="">Todos os Canais</option></select>
+                    <select id="filtroStatus" class="filter-input"><option value="">Todos os Status</option><option value="sim">Sim</option><option value="nao">Não</option><option value="vazio">Sem Info</option></select>
+                    <select id="filtroCurva" class="filter-input"><option value="">Todas as Curvas</option></select>
+                    <input type="text" id="inputBusca" class="filter-input" style="flex: 1;" placeholder="Buscar SKU, Descrição ou Marca...">
+                </div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Canal</th>
+                                <th>Curva</th>
+                                <th>SKU</th>
+                                <th>Descrição</th>
+                                <th id="thEstoque" class="sortable" onclick="ordenarEstoque()" style="cursor: pointer; user-select: none;" title="Clique para ordenar">Estoque ↕</th>
+                                <th>Status</th>
+                                <th>Link</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaCorpo"></tbody>
+                    </table>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px;">
+                    <span id="pageInfo">Mostrando 0 de 0</span>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="filter-input" id="btnPrev" onclick="mudarPagina(-1)" style="cursor:pointer">Anterior</button>
+                        <button class="filter-input" id="btnNext" onclick="mudarPagina(1)" style="cursor:pointer">Próxima</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. ANYMARKET WIDE -->
+        <div id="view-anymarket" class="view-section">
+            <div class="header">
+                <h1>Auditoria Anymarket</h1>
+                <p>Jogue a planilha de erros abaixo para mapear as falhas críticas de integração.</p>
+            </div>
+            
+            <div class="card" id="cardUploadAny">
+                <label class="dropzone" id="dropzoneAny">
+                    <h3 style="margin-bottom: 8px;">Arraste o arquivo Excel (.xlsx) de erros aqui</h3>
+                    <p>Ou clique para selecionar do seu computador.</p>
+                    <input type="file" id="fileAny" accept=".xlsx, .xls, .csv" style="display: none;" onchange="lerPlanilhaAny(event)">
+                </label>
+            </div>
+
+            <div id="resultadoAny" style="display: none;">
+                <!-- Gráfico -->
+                <div class="card">
+                    <h3 style="margin-bottom: 16px; font-size: 16px;">Panorama de Erros</h3>
+                    <div class="chart-container" style="height: 250px;"><canvas id="chartAny"></canvas></div>
+                </div>
+                
+                <!-- Tabela Larga -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
+                        <h3 style="font-size: 16px;">Lista de Correção</h3>
+                        <div style="display: flex; gap: 12px; flex: 1; justify-content: flex-end; flex-wrap: wrap;">
+                            <select id="filtroErroAny" class="filter-input" style="max-width: 350px; flex: 1;" onchange="filtrarTabelaAny()">
+                                <option value="">⚠️ Todos os Erros</option>
+                            </select>
+                            <input type="text" id="buscaAny" class="filter-input" style="max-width: 250px; flex: 1;" placeholder="Buscar SKU ou Palavra..." oninput="filtrarTabelaAny()">
+                            <button class="btn-outline" onclick="exportarAnyCSV()">📥 Exportar Lista (Planilha Original)</button>
+                        </div>
+                    </div>
+                    
+                    <div style="overflow-x: auto;">
+                        <table style="font-size: 13px; width: 100%; table-layout: fixed; min-width: 600px;">
+                            <thead><tr id="anyTableHeader"></tr></thead>
+                            <tbody id="anyTableBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Paginação Anymarket -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px;">
+                        <span id="pageInfoAny">Mostrando 0 de 0</span>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="filter-input" id="btnPrevAny" onclick="mudarPaginaAny(-1)" style="cursor:pointer">Anterior</button>
+                            <button class="filter-input" id="btnNextAny" onclick="mudarPaginaAny(1)" style="cursor:pointer">Próxima</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. RELATÓRIOS WIZARD -->
+        <div id="view-relatorio" class="view-section">
+            <div class="header">
+                <h1>Gerador de Relatórios</h1>
+                <p>Filtre e baixe a sua base de dados atualizada em formato Excel (CSV).</p>
+            </div>
+            <div class="card">
+                <div class="wizard-step">
+                    <h3><span>1</span> Quais Marketplaces quer exportar?</h3>
+                    <div class="checkbox-group" id="wizardCanais"></div>
+                </div>
+                <div class="wizard-step">
+                    <h3><span>2</span> Qual a situação dos anúncios?</h3>
+                    <div class="checkbox-group">
+                        <label class="checkbox-label"><input type="checkbox" id="wz-sim" checked> Anunciados (Sim)</label>
+                        <label class="checkbox-label"><input type="checkbox" id="wz-nao" checked> Não Anunciados</label>
+                        <label class="checkbox-label"><input type="checkbox" id="wz-vazio" checked> Sem Informação</label>
+                    </div>
+                </div>
+                <div class="wizard-step" style="border: none; padding-bottom: 0;">
+                    <h3><span>3</span> Tudo pronto!</h3>
+                    <button class="btn-sync" onclick="gerarRelatorioCSV()">📥 Baixar Planilha CSV</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // CONFIG GLOBAIS
+        const API_URL = "https://script.google.com/macros/s/AKfycbw5LhNN2TcUEp-CHI3lCFHv1IdmDITRcoDY3Km6fZ0W_rd7k_T3DKj8WEulAvXsLAfN5g/exec";
+        
+        // Vars Catálogo
+        let dadosGlobais = [], dadosFiltrados = [];
+        let pAtual = 1; const itensPagina = 50;
+        let cStatus = null, cMarket = null, cAny = null;
+        let ordemEstoque = 0; 
+        let ufAtual = 'TODOS'; // Filtro de Estado
+
+        // Vars Anymarket
+        let dadosAny = [], listaRenderAny = [];
+        let pAtualAny = 1; const itensPaginaAny = 50;
+        let colunaErroAny = "", chavesAny = [];
+        let mapaCoresErro = {}; 
+        const paletaCores = ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#84cc16', '#6366f1', '#10b981'];
+
+        // Modo Cadastro / Operacional
+        let modoCadastroAtivo = false;
+
+        window.onload = () => { 
+            const temaAtual = document.documentElement.getAttribute('data-theme');
+            Chart.defaults.color = temaAtual === 'dark' ? '#cbd5e1' : '#6b7280';
+            
+            atualizarTextoBotaoTema();
+            inicializarModoAcesso();
+            configurarFiltros(); 
+            buscarDadosAPI(); 
+        };
+
+        /* --- CONTROLE DE MODO PÚBLICO / CADASTRO --- */
+        function inicializarModoAcesso() {
+            const ehAdminHash = window.location.hash === '#cadastro' || window.location.hash === '#admin';
+            const ehAdminSalvo = localStorage.getItem('modoCadastroAtivo') === 'true';
+
+            if (ehAdminHash || ehAdminSalvo) {
+                ativarModoCadastro(false);
+            } else {
+                desativarModoCadastro();
+            }
+        }
+
+        function solicitarAcessoCadastro() {
+            if (modoCadastroAtivo) {
+                if (confirm("Deseja sair do modo de edição/cadastro?")) {
+                    desativarModoCadastro();
+                }
+                return;
+            }
+            document.getElementById('modalAcesso').style.display = 'flex';
+            document.getElementById('inputSenhaCadastro').value = '';
+            document.getElementById('inputSenhaCadastro').focus();
+        }
+
+        function fecharModalAcesso() {
+            document.getElementById('modalAcesso').style.display = 'none';
+        }
+
+        function verificarSenhaCadastro() {
+            const senha = document.getElementById('inputSenhaCadastro').value;
+            if (senha === 'admin' || senha === 'cadastro' || senha === '1234') {
+                fecharModalAcesso();
+                ativarModoCadastro(true);
+            } else {
+                alert('Senha incorreta.');
+            }
+        }
+
+        function ativarModoCadastro(salvar = true) {
+            modoCadastroAtivo = true;
+            if (salvar) localStorage.setItem('modoCadastroAtivo', 'true');
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+            const lock = document.getElementById('lockTrigger');
+            if (lock) {
+                lock.innerText = '🔓';
+                lock.title = 'Modo Cadastro Ativo (Clique para sair)';
+                lock.style.opacity = '1';
+            }
+        }
+
+        function desativarModoCadastro() {
+            modoCadastroAtivo = false;
+            localStorage.removeItem('modoCadastroAtivo');
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            const lock = document.getElementById('lockTrigger');
+            if (lock) {
+                lock.innerText = '🔒';
+                lock.title = 'Área Restrita';
+                lock.style.opacity = '0.5';
+            }
+            switchView('resumo', document.querySelector('.nav-item'));
+        }
+
+        function switchView(id, el) {
+            document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
+            if (el) el.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
+            document.getElementById('view-' + id).classList.add('active');
+            if (id === 'tabela') renderTabela();
+        }
+
+        function toggleTheme() {
+            const h = document.documentElement;
+            const novoTema = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            
+            h.setAttribute('data-theme', novoTema);
+            localStorage.setItem('temaCatalogo', novoTema);
+            
+            Chart.defaults.color = novoTema === 'dark' ? '#cbd5e1' : '#6b7280';
+            if(cStatus) cStatus.update(); if(cMarket) cMarket.update(); if(cAny) cAny.update();
+            
+            atualizarTextoBotaoTema();
+        }
+
+        function atualizarTextoBotaoTema() {
+            const btn = document.getElementById('btnTheme');
+            const ehEscuro = document.documentElement.getAttribute('data-theme') === 'dark';
+            btn.innerHTML = ehEscuro ? '☀️ Modo Claro' : '🌙 Modo Escuro';
+        }
+
+        /* --- FILTRO SP / MG --- */
+        function filtrarUF(uf, el) {
+            ufAtual = uf;
+            document.querySelectorAll('.btn-uf').forEach(b => b.classList.remove('active'));
+            if(el) el.classList.add('active');
+            processarResumo();
+        }
+
+        async function buscarDadosAPI() {
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('loadingMsg').innerText = "Sincronizando Google Sheets...";
+            try {
+                const res = await fetch(API_URL);
+                const json = JSON.parse(await res.text());
+                
+                dadosGlobais = json.map(row => {
+                    const g = (opts) => {
+                        const lKeys = Object.keys(row).map(k => String(k).toLowerCase().trim());
+                        for(let o of opts) { let idx = lKeys.indexOf(o.toLowerCase()); if(idx !== -1) return String(Object.values(row)[idx]).trim(); }
+                        return "";
+                    };
+
+                    let stRaw = g(['status', 'estado', 'anunciado']).toLowerCase();
+                    let stCat = 'vazio';
+                    if (['sim', 'anunciado', 'ok', 'ativo'].includes(stRaw)) stCat = 'sim';
+                    else if (['não', 'nao', 'não anunciado', 'inativo'].includes(stRaw) || stRaw.includes('fora de linha')) stCat = 'nao';
+
+                    let ufRaw = g(['uf', 'estado', 'filial', 'regional', 'deposito', 'origem', 'cd', 'unidade']);
+                    let canalRaw = g(['Marketplace', 'aba']) || "Geral";
+                    let ufCat = "OUTROS";
+
+                    if (/sp|são paulo|sao paulo/i.test(ufRaw) || /sp|são paulo|sao paulo/i.test(canalRaw)) {
+                        ufCat = "SP";
+                    } else if (/mg|minas|minas gerais/i.test(ufRaw) || /mg|minas|minas gerais/i.test(canalRaw)) {
+                        ufCat = "MG";
+                    } else {
+                        ufCat = ufRaw.toUpperCase() || "SP";
+                    }
+
+                    return {
+                        canal: canalRaw,
+                        uf: ufCat,
+                        curva: g(['curva', 'curva abc']).toUpperCase() || "-",
+                        sku: g(['sku', 'nac', 'código', 'id', 'nº do item']),
+                        marca: g(['marca', 'fabricante', 'brand']) || "Sem Marca",
+                        desc: g(['descrição', 'descricao', 'produto', 'nome', 'titulo']),
+                        estoque: parseInt(g(['estoque', 'qtd', 'quantidade', 'estoque geral'])) || 0,
+                        link: g(['link', 'url', 'anúncio']) || "",
+                        status: stCat,
+                        statusOriginal: stRaw || "Vazio"
+                    };
+                }).filter(d => d.sku !== "");
+
+                dadosFiltrados = [...dadosGlobais];
+                document.getElementById('syncTime').innerText = new Date().toLocaleTimeString();
+                
+                popularDropdowns();
+                processarResumo();
+                renderTabela();
+            } catch (e) { alert("Erro API: " + e.message); } 
+            finally { document.getElementById('loadingState').style.display = 'none'; }
+        }
+
+        function popularDropdowns() {
+            let canais = [...new Set(dadosGlobais.map(d=>d.canal))].sort();
+            
+            let cSel = document.getElementById('filtroAba');
+            cSel.innerHTML = '<option value="">Todos os Canais</option>';
+            canais.forEach(c => cSel.innerHTML += `<option value="${c}">${c}</option>`);
+
+            let wCanais = document.getElementById('wizardCanais');
+            wCanais.innerHTML = `<label class="checkbox-label" style="background:var(--primary); color:white; border:none;"><input type="checkbox" onchange="document.querySelectorAll('.wz-canal').forEach(cb=>cb.checked=this.checked)" checked> Todos os Canais</label>`;
+            canais.forEach(c => wCanais.innerHTML += `<label class="checkbox-label"><input type="checkbox" class="wz-canal" value="${c}" checked> ${c}</label>`);
+
+            let curvas = [...new Set(dadosGlobais.map(d=>d.curva).filter(c=>c!=="-"))].sort();
+            let cvSel = document.getElementById('filtroCurva');
+            cvSel.innerHTML = '<option value="">Todas as Curvas</option>';
+            curvas.forEach(c => cvSel.innerHTML += `<option value="${c}">${c}</option>`);
+        }
+
+        function processarResumo() {
+            let s=0, n=0, v=0, cCount={};
+            let alertaNao = 0;
+
+            let baseResumo = dadosGlobais.filter(d => {
+                if (ufAtual === 'TODOS') return true;
+                return d.uf === ufAtual;
+            });
+
+            baseResumo.forEach(d => {
+                if(d.status==='sim') s++; 
+                else if(d.status==='nao') { n++; if(d.estoque > 0) alertaNao++; } 
+                else v++;
+                cCount[d.canal] = (cCount[d.canal]||0)+1;
+            });
+
+            document.getElementById('kpiTotal').innerText = baseResumo.length.toLocaleString('pt-BR');
+            document.getElementById('kpiSim').innerText = s; 
+            document.getElementById('kpiNao').innerText = n; 
+            document.getElementById('kpiVazio').innerText = v;
+            document.getElementById('alertaEstoqueNao').innerText = alertaNao;
+
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            let cTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? '#1e293b' : '#ffffff';
+
+            if(cStatus) cStatus.destroy();
+            cStatus = new Chart(document.getElementById('chartStatus'), {
+                type: 'doughnut',
+                data: { labels: ['Anunciados', 'Não Anunciados', 'Sem Info'], datasets: [{ data: [s, n, v], backgroundColor: ['#14b8a6', '#f59e0b', '#94a3b8'], borderColor: cTheme }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
+            });
+
+            let sortCanais = Object.entries(cCount).sort((a,b)=>b[1]-a[1]);
+            if(cMarket) cMarket.destroy();
+            cMarket = new Chart(document.getElementById('chartMarketplaces'), {
+                type: 'bar',
+                data: { labels: sortCanais.map(c=>c[0]), datasets: [{ label: 'Qtd Itens', data: sortCanais.map(c=>c[1]), backgroundColor: '#14b8a6' }] },
+                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins:{legend:{display:false}} }
+            });
+        }
+
+        /* --- CONTROLES DE TABELA E FILTROS DO CATÁLOGO --- */
+        function configurarFiltros() {
+            ['filtroAba', 'filtroStatus', 'filtroCurva', 'inputBusca'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => { pAtual = 1; aplicarFiltros(); });
+            });
+        }
+
+        function ordenarEstoque() {
+            if(ordemEstoque === 0) ordemEstoque = 1;
+            else if(ordemEstoque === 1) ordemEstoque = -1;
+            else ordemEstoque = 0;
+
+            let th = document.getElementById('thEstoque');
+            if(ordemEstoque === 1) th.innerText = "Estoque ▲";
+            else if(ordemEstoque === -1) th.innerText = "Estoque ▼";
+            else th.innerText = "Estoque ↕";
+
+            aplicarFiltros();
+        }
+
+        function aplicarFiltros() {
+            let a = document.getElementById('filtroAba').value, s = document.getElementById('filtroStatus').value, 
+                c = document.getElementById('filtroCurva').value, q = document.getElementById('inputBusca').value.toLowerCase();
+
+            dadosFiltrados = dadosGlobais.filter(d => {
+                return (a==="" || d.canal===a) && (s==="" || d.status===s) && (c==="" || d.curva===c) &&
+                       (q==="" || d.sku.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q) || d.marca.toLowerCase().includes(q));
+            });
+
+            if(ordemEstoque !== 0) {
+                dadosFiltrados.sort((itemA, itemB) => {
+                    return ordemEstoque === 1 ? itemA.estoque - itemB.estoque : itemB.estoque - itemA.estoque;
+                });
+            }
+
+            renderTabela();
+        }
+
+        function renderTabela() {
+            const tb = document.getElementById('tabelaCorpo');
+            let ini = (pAtual - 1) * itensPagina, fim = ini + itensPagina;
+            let am = dadosFiltrados.slice(ini, fim);
+
+            tb.innerHTML = "";
+            am.forEach(d => {
+                let lbl = d.status==='sim'?'Sim':d.status==='nao'?'Não':'S/I';
+                let linkBtn = d.link && d.link.startsWith('http') ? `<a href="${d.link}" target="_blank" class="btn-link">🔗 Ver Anúncio</a>` : `<span class="badge vazio">Sem link</span>`;
+                
+                tb.innerHTML += `<tr>
+                    <td style="color:var(--text-muted); font-size:11px;">${d.canal}</td>
+                    <td style="font-weight:600; color:var(--primary);">${d.curva}</td>
+                    <td style="font-weight:600">${d.sku}</td>
+                    <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${d.desc.replace(/"/g, '&quot;')}">${d.desc}</td>
+                    <td>${d.estoque}</td>
+                    <td><span class="badge ${d.status}">${lbl}</span></td>
+                    <td>${linkBtn}</td>
+                </tr>`;
+            });
+
+            document.getElementById('pageInfo').innerText = `Página ${pAtual} (Total: ${dadosFiltrados.length} itens)`;
+            document.getElementById('btnPrev').disabled = pAtual === 1; document.getElementById('btnNext').disabled = fim >= dadosFiltrados.length;
+        }
+        function mudarPagina(d) { pAtual += d; renderTabela(); }
+
+        /* --- RELATÓRIOS CSV --- */
+        function gerarRelatorioCSV() {
+            let canaisSel = Array.from(document.querySelectorAll('.wz-canal:checked')).map(cb => cb.value);
+            let checkSim = document.getElementById('wz-sim').checked;
+            let checkNao = document.getElementById('wz-nao').checked;
+            let checkVazio = document.getElementById('wz-vazio').checked;
+
+            let baseExport = dadosGlobais.filter(d => {
+                if(!canaisSel.includes(d.canal)) return false;
+                if(d.status === 'sim' && !checkSim) return false;
+                if(d.status === 'nao' && !checkNao) return false;
+                if(d.status === 'vazio' && !checkVazio) return false;
+                return true;
+            });
+
+            if(baseExport.length === 0) return alert("Nenhum dado com essas seleções!");
+
+            let cab = ["Canal", "Curva", "SKU", "Descrição", "Marca", "Estoque", "Status Original", "Link do Anuncio"];
+            let lin = baseExport.map(d => [d.canal, d.curva, d.sku, `"${d.desc.replace(/"/g,'""')}"`, d.marca, d.estoque, d.statusOriginal, d.link].join(";"));
+            let blob = new Blob(["\uFEFF" + cab.join(";") + "\n" + lin.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            
+            let l = document.createElement("a"); l.href = URL.createObjectURL(blob);
+            l.download = `Relatorio_Personalizado_${new Date().getTime()}.csv`; l.click();
+        }
+
+        /* --- AUDITORIA ANYMARKET --- */
+        function lerPlanilhaAny(e) {
+            const f = e.target.files[0]; if(!f) return;
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('loadingMsg').innerText = "Analisando Erros...";
+
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, {type: 'array'});
+                    const jsonArr = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], {defval: ""});
+                    
+                    if(jsonArr.length === 0) throw new Error("A planilha está vazia.");
+
+                    dadosAny = jsonArr;
+                    chavesAny = Object.keys(dadosAny[0]);
+                    colunaErroAny = chavesAny.find(k => /erro|motivo|mensagem|falha/i.test(k)) || chavesAny[chavesAny.length - 1]; 
+                    
+                    let eCount = {};
+                    dadosAny.forEach(r => { let eMsg = r[colunaErroAny] || "Sem Descrição"; eCount[eMsg] = (eCount[eMsg]||0)+1; });
+                    let sortErr = Object.entries(eCount).sort((a,b)=>b[1]-a[1]);
+
+                    mapaCoresErro = {};
+                    sortErr.forEach((err, idx) => {
+                        mapaCoresErro[err[0]] = paletaCores[idx % paletaCores.length];
+                    });
+
+                    if(cAny) cAny.destroy();
+                    Chart.defaults.color = document.documentElement.getAttribute('data-theme') === 'dark' ? '#cbd5e1' : '#6b7280';
+                    cAny = new Chart(document.getElementById('chartAny'), {
+                        type: 'pie',
+                        data: { 
+                            labels: sortErr.slice(0,10).map(e=>e[0].substring(0,40)+"..."), 
+                            datasets: [{ 
+                                data: sortErr.slice(0,10).map(e=>e[1]), 
+                                backgroundColor: sortErr.slice(0,10).map(e=>mapaCoresErro[e[0]]) 
+                            }] 
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{position:'right'}} }
+                    });
+
+                    let fSel = document.getElementById('filtroErroAny');
+                    fSel.innerHTML = '<option value="">⚠️ Todos os Erros (Críticos Primeiro)</option>';
+                    sortErr.forEach(err => { fSel.innerHTML += `<option value="${err[0].replace(/"/g, '&quot;')}">${err[0].substring(0, 70)}... (${err[1]} itens)</option>`; });
+
+                    document.getElementById('cardUploadAny').style.display = 'none';
+                    document.getElementById('resultadoAny').style.display = 'block';
+
+                    filtrarTabelaAny();
+                } catch(err) { alert("Erro ao ler planilha: " + err.message); } 
+                finally { document.getElementById('loadingState').style.display = 'none'; e.target.value = ""; }
+            };
+            reader.readAsArrayBuffer(f);
+        }
+
+        function filtrarTabelaAny() {
+            let filtro = document.getElementById('filtroErroAny').value;
+            let busca = document.getElementById('buscaAny').value.toLowerCase();
+
+            listaRenderAny = dadosAny.filter(r => {
+                let eMsg = r[colunaErroAny] || "Sem Descrição";
+                let passFiltro = filtro === "" || eMsg === filtro;
+                
+                let textoLinha = Object.values(r).join(" ").toLowerCase();
+                let passBusca = busca === "" || textoLinha.includes(busca);
+                
+                return passFiltro && passBusca;
+            });
+
+            if (filtro === "") {
+                let eCount = {};
+                dadosAny.forEach(r => { let eMsg = r[colunaErroAny] || "Sem Descrição"; eCount[eMsg] = (eCount[eMsg]||0)+1; });
+                listaRenderAny.sort((a,b) => eCount[b[colunaErroAny] || "Sem Descrição"] - eCount[a[colunaErroAny] || "Sem Descrição"]);
+            }
+
+            pAtualAny = 1;
+            renderTabelaAny();
+        }
+
+        function renderTabelaAny() {
+            let cabecalhoHtml = `
+                <th style="width: 20%;">${chavesAny[0]}</th>
+                <th style="width: 30%;">${chavesAny[1] ? chavesAny[1] : 'Detalhe'}</th>
+                <th style="width: 50%;">Mensagem Completa do Anymarket</th>
+            `;
+            document.getElementById('anyTableHeader').innerHTML = cabecalhoHtml;
+            
+            let ini = (pAtualAny - 1) * itensPaginaAny;
+            let fim = ini + itensPaginaAny;
+            let am = listaRenderAny.slice(ini, fim);
+
+            let corpoHtml = '';
+            am.forEach(r => {
+                let detalhe = chavesAny[1] ? String(r[chavesAny[1]]) : '-';
+                let msgErro = r[colunaErroAny] || 'Nenhum motivo informado';
+                let corDestaque = mapaCoresErro[msgErro] || '#6b7280';
+
+                corpoHtml += `<tr>
+                    <td style="font-weight:600; word-wrap: break-word;">${r[chavesAny[0]] || '-'}</td>
+                    <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${detalhe.replace(/"/g, '&quot;')}">${detalhe}</td>
+                    <td style="white-space: normal; line-height: 1.4;">
+                        <span style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; background: ${corDestaque}15; color: ${corDestaque}; border: 1px solid ${corDestaque}30;">
+                            ${msgErro}
+                        </span>
+                    </td>
+                </tr>`;
+            });
+            document.getElementById('anyTableBody').innerHTML = corpoHtml;
+
+            document.getElementById('pageInfoAny').innerText = `Página ${pAtualAny} (Total: ${listaRenderAny.length} erros)`;
+            document.getElementById('btnPrevAny').disabled = pAtualAny === 1; 
+            document.getElementById('btnNextAny').disabled = fim >= listaRenderAny.length;
+        }
+
+        function mudarPaginaAny(d) {
+            pAtualAny += d;
+            renderTabelaAny();
+        }
+
+        function exportarAnyCSV() {
+            if(listaRenderAny.length === 0) return alert("Nenhum dado para exportar.");
+            
+            let cab = chavesAny; 
+            let lin = listaRenderAny.map(r => {
+                return chavesAny.map(k => {
+                    let val = r[k] !== undefined ? String(r[k]) : "";
+                    return `"${val.replace(/"/g, '""')}"`;
+                }).join(";");
+            });
+
+            let blob = new Blob(["\uFEFF" + cab.join(";") + "\n" + lin.join("\n")], { type: 'text/csv;charset=utf-8;' });
+            let l = document.createElement("a"); l.href = URL.createObjectURL(blob);
+            l.download = `Correcao_Anymarket_${new Date().getTime()}.csv`; l.click();
+        }
+    </script>
+</body>
+</html>

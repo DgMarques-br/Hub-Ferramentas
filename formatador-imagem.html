@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formatador de Imagem (1200x1200px)</title>
+<style>
+  :root{
+    --bg: #EEF0EF;
+    --paper: #FFFFFF;
+    --ink: #17211D;
+    --ink-soft: #576159;
+    --line: #DADFDA;
+    --line-soft: #E7EAE6;
+    --teal: #1F6F5C;
+    --teal-dark: #164F42;
+    --teal-wash: #E4F0EC;
+    --plum: #5B4B8A;
+    --plum-wash: #ECE8F5;
+    --amber: #B9762D;
+    --amber-wash: #F7ECDE;
+    --red: #D93025;
+    --red-wash: #FCE8E6;
+    --radius: 10px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  }
+  :root[data-theme="dark"]{
+    --bg: #11201B;
+    --paper: #16231E;
+    --ink: #E8EEEC;
+    --ink-soft: #92A49C;
+    --line: #233830;
+    --line-soft: #1D2D27;
+    --teal: #3FB492;
+    --teal-dark: #7FDDBE;
+    --teal-wash: #1B3830;
+    --plum: #C2B0EC;
+    --plum-wash: #2B2440;
+    --amber: #E3A95D;
+    --amber-wash: #39301A;
+    --red: #F28B82;
+    --red-wash: #3C1E1A;
+  }
+  *{ box-sizing: border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    transition: background .15s ease, color .15s ease;
+  }
+
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
+  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; transition: color 0.15s ease; }
+  .nav-back:hover { color: var(--teal); }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); font-weight: 600; margin: 0 0 6px; }
+  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 520px; }
+
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
+
+  main { max-width: 800px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
+  
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  
+  /* Área de Upload / Drag & Drop */
+  .drop-zone {
+    width: 100%;
+    max-width: 400px;
+    height: 300px;
+    margin: 0 auto 24px;
+    border: 2px dashed var(--ink-soft);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--teal);
+    background: var(--teal-wash);
+  }
+  
+  .drop-zone-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 12px;
+    pointer-events: none;
+  }
+  
+  .btn-upload {
+    padding: 10px 20px;
+    font-size: 14px;
+    background-color: var(--ink-soft);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    pointer-events: none;
+  }
+
+  #fileInput { display: none; }
+
+  /* Pré-visualização do resultado */
+  .preview-container {
+    display: none;
+    margin-top: 30px;
+  }
+  
+  .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 16px; }
+  
+  .preview-image {
+    max-width: 100%;
+    width: 300px;
+    height: 300px;
+    border: 1px solid var(--line);
+    background-color: #fff; /* Fundo sempre branco para a pré-visualização da borda */
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    object-fit: contain;
+  }
+
+  .actions { display: flex; gap: 12px; justify-content: center; }
+  .btn-primary { padding: 12px 24px; font-size: 14.5px; background-color: var(--teal); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+  .btn-secondary:hover { background: var(--line-soft); }
+
+  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <a href="index.html" class="nav-back">← Voltar ao Hub</a>
+      <p class="brand-eyebrow">Mídia</p>
+      <h1>Formatador de Imagem</h1>
+      <p class="subtitle">Enquadramento automático para 1200x1200px sem cortar a imagem, com preenchimento de fundo branco.</p>
+    </div>
+    <div>
+      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    
+    <!-- Zona de Drop e Seleção de Arquivo -->
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="drop-zone-text">Arraste a imagem<br>desejada</div>
+      <button class="btn-upload">Pesquisar documentos</button>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <!-- Área de Resultado (Oculta inicialmente) -->
+    <div class="preview-container" id="previewContainer">
+      <div class="preview-title">Resultado (1200 x 1200px)</div>
+      <img id="resultImage" class="preview-image" src="" alt="Pré-visualização">
+      <div class="actions">
+        <button class="btn-primary" id="btnDownload">Baixar Imagem</button>
+        <button class="btn-secondary" onclick="resetarFormatador()">Formatar Outra</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>Processamento local no navegador. A sua imagem não é enviada para nenhum servidor.</footer>
+
+<script>
+// --- GESTÃO DE TEMA ---
+const themeToggleBtn = document.getElementById('themeToggle');
+function applyTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+}
+const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+themeToggleBtn.addEventListener('click', () => {
+  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(next);
+  localStorage.setItem('sapCatalogTheme', next);
+});
+
+// --- LÓGICA DO FORMATADOR ---
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewContainer = document.getElementById('previewContainer');
+const resultImage = document.getElementById('resultImage');
+const btnDownload = document.getElementById('btnDownload');
+
+let imagemFinalDataUrl = '';
+let nomeArquivoOriginal = '';
+
+// Eventos de Drag & Drop
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+  dropZone.addEventListener(eventName, preventDefaults, false);
+});
+function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
+
+['dragenter', 'dragover'].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
+});
+['dragleave', 'drop'].forEach(eventName => {
+  dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+});
+
+dropZone.addEventListener('drop', (e) => {
+  let dt = e.dataTransfer;
+  let files = dt.files;
+  if(files.length > 0) processarArquivo(files[0]);
+});
+
+fileInput.addEventListener('change', function() {
+  if (this.files && this.files[0]) processarArquivo(this.files[0]);
+});
+
+function processarArquivo(file) {
+  if (!file.type.match('image.*')) {
+    alert("Por favor, selecione um arquivo de imagem válido.");
+    return;
+  }
+  
+  nomeArquivoOriginal = file.name.split('.')[0];
+  const reader = new FileReader();
+  
+  reader.onload = function(e) {
+    const img = new Image();
+    img.onload = function() {
+      gerarImagem1200(img);
+    }
+    img.src = e.target.result;
+  }
+  reader.readAsDataURL(file);
+}
+
+function gerarImagem1200(imgOriginal) {
+  const TAMANHO_ALVO = 1200;
+  
+  // Cria o Canvas
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = TAMANHO_ALVO;
+  canvas.height = TAMANHO_ALVO;
+  
+  // Preenche o fundo com branco
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
+  
+  // Calcula proporções
+  const ratioOriginal = imgOriginal.width / imgOriginal.height;
+  let drawWidth, drawHeight;
+  
+  if (imgOriginal.width > imgOriginal.height) {
+    // Imagem horizontal (Paisagem)
+    drawWidth = TAMANHO_ALVO;
+    drawHeight = TAMANHO_ALVO / ratioOriginal;
+  } else {
+    // Imagem vertical (Retrato) ou Quadrada
+    drawHeight = TAMANHO_ALVO;
+    drawWidth = TAMANHO_ALVO * ratioOriginal;
+  }
+  
+  // Calcula posição centralizada
+  const x = (TAMANHO_ALVO - drawWidth) / 2;
+  const y = (TAMANHO_ALVO - drawHeight) / 2;
+  
+  // Desenha a imagem no canvas
+  ctx.drawImage(imgOriginal, x, y, drawWidth, drawHeight);
+  
+  // Extrai o resultado como JPG (qualidade alta)
+  imagemFinalDataUrl = canvas.toDataURL('image/jpeg', 0.95);
+  
+  // Exibe na interface
+  resultImage.src = imagemFinalDataUrl;
+  dropZone.style.display = 'none';
+  previewContainer.style.display = 'block';
+}
+
+btnDownload.addEventListener('click', () => {
+  if (!imagemFinalDataUrl) return;
+  const a = document.createElement('a');
+  a.href = imagemFinalDataUrl;
+  a.download = `${nomeArquivoOriginal}_1200x1200.jpg`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+});
+
+function resetarFormatador() {
+  fileInput.value = "";
+  imagemFinalDataUrl = '';
+  previewContainer.style.display = 'none';
+  dropZone.style.display = 'flex';
+}
+</script>
+</body>
+</html>
