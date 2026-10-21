@@ -3,110 +3,61 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Descrições Rígido (Tavily + Groq)</title>
+<title>Gerador de Descrições IA (Proteção de Tokens)</title>
 <style>
   :root{
-    --bg: #EEF0EF;
-    --paper: #FFFFFF;
-    --ink: #17211D;
-    --ink-soft: #576159;
-    --line: #DADFDA;
-    --line-soft: #E7EAE6;
-    --teal: #1F6F5C;
-    --teal-dark: #164F42;
-    --teal-wash: #E4F0EC;
-    --amber: #B9762D;
-    --amber-wash: #F7ECDE;
-    --plum: #5B4B8A;
-    --plum-wash: #ECE8F5;
-    --red: #D93025;
-    --radius: 10px;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --bg: #EEF0EF; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
+    --line: #DADFDA; --line-soft: #E7EAE6; --teal: #1F6F5C;
+    --plum: #5B4B8A; --plum-wash: #ECE8F5; --radius: 10px;
+    --mono: ui-monospace, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --serif: Georgia, serif;
   }
   :root[data-theme="dark"]{
-    --bg: #11201B;
-    --paper: #16231E;
-    --ink: #E8EEEC;
-    --ink-soft: #92A49C;
-    --line: #233830;
-    --line-soft: #1D2D27;
-    --teal: #3FB492;
-    --teal-dark: #7FDDBE;
-    --teal-wash: #1B3830;
-    --plum: #C2B0EC;
-    --plum-wash: #2B2440;
-    --amber: #E3A95D;
+    --bg: #11201B; --paper: #16231E; --ink: #E8EEEC; --ink-soft: #92A49C;
+    --line: #233830; --line-soft: #1D2D27; --plum: #C2B0EC; --plum-wash: #2B2440;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
-  body{
-    background: var(--bg); color: var(--ink); font-family: var(--sans);
-    min-height: 100vh; -webkit-font-smoothing: antialiased;
-    transition: background .15s ease, color .15s ease;
-  }
-
+  body{ background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; margin:0; padding:0; transition: background .15s, color .15s; }
   header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
-  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
   .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; }
-  .nav-back:hover { color: var(--plum); }
   .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--plum); font-weight: 600; margin: 0 0 6px; }
-  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 6px; color: var(--ink); }
-  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 520px; }
-
-  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; }
-
+  h1{ font-family: var(--serif); font-size: 34px; margin: 0 0 6px; }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; }
+  .theme-toggle{ border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  
   main { max-width: 1180px; margin: 0 auto; padding: 32px 24px 60px; }
   .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
   @media (max-width: 850px){ .split-view { grid-template-columns: 1fr; } }
-
   .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; }
+  
   .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
-  .form-group .hint { font-size: 12px; color: var(--ink-soft); margin-top: 4px; display: block; line-height: 1.4; }
-
-  input[type="text"], input[type="password"], textarea {
-    width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--line);
-    background: var(--bg); font-size: 14.5px; font-family: var(--sans); color: var(--ink); outline: none;
-  }
-  input:focus, textarea:focus { border-color: var(--plum); background: var(--paper); }
-  textarea { resize: vertical; min-height: 140px; }
-
-  .actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line-soft); }
-  .btn-primary { flex: 1; padding: 12px 24px; font-size: 14.5px; background-color: var(--plum); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
-  .btn-primary:hover { opacity: 0.9; }
+  .form-group label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 8px; }
+  input, textarea { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); font-family: var(--sans); }
+  input:focus, textarea:focus { border-color: var(--plum); background: var(--paper); outline:none;}
+  textarea { min-height: 140px; resize: vertical; }
+  
+  .actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line-soft); flex-wrap: wrap;}
+  .btn-primary { flex: 1; padding: 12px 20px; background-color: var(--plum); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 150px;}
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-  .btn-secondary:hover { background: var(--line-soft); }
-
+  .btn-secondary { flex: 1; padding: 12px 20px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; min-width: 150px;}
+  
   .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
   .tab-btn { background: none; border: none; padding: 0 0 10px 0; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; }
   .tab-btn.active { color: var(--plum); border-bottom-color: var(--plum); }
   .tab-content { display: none; flex-grow: 1; flex-direction: column; }
   .tab-content.active { display: flex; }
-
-  #htmlOutput { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink-soft); background: var(--bg); height: 100%; min-height: 480px; }
   
-  .preview-box {
-    border: 1.5px solid var(--line); border-radius: 8px; padding: 20px; background: var(--paper);
-    min-height: 480px; font-family: Arial, sans-serif; flex-grow: 1;
-  }
+  #htmlOutput { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); min-height: 450px; }
+  .preview-box { border: 1.5px solid var(--line); border-radius: 8px; padding: 20px; background: var(--paper); min-height: 450px; }
   
-  .sources-box {
-    margin-top: 16px;
-    padding: 14px;
-    background: var(--plum-wash);
-    border: 1px solid rgba(91, 75, 138, 0.2);
-    border-radius: 8px;
-  }
-  .sources-title { font-size: 13px; font-weight: 700; color: var(--plum); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .sources-box { margin-top: 16px; padding: 14px; background: var(--plum-wash); border-radius: 8px; }
+  .sources-title { font-size: 13px; font-weight: 700; color: var(--plum); margin-bottom: 6px; }
   .sources-list { margin: 0; padding-left: 20px; font-size: 12px; color: var(--ink-soft); }
-  .sources-list li { margin-bottom: 4px; word-break: break-all; }
   .sources-list a { color: var(--plum); text-decoration: none; font-weight: 600; }
-  .sources-list a:hover { text-decoration: underline; }
-
-  .toast{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #17211D; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: all .18s ease; z-index: 100; }
+  
+  .toast{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #17211D; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13.5px; opacity: 0; transition: all .2s ease; z-index: 100; }
   .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
@@ -116,67 +67,60 @@
   <div class="top-inner">
     <div>
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
-      <p class="brand-eyebrow">Padrão Definitivo (Tavily + Groq)</p>
+      <p class="brand-eyebrow">Motor de Criação</p>
       <h1>Gerador de Descrições IA</h1>
-      <p class="subtitle">Pesquisa automática obedecendo rigorosamente às regras de negócio da Inpower.</p>
+      <p class="subtitle">Após gerar, exporte para Word e valide as informações localmente.</p>
     </div>
-    <div>
-      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
-    </div>
+    <div><button class="theme-toggle" id="themeToggle">🌙 Modo escuro</button></div>
   </div>
 </header>
 
 <main>
   <div class="split-view">
-    <!-- COLUNA 1: ENTRADA -->
     <div class="card">
       <div class="form-group">
-        <label for="apiKeyGroq">Chave API Groq (gsk_...)</label>
-        <input type="password" id="apiKeyGroq" placeholder="Cole sua chave Groq aqui">
+        <label>Chave API Groq</label>
+        <input type="password" id="apiKeyGroq" placeholder="gsk_...">
       </div>
       <div class="form-group">
-        <label for="apiKeyTavily">Chave API Tavily (tvly-...)</label>
-        <input type="password" id="apiKeyTavily" placeholder="Cole sua chave Tavily aqui">
+        <label>Chave API Tavily</label>
+        <input type="password" id="apiKeyTavily" placeholder="tvly-...">
       </div>
       <div class="form-group">
-        <label for="tituloInput">Nome do Produto / Modelo</label>
-        <input type="text" id="tituloInput" placeholder="Ex: Headset Gamer Trust Varzz GXT 460 T23380">
+        <label>Nome do Produto / Modelo</label>
+        <input type="text" id="tituloInput" placeholder="Ex: Placa Mãe Gigabyte Z790 Aero G AX">
       </div>
       <div class="form-group" style="flex-grow: 1; display: flex; flex-direction: column;">
-        <label for="rawInfoInput">Instruções Manuais / Forçar Dados (Opcional)</label>
-        <textarea id="rawInfoInput" placeholder="Ex: 'EAN: 8713439233804. Anatel: 12345-67-89012. Garantia de 3 anos.'"></textarea>
-        <span class="hint">A IA irá consultar automaticamente o documento de regras externo para formatar o texto final.</span>
+        <label>Instruções Manuais / Forçar Dados (Opcional)</label>
+        <textarea id="rawInfoInput" placeholder="Ex: 'EAN: 8713439233804. NAC011068.'"></textarea>
       </div>
       <div class="actions">
         <button type="button" class="btn-primary" id="btnGerar" onclick="executarAutomacao()">✨ Pesquisar na Web e Gerar</button>
       </div>
     </div>
 
-    <!-- COLUNA 2: SAÍDA -->
     <div class="card">
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('html')">&lt;/&gt; Código HTML</button>
-        <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização e Texto Limpo</button>
+        <button class="tab-btn active" onclick="switchTab('html')">&lt;/&gt; HTML</button>
+        <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização</button>
       </div>
+      
       <div id="tab-html" class="tab-content active">
         <textarea id="htmlOutput" readonly placeholder="A descrição formatada em HTML aparecerá aqui..."></textarea>
       </div>
       <div id="tab-preview" class="tab-content">
-        <div class="preview-box" id="previewOutput">
-          <span style="color: var(--ink-soft); font-size: 14px;">Preencha os dados e clique em 'Pesquisar na Web e Gerar'.</span>
-        </div>
+        <div class="preview-box" id="previewOutput">Aguardando geração...</div>
       </div>
+      
       <div class="sources-box" id="sourcesBox" style="display:none;">
-        <div class="sources-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
-          Fontes e Links Utilizados na Pesquisa:
-        </div>
+        <div class="sources-title">Fontes Consultadas:</div>
         <ul class="sources-list" id="sourcesList"></ul>
       </div>
-      <<div class="actions" style="margin-top: 16px;">
-        <button type="button" class="btn-primary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
-        <button type="button" class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto s/ HTML</button>
-        <button type="button" class="btn-secondary" style="background: #2B579A; color: white; border: none;" onclick="exportarParaWord()">📄 Exportar Word</button>
+
+      <div class="actions">
+        <button class="btn-secondary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
+        <button class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto</button>
+        <button class="btn-primary" style="background: #2B579A; min-width: 100%;" onclick="exportarParaWord()">📄 Exportar para Word (.doc)</button>
       </div>
     </div>
   </div>
@@ -185,14 +129,12 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// --- TEMA E PERSISTÊNCIA DAS CHAVES ---
 const themeToggleBtn = document.getElementById('themeToggle');
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
   themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
 }
-const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+applyTheme(localStorage.getItem('sapCatalogTheme') || 'dark');
 themeToggleBtn.addEventListener('click', () => {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   applyTheme(next);
@@ -206,6 +148,12 @@ keyTavily.value = localStorage.getItem('tavily_api_key') || '';
 keyGroq.addEventListener('input', () => localStorage.setItem('groq_api_key', keyGroq.value.trim()));
 keyTavily.addEventListener('input', () => localStorage.setItem('tavily_api_key', keyTavily.value.trim()));
 
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg; toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -218,148 +166,113 @@ function switchTab(tab) {
   }
 }
 
-// --- FLUXO PRINCIPAL: LEITURA TXT + TAVILY + GROQ ---
 async function executarAutomacao() {
-  const groqKey = keyGroq.value.trim();
-  const tavilyKey = keyTavily.value.trim();
+  const groqKey = keyGroq.value.trim(); const tavilyKey = keyTavily.value.trim();
   const titulo = document.getElementById('tituloInput').value.trim();
   const instrucoes = document.getElementById('rawInfoInput').value.trim();
   const btn = document.getElementById('btnGerar');
-  const sourcesBox = document.getElementById('sourcesBox');
-  const sourcesList = document.getElementById('sourcesList');
+  const sourcesBox = document.getElementById('sourcesBox'); const sourcesList = document.getElementById('sourcesList');
 
-  if (!groqKey || !tavilyKey) {
-    alert("Por favor, preencha ambas as Chaves API (Groq e Tavily).");
-    return;
-  }
-  if (!titulo) {
-    alert("Por favor, informe o nome do produto.");
-    return;
-  }
-
-  btn.disabled = true;
-  sourcesBox.style.display = 'none';
-  sourcesList.innerHTML = '';
+  if (!groqKey || !tavilyKey || !titulo) { alert("Preencha as chaves e o título."); return; }
+  btn.disabled = true; sourcesBox.style.display = 'none'; sourcesList.innerHTML = '';
 
   try {
-    // PASSO 1: LER O FICHEIRO DE REGRAS EXTERNO
-    btn.textContent = "📖 A ler regras do servidor...";
     let regrasExternas = "";
     try {
       const resRegras = await fetch('PADRÃO-DE-DESCRIÇÃO.txt');
-      if(resRegras.ok) {
-        regrasExternas = await resRegras.text();
-      } else {
-        throw new Error("O ficheiro PADRÃO-DE-DESCRIÇÃO.txt não foi encontrado.");
-      }
-    } catch(err) {
-      alert("Aviso crítico: " + err.message + " Verifique se enviou o ficheiro para o GitHub.");
-      throw err; 
-    }
+      if(resRegras.ok) regrasExternas = await resRegras.text();
+    } catch(err) { console.warn("Aviso: TXT não encontrado, prosseguindo sem as regras rígidas extras."); }
 
-    // PASSO 2: PESQUISA NA WEB VIA TAVILY
     const queryLimpa = titulo.replace(/para PC|Iluminado|Preto|Branco|Com Fio/gi, '').trim();
-    const queryFinal = `"${queryLimpa}" ficha tecnica especificacoes`;
+    const queryFinal = `"${queryLimpa}" site oficial fabricante especificacoes ficha tecnica`;
 
     btn.textContent = "🔍 A pesquisar na web...";
     const tavilyRes = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        api_key: tavilyKey,
-        query: queryFinal,
-        search_depth: "advanced",
-        include_answer: true,
-        max_results: 6
+        api_key: tavilyKey, 
+        query: queryFinal, 
+        search_depth: "basic", 
+        include_answer: true, 
+        max_results: 4 
       })
     });
 
     const tavilyData = await tavilyRes.json();
-    if (!tavilyRes.ok) throw new Error(tavilyData.message || "Erro ao consultar a Tavily API.");
+    if (!tavilyRes.ok) throw new Error(tavilyData.message || "Erro Tavily");
 
-    const palavrasChave = titulo.toLowerCase().split(/\s+/).filter(p => p.length > 3);
     let contextoWeb = tavilyData.answer ? `Resumo da Web: ${tavilyData.answer}\n\n` : "";
     const linksUteis = [];
 
-    if (tavilyData.results && tavilyData.results.length > 0) {
+    if (tavilyData.results) {
       tavilyData.results.forEach(res => {
-        const textoParaVerificacao = (res.title + " " + res.content).toLowerCase();
-        const correspondencias = palavrasChave.filter(palavra => textoParaVerificacao.includes(palavra));
-        if (correspondencias.length >= 2 || textoParaVerificacao.includes(queryLimpa.toLowerCase())) {
-          contextoWeb += `- Fonte: ${res.title}\nConteúdo: ${res.content}\n\n`;
-          if (res.url) linksUteis.push({ title: res.title || res.url, url: res.url });
-        }
-      });
-    }
-
-    if (linksUteis.length === 0 && tavilyData.results) {
-      tavilyData.results.slice(0, 3).forEach(res => {
         contextoWeb += `- Fonte: ${res.title}\nConteúdo: ${res.content}\n\n`;
         if (res.url) linksUteis.push({ title: res.title || res.url, url: res.url });
       });
     }
 
-    // PASSO 3: GROQ ALIMENTADO PELAS REGRAS DO TXT + SUPER PROMPT
+    if (contextoWeb.length > 3500) {
+      contextoWeb = contextoWeb.substring(0, 3500) + "\n\n[... TEXTO CORTADO PARA NÃO EXCEDER LIMITE DA IA ...]";
+    }
+
     btn.textContent = "✨ A formatar com Groq...";
     const promptGroq = `
 Você é um especialista rigoroso na criação de descrições para e-commerce.
 
-REGRAS DE NEGÓCIO OBRIGATÓRIAS (LEI ABSOLUTA):
+REGRAS DE NEGÓCIO OBRIGATÓRIAS:
 Leia e aplique CADA UMA das regras abaixo com atenção meticulosa.
 =========================================
 ${regrasExternas}
 =========================================
 
-INSTRUÇÕES CRÍTICAS DE SOBREPOSIÇÃO (NÃO IGNORE):
+INSTRUÇÕES CRÍTICAS DE DESIGN E SOBREPOSIÇÃO:
 1. Os Títulos 'DIMENSÕES' e 'ITENS INCLUSOS' devem obrigatoriamente ter font-size:12px.
-2. NUNCA OMita a secção ITENS INCLUSOS. Se não achar na web, deduza o básico pelo nome do produto (Ex: 1 Headset, 1 Manual).
-3. Procure intensamente por DIMENSÕES na web. Se realmente não achar, coloque '[A confirmar] cm' para o utilizador preencher depois. Não apague a secção.
-4. EAN, Anatel e NAC: As palavras que dão nome à chave DEVEM estar em negrito (<strong>), mas os números que vêm a seguir NÃO PODEM estar em negrito, somente o NAC por inteiro é em negrito. (Exemplo correto: <strong>EAN:</strong> 123456789)(Exemplo correto: <strong>NACxxxxxxx</strong>).
-5. O NAC não tem dois pontos. Exemplo correto: <strong>NAC</strong>000000.
+2. NUNCA OMita a secção ITENS INCLUSOS. Se não achar, deduza o básico (Ex: 1 Produto, 1 Manual).
+3. Procure por DIMENSÕES na web. Se não achar, coloque '[A confirmar] cm'. Não apague a secção.
+4. EAN, Anatel e NAC: Para EAN e Anatel, só o rótulo é negrito (<strong>EAN:</strong> 12345). Para o NAC, TODO o texto e números são negrito (<strong>NAC000000</strong>). Não adicione linhas em branco extras antes do NAC.
+5. FONTES DE PESQUISA: Priorize ABSOLUTAMENTE extrair as informações do link que pertencer ao site oficial do fabricante. Se o fabricante não estiver nas fontes, confie nos dados dos marketplaces confiáveis listados no 'Resumo da Web'.
 
 MOLDE OBRIGATÓRIO DE SAÍDA (HTML):
-Retorne APENAS o código HTML puro abaixo preenchido.
+Retorne APENAS o código HTML puro abaixo preenchido, respeitando exatamente as quebras de linha (<br>).
 
 <span style="font-size:14px;"><strong>[TÍTULO DO PRODUTO EM TITLE CASE]</strong></span><br><br>
 <span style="font-size:12px;">
 [Parágrafo único comercial e objetivo sobre o produto]
 </span><br><br>
-<span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br>
+<span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br><br>
 <span style="font-size:12px;">
 <strong>[Chave]:</strong> [Valor]<br>
 </span><br>
 <span style="font-size:12px;"><strong>DIMENSÕES</strong></span><br>
 <span style="font-size:12px;">
 [Comp] x [Larg] x [Alt] cm
-</span><br>
+</span><br><br>
 <span style="font-size:12px;"><strong>ITENS INCLUSOS</strong></span><br>
 <span style="font-size:12px;">
 [Qtd] [Item]<br>
-</span><br>
+</span><br><br>
 <span style="font-size:12px;">
 Imagens de caráter ilustrativo.<br>
 Informações divulgadas de acordo com o manual do fabricante.<br>
 Produto novo na caixa, lacrado, com nota fiscal e garantia do fabricante de [PRAZO CONVERTIDO].<br>
 Em caso de dúvidas sobre informações técnicas, consulte o manual do fabricante.<br><br>
 <strong>EAN:</strong> [Valor, ou apagar linha se não achar]<br>
-<strong>Anatel:</strong> [Valor, ou apagar linha se não achar]
-<span style="font-size:12px;"><strong>NAC000000</strong></span>
-</span><br>
+<strong>Anatel:</strong> [Valor, ou apagar linha se não achar]<br>
+<strong>NAC000000</strong>
+</span>
 
 DADOS DO PRODUTO:
 Nome: ${titulo}
 Instruções extras do usuário: ${instrucoes}
 
-INFORMAÇÕES RECOLHIDAS DA WEB (Base de Extração):
+INFORMAÇÕES RECOLHIDAS DA WEB:
 ${contextoWeb}
 `;
 
     const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${groqKey}`
-      },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${groqKey}` },
       body: JSON.stringify({
         model: 'openai/gpt-oss-120b',
         messages: [{ role: 'user', content: promptGroq }],
@@ -368,7 +281,7 @@ ${contextoWeb}
     });
 
     const groqData = await groqRes.json();
-    if (groqData.error) throw new Error(groqData.error.message || "Erro na comunicação com a Groq.");
+    if (groqData.error) throw new Error(groqData.error.message || "Erro Groq");
 
     if (groqData.choices && groqData.choices[0]?.message?.content) {
       let htmlGerado = groqData.choices[0].message.content;
@@ -380,102 +293,65 @@ ${contextoWeb}
       if (linksUteis.length > 0) {
         linksUteis.forEach(item => {
           const li = document.createElement('li');
-          const a = document.createElement('a');
-          a.href = item.url;
-          a.target = "_blank";
-          a.textContent = item.title;
-          li.appendChild(a);
-          sourcesList.appendChild(li);
+          const a = document.createElement('a'); a.href = item.url; a.target = "_blank"; a.textContent = item.title;
+          li.appendChild(a); sourcesList.appendChild(li);
         });
         sourcesBox.style.display = 'block';
       }
-
-      showToast("Descrição validada e gerada com sucesso!");
-    } else {
-      throw new Error("Resposta inválida recebida da IA.");
+      showToast("Descrição gerada com sucesso!");
     }
-
   } catch (err) {
     alert("Erro no processo: " + err.message);
   } finally {
-    btn.disabled = false;
-    btn.textContent = "✨ Pesquisar na Web e Gerar";
+    btn.disabled = false; btn.textContent = "✨ Pesquisar na Web e Gerar";
   }
 }
 
-// --- UTILITÁRIOS ---
-function showToast(msg) {
-  const toast = document.getElementById('toast');
-  toast.textContent = msg;
-  toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
-}
-
 function copiarTexto(elId, label) {
-  const el = document.getElementById(elId);
-  if (!el.value) return;
-  el.select();
-  document.execCommand('copy');
-  showToast(label + " copiado com sucesso!");
+  const el = document.getElementById(elId); if (!el.value) return;
+  el.select(); document.execCommand('copy'); showToast(label + " copiado com sucesso!");
 }
 
 function copiarRenderizado() {
   const prev = document.getElementById('previewOutput');
-  if(!prev.innerText.trim() || prev.innerText.includes('Preencha os dados')) return;
-  
+  if(!prev.innerText.trim() || prev.innerText.includes('Aguardando geração')) return;
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(prev.innerText).then(() => showToast('Texto limpo copiado!'));
   } else {
-    const ta = document.createElement('textarea');
-    ta.value = prev.innerText;
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-    showToast('Texto limpo copiado!');
+    const ta = document.createElement('textarea'); ta.value = prev.innerText;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); showToast('Texto limpo copiado!');
   }
 }
 
 function exportarParaWord() {
   const htmlContent = document.getElementById('htmlOutput').value;
+  if(!htmlContent.trim()) { showToast('Nenhum conteúdo para exportar.'); return; }
   
-  if(!htmlContent.trim()) {
-    showToast('Nenhum conteúdo para exportar.');
-    return;
-  }
-
-  // Nome do ficheiro será o nome do produto (ou genérico se estiver vazio)
-  let nomeArquivo = document.getElementById('tituloInput').value.trim();
-  if (!nomeArquivo) nomeArquivo = 'Descricao_Produto';
+  let tituloProduto = document.getElementById('tituloInput').value.trim() || 'Descricao_Produto';
   
-  // Limpa o nome do ficheiro para remover caracteres inválidos
-  nomeArquivo = nomeArquivo.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+  // Tenta extrair o NAC gerado no HTML (Ex: NAC011068)
+  const nacMatch = htmlContent.match(/NAC\d+/i);
+  let nacPrefixo = nacMatch ? nacMatch[0].toUpperCase() : 'NAC_ND';
 
-  // Cabeçalho especial que avisa o Windows/Office que isto é um documento Word com formatação UTF-8
-  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+  // Monta o nome do arquivo: NAC000000 - Titulo do Produto
+  let nomeArquivo = `${nacPrefixo} - ${tituloProduto}`;
+  
+  // Limpa caracteres que o Windows não aceita em nomes de arquivos, mas preserva os espaços e hífens
+  nomeArquivo = nomeArquivo.replace(/[\\/:*?"<>|]/g, '').trim();
+
+  // Força a fonte Arial em todo o documento do Word
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title><style>body { font-family: Arial, sans-serif; }</style></head><body>";
   const postHtml = "</body></html>";
-  
   const htmlDoc = preHtml + htmlContent + postHtml;
 
-  // Criar um "pacote" (Blob) com o conteúdo para download
-  const blob = new Blob(['\ufeff', htmlDoc], {
-    type: 'application/msword'
-  });
-  
-  // Gerar o link de download invisível e clicar nele
+  const blob = new Blob(['\ufeff', htmlDoc], { type: 'application/msword' });
   const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(htmlDoc);
   const downloadLink = document.createElement("a");
-
   document.body.appendChild(downloadLink);
   
-  if (navigator.msSaveOrOpenBlob) {
-    navigator.msSaveOrOpenBlob(blob, nomeArquivo + '.doc');
-  } else {
-    downloadLink.href = url;
-    downloadLink.download = nomeArquivo + '.doc';
-    downloadLink.click();
-  }
-
+  if (navigator.msSaveOrOpenBlob) { navigator.msSaveOrOpenBlob(blob, nomeArquivo + '.doc'); } 
+  else { downloadLink.href = url; downloadLink.download = nomeArquivo + '.doc'; downloadLink.click(); }
   document.body.removeChild(downloadLink);
   showToast('Ficheiro Word exportado com sucesso!');
 }
