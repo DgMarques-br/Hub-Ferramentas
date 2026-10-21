@@ -4,7 +4,7 @@ REGRA DE OURO ABSOLUTA: NUNCA invente, deduza ou estime nenhuma informação (me
 
 1. ESTRUTURA E ORDEM OBRIGATÓRIA
 - Título: Produto + Marca + Cor + Modelo (Capitalização normal).
-- Introdução: Apenas 1 parágrafo comercial e objetivo.
+- Introdução: Apenas 1 parágrafo comercial, objetivo, vendível e veridico.
 - ESPECIFICAÇÕES: Lista simples (1 por linha). Sem tabelas, sem negrito.
 - DIMENSÕES: Sempre em cm (Ex: 20 x 15 x 5 cm). Exclua a seção inteira se não houver dados exatos.
 - ITENS INCLUSOS: Formato estrito "[Qtd] [Nome]". Ex: 1 Cabo, 2 Manuais. Proibido usar hífen, "unidade(s)", "kit" ou "conjunto".
