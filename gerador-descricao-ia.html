@@ -313,7 +313,7 @@ INSTRUÇÕES CRÍTICAS DE SOBREPOSIÇÃO (NÃO IGNORE):
 1. Os Títulos 'DIMENSÕES' e 'ITENS INCLUSOS' devem obrigatoriamente ter font-size:12px.
 2. NUNCA OMita a secção ITENS INCLUSOS. Se não achar na web, deduza o básico pelo nome do produto (Ex: 1 Headset, 1 Manual).
 3. Procure intensamente por DIMENSÕES na web. Se realmente não achar, coloque '[A confirmar] cm' para o utilizador preencher depois. Não apague a secção.
-4. EAN, Anatel e NAC: As palavras que dão nome à chave DEVEM estar em negrito (<strong>), mas os números que vêm a seguir NÃO PODEM estar em negrito. (Exemplo correto: <strong>EAN:</strong> 123456789).
+4. EAN, Anatel e NAC: As palavras que dão nome à chave DEVEM estar em negrito (<strong>), mas os números que vêm a seguir NÃO PODEM estar em negrito, somente o NAC por inteiro é em negrito. (Exemplo correto: <strong>EAN:</strong> 123456789)(Exemplo correto: <strong>NACxxxxxxx</strong>).
 5. O NAC não tem dois pontos. Exemplo correto: <strong>NAC</strong>000000.
 
 MOLDE OBRIGATÓRIO DE SAÍDA (HTML):
@@ -326,15 +326,15 @@ Retorne APENAS o código HTML puro abaixo preenchido.
 <span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br>
 <span style="font-size:12px;">
 <strong>[Chave]:</strong> [Valor]<br>
-</span><br><br>
+</span><br>
 <span style="font-size:12px;"><strong>DIMENSÕES</strong></span><br>
 <span style="font-size:12px;">
 [Comp] x [Larg] x [Alt] cm
-</span><br><br>
+</span><br>
 <span style="font-size:12px;"><strong>ITENS INCLUSOS</strong></span><br>
 <span style="font-size:12px;">
 [Qtd] [Item]<br>
-</span><br><br>
+</span><br>
 <span style="font-size:12px;">
 Imagens de caráter ilustrativo.<br>
 Informações divulgadas de acordo com o manual do fabricante.<br>
@@ -342,8 +342,8 @@ Produto novo na caixa, lacrado, com nota fiscal e garantia do fabricante de [PRA
 Em caso de dúvidas sobre informações técnicas, consulte o manual do fabricante.<br><br>
 <strong>EAN:</strong> [Valor, ou apagar linha se não achar]<br>
 <strong>Anatel:</strong> [Valor, ou apagar linha se não achar]
-</span><br><br>
-<span style="font-size:12px;"><strong>NAC</strong>000000</span>
+<span style="font-size:12px;"><strong>NAC000000</strong></span>
+</span><br>
 
 DADOS DO PRODUTO:
 Nome: ${titulo}
