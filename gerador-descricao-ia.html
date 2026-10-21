@@ -173,9 +173,10 @@
         </div>
         <ul class="sources-list" id="sourcesList"></ul>
       </div>
-      <div class="actions" style="margin-top: 16px;">
+      <<div class="actions" style="margin-top: 16px;">
         <button type="button" class="btn-primary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
         <button type="button" class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto s/ HTML</button>
+        <button type="button" class="btn-secondary" style="background: #2B579A; color: white; border: none;" onclick="exportarParaWord()">📄 Exportar Word</button>
       </div>
     </div>
   </div>
@@ -433,6 +434,50 @@ function copiarRenderizado() {
     document.body.removeChild(ta);
     showToast('Texto limpo copiado!');
   }
+}
+
+function exportarParaWord() {
+  const htmlContent = document.getElementById('htmlOutput').value;
+  
+  if(!htmlContent.trim()) {
+    showToast('Nenhum conteúdo para exportar.');
+    return;
+  }
+
+  // Nome do ficheiro será o nome do produto (ou genérico se estiver vazio)
+  let nomeArquivo = document.getElementById('tituloInput').value.trim();
+  if (!nomeArquivo) nomeArquivo = 'Descricao_Produto';
+  
+  // Limpa o nome do ficheiro para remover caracteres inválidos
+  nomeArquivo = nomeArquivo.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+  // Cabeçalho especial que avisa o Windows/Office que isto é um documento Word com formatação UTF-8
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+  const postHtml = "</body></html>";
+  
+  const htmlDoc = preHtml + htmlContent + postHtml;
+
+  // Criar um "pacote" (Blob) com o conteúdo para download
+  const blob = new Blob(['\ufeff', htmlDoc], {
+    type: 'application/msword'
+  });
+  
+  // Gerar o link de download invisível e clicar nele
+  const url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(htmlDoc);
+  const downloadLink = document.createElement("a");
+
+  document.body.appendChild(downloadLink);
+  
+  if (navigator.msSaveOrOpenBlob) {
+    navigator.msSaveOrOpenBlob(blob, nomeArquivo + '.doc');
+  } else {
+    downloadLink.href = url;
+    downloadLink.download = nomeArquivo + '.doc';
+    downloadLink.click();
+  }
+  
+  document.body.removeChild(downloadLink);
+  showToast('Ficheiro Word exportado com sucesso!');
 }
 </script>
 </body>
