@@ -27,6 +27,7 @@
             --primary-dark: #0d4f48; --primary: #127a66; --primary-light: #e6f2f0;
             --orange: #d97706; --danger: #dc2626; --gray-light: #f3f4f6;
             --badge-bg: #f3f4f6; --chart-text: #6b7280;
+            --orange-light: rgba(217, 119, 6, 0.1);
         }
 
         [data-theme="dark"] {
@@ -35,6 +36,7 @@
             --primary-dark: #ccfbf1; --primary: #14b8a6; --primary-light: rgba(20, 184, 166, 0.1);
             --orange: #f59e0b; --danger: #ef4444; --gray-light: #334155;
             --badge-bg: #334155; --chart-text: #cbd5e1;
+            --orange-light: rgba(245, 158, 11, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
@@ -119,16 +121,60 @@
         .chart-container { position: relative; height: 300px; width: 100%; display: flex; justify-content: center; }
         
         /* TABELA */
-        .toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
         .filter-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-surface); color: var(--text-main); font-size: 13px; outline: none; }
         
+        /* CHECKBOXES BONITOS STATUS */
+        .status-filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 4px 6px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .status-title {
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            padding-left: 6px;
+            padding-right: 4px;
+        }
+
+        .custom-chk input[type="checkbox"] { display: none; }
+
+        .custom-chk {
+            cursor: pointer;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 12px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .custom-chk:hover { background: var(--gray-light); }
+        .custom-chk.sim input:checked + span { color: var(--primary); }
+        .custom-chk.sim:has(input:checked) { background: var(--primary-light); border-color: var(--primary); }
+        .custom-chk.nao input:checked + span { color: var(--orange); }
+        .custom-chk.nao:has(input:checked) { background: var(--orange-light); border-color: var(--orange); }
+        .custom-chk.vazio input:checked + span { color: var(--text-main); }
+        .custom-chk.vazio:has(input:checked) { background: var(--badge-bg); border-color: var(--text-muted); }
+
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
         th { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
         th.sortable:hover { color: var(--primary); background-color: var(--primary-light); border-radius: 6px; }
         td { padding: 12px; border-bottom: 1px solid var(--border); }
         .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
         .badge.sim { background: var(--primary-light); color: var(--primary); }
-        .badge.nao { background: rgba(245, 158, 11, 0.1); color: var(--orange); }
+        .badge.nao { background: var(--orange-light); color: var(--orange); }
         .badge.vazio { background: var(--badge-bg); color: var(--text-muted); }
 
         /* WIZARD */
@@ -192,10 +238,10 @@
 
         <div class="topbar">
             <div style="display: flex; align-items: center; gap: 16px;">
-                <a href="./index.html" class="btn-outline">← Voltar</a>
-                <div style="font-size: 13px; color: var(--text-muted);">Sincronização: <strong id="syncTime">--</strong></div>
+                <a href=""./index.htm" class="btn-outline">← Voltar</a>
+                <div style="font-size: 13px; color: var(--text-muted);" id="syncTime">--</div>
             </div>
-            <button class="btn-sync" id="btnSync" onclick="buscarDadosAPI()">🔄 Atualizar Dados</button>
+            <button class="btn-sync" id="btnSync" onclick="buscarDadosAPI(true)">🔄 Atualizar Dados</button>
         </div>
 
         <!-- 1. RESUMO -->
@@ -249,7 +295,27 @@
             <div class="card">
                 <div class="toolbar">
                     <select id="filtroAba" class="filter-input"><option value="">Todos os Canais</option></select>
-                    <select id="filtroStatus" class="filter-input"><option value="">Todos os Status</option><option value="sim">Sim</option><option value="nao">Não</option><option value="vazio">Sem Info</option></select>
+                    
+                    <!-- SELEÇÃO MÚLTIPLA DE STATUS BONITA -->
+                    <div class="status-filter-group">
+                        <span class="status-title">Status:</span>
+                        
+                        <label class="custom-chk sim">
+                            <input type="checkbox" class="chk-status" value="sim" checked>
+                            <span>Sim</span>
+                        </label>
+                        
+                        <label class="custom-chk nao">
+                            <input type="checkbox" class="chk-status" value="nao" checked>
+                            <span>Não</span>
+                        </label>
+
+                        <label class="custom-chk vazio">
+                            <input type="checkbox" class="chk-status" value="vazio" checked>
+                            <span>Sem Info</span>
+                        </label>
+                    </div>
+
                     <select id="filtroCurva" class="filter-input"><option value="">Todas as Curvas</option></select>
                     <input type="text" id="inputBusca" class="filter-input" style="flex: 1;" placeholder="Buscar SKU, Descrição ou Marca...">
                 </div>
@@ -363,13 +429,14 @@
     <script>
         // CONFIG GLOBAIS
         const API_URL = "https://script.google.com/macros/s/AKfycbw5LhNN2TcUEp-CHI3lCFHv1IdmDITRcoDY3Km6fZ0W_rd7k_T3DKj8WEulAvXsLAfN5g/exec";
+        const DB_NAME = "CatalogoDB";
         
         // Vars Catálogo
         let dadosGlobais = [], dadosFiltrados = [];
         let pAtual = 1; const itensPagina = 50;
         let cStatus = null, cMarket = null, cAny = null;
         let ordemEstoque = 0; 
-        let ufAtual = 'TODOS'; // Filtro de Estado
+        let ufAtual = 'TODOS';
 
         // Vars Anymarket
         let dadosAny = [], listaRenderAny = [];
@@ -378,8 +445,47 @@
         let mapaCoresErro = {}; 
         const paletaCores = ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#84cc16', '#6366f1', '#10b981'];
 
-        // Modo Cadastro / Operacional
+        // Modo Cadastro
         let modoCadastroAtivo = false;
+
+        // HELPER BANCO DE DADOS INTERNO (IndexedDB - Suporta grandes volumes sem erro de quota)
+        function salvarCacheIDB(dados, tempo) {
+            try {
+                let req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = (e) => {
+                    let db = e.target.result;
+                    if (!db.objectStoreNames.contains("cache")) db.createObjectStore("cache");
+                };
+                req.onsuccess = (e) => {
+                    let db = e.target.result;
+                    let tx = db.transaction("cache", "readwrite");
+                    let store = tx.objectStore("cache");
+                    store.put(dados, "dadosGlobais");
+                    store.put(tempo, "tempo");
+                };
+            } catch(e) { console.warn("Cache IDB erro ao salvar", e); }
+        }
+
+        function lerCacheIDB(callback) {
+            try {
+                let req = indexedDB.open(DB_NAME, 1);
+                req.onupgradeneeded = (e) => {
+                    let db = e.target.result;
+                    if (!db.objectStoreNames.contains("cache")) db.createObjectStore("cache");
+                };
+                req.onsuccess = (e) => {
+                    let db = e.target.result;
+                    if (!db.objectStoreNames.contains("cache")) { callback(null, null); return; }
+                    let tx = db.transaction("cache", "readonly");
+                    let store = tx.objectStore("cache");
+                    let reqData = store.get("dadosGlobais");
+                    let reqTime = store.get("tempo");
+                    tx.oncomplete = () => callback(reqData.result, reqTime.result);
+                    tx.onerror = () => callback(null, null);
+                };
+                req.onerror = () => callback(null, null);
+            } catch(e) { callback(null, null); }
+        }
 
         window.onload = () => { 
             const temaAtual = document.documentElement.getAttribute('data-theme');
@@ -388,26 +494,34 @@
             atualizarTextoBotaoTema();
             inicializarModoAcesso();
             configurarFiltros(); 
-            buscarDadosAPI(); 
+            
+            // Tenta carregar do banco interno rapidamente
+            lerCacheIDB((cacheDados, cacheTempo) => {
+                if (cacheDados && cacheDados.length > 0) {
+                    dadosGlobais = cacheDados;
+                    dadosFiltrados = [...dadosGlobais];
+                    document.getElementById('syncTime').innerHTML = `<span style="color:var(--primary)">⚡ Em Memória (${cacheTempo || 'Anterior'})</span>`;
+                    popularDropdowns();
+                    processarResumo();
+                    aplicarFiltros();
+                    buscarDadosAPI(false); // Atualiza no fundo sem travar
+                } else {
+                    buscarDadosAPI(true); // Se não tem cache, mostra tela de carregamento
+                }
+            });
         };
 
         /* --- CONTROLE DE MODO PÚBLICO / CADASTRO --- */
         function inicializarModoAcesso() {
             const ehAdminHash = window.location.hash === '#cadastro' || window.location.hash === '#admin';
             const ehAdminSalvo = localStorage.getItem('modoCadastroAtivo') === 'true';
-
-            if (ehAdminHash || ehAdminSalvo) {
-                ativarModoCadastro(false);
-            } else {
-                desativarModoCadastro();
-            }
+            if (ehAdminHash || ehAdminSalvo) ativarModoCadastro(false);
+            else desativarModoCadastro();
         }
 
         function solicitarAcessoCadastro() {
             if (modoCadastroAtivo) {
-                if (confirm("Deseja sair do modo de edição/cadastro?")) {
-                    desativarModoCadastro();
-                }
+                if (confirm("Deseja sair do modo de edição/cadastro?")) desativarModoCadastro();
                 return;
             }
             document.getElementById('modalAcesso').style.display = 'flex';
@@ -415,18 +529,13 @@
             document.getElementById('inputSenhaCadastro').focus();
         }
 
-        function fecharModalAcesso() {
-            document.getElementById('modalAcesso').style.display = 'none';
-        }
+        function fecharModalAcesso() { document.getElementById('modalAcesso').style.display = 'none'; }
 
         function verificarSenhaCadastro() {
             const senha = document.getElementById('inputSenhaCadastro').value;
             if (senha === 'admin' || senha === 'cadastro' || senha === '1234') {
-                fecharModalAcesso();
-                ativarModoCadastro(true);
-            } else {
-                alert('Senha incorreta.');
-            }
+                fecharModalAcesso(); ativarModoCadastro(true);
+            } else alert('Senha incorreta.');
         }
 
         function ativarModoCadastro(salvar = true) {
@@ -434,11 +543,7 @@
             if (salvar) localStorage.setItem('modoCadastroAtivo', 'true');
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
             const lock = document.getElementById('lockTrigger');
-            if (lock) {
-                lock.innerText = '🔓';
-                lock.title = 'Modo Cadastro Ativo (Clique para sair)';
-                lock.style.opacity = '1';
-            }
+            if (lock) { lock.innerText = '🔓'; lock.title = 'Modo Cadastro Ativo'; lock.style.opacity = '1'; }
         }
 
         function desativarModoCadastro() {
@@ -446,11 +551,7 @@
             localStorage.removeItem('modoCadastroAtivo');
             document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
             const lock = document.getElementById('lockTrigger');
-            if (lock) {
-                lock.innerText = '🔒';
-                lock.title = 'Área Restrita';
-                lock.style.opacity = '0.5';
-            }
+            if (lock) { lock.innerText = '🔒'; lock.title = 'Área Restrita'; lock.style.opacity = '0.5'; }
             switchView('resumo', document.querySelector('.nav-item'));
         }
 
@@ -465,13 +566,10 @@
         function toggleTheme() {
             const h = document.documentElement;
             const novoTema = h.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            
             h.setAttribute('data-theme', novoTema);
             localStorage.setItem('temaCatalogo', novoTema);
-            
             Chart.defaults.color = novoTema === 'dark' ? '#cbd5e1' : '#6b7280';
             if(cStatus) cStatus.update(); if(cMarket) cMarket.update(); if(cAny) cAny.update();
-            
             atualizarTextoBotaoTema();
         }
 
@@ -481,7 +579,6 @@
             btn.innerHTML = ehEscuro ? '☀️ Modo Claro' : '🌙 Modo Escuro';
         }
 
-        /* --- FILTRO SP / MG --- */
         function filtrarUF(uf, el) {
             ufAtual = uf;
             document.querySelectorAll('.btn-uf').forEach(b => b.classList.remove('active'));
@@ -489,9 +586,15 @@
             processarResumo();
         }
 
-        async function buscarDadosAPI() {
-            document.getElementById('loadingState').style.display = 'flex';
-            document.getElementById('loadingMsg').innerText = "Sincronizando Google Sheets...";
+        async function buscarDadosAPI(forcarTela = false) {
+            if (forcarTela) {
+                document.getElementById('loadingState').style.display = 'flex';
+                document.getElementById('loadingMsg').innerText = "Sincronizando Google Sheets...";
+            } else {
+                document.getElementById('btnSync').innerText = "🔄 Sincronizando...";
+                document.getElementById('btnSync').disabled = true;
+            }
+
             try {
                 const res = await fetch(API_URL);
                 const json = JSON.parse(await res.text());
@@ -505,20 +608,20 @@
 
                     let stRaw = g(['status', 'estado', 'anunciado']).toLowerCase();
                     let stCat = 'vazio';
-                    if (['sim', 'anunciado', 'ok', 'ativo'].includes(stRaw)) stCat = 'sim';
-                    else if (['não', 'nao', 'não anunciado', 'inativo'].includes(stRaw) || stRaw.includes('fora de linha')) stCat = 'nao';
+                    
+                    const keywordsSim = ['sim', 'anunciado', 'ok', 'ativo'];
+                    const keywordsNao = ['não', 'nao', 'não anunciado', 'inativo', 'sem anúncio', 'sem anuncio', 'fora de linha'];
+
+                    if (keywordsSim.some(k => stRaw === k)) stCat = 'sim';
+                    else if (keywordsNao.some(k => stRaw.includes(k))) stCat = 'nao';
 
                     let ufRaw = g(['uf', 'estado', 'filial', 'regional', 'deposito', 'origem', 'cd', 'unidade']);
                     let canalRaw = g(['Marketplace', 'aba']) || "Geral";
                     let ufCat = "OUTROS";
 
-                    if (/sp|são paulo|sao paulo/i.test(ufRaw) || /sp|são paulo|sao paulo/i.test(canalRaw)) {
-                        ufCat = "SP";
-                    } else if (/mg|minas|minas gerais/i.test(ufRaw) || /mg|minas|minas gerais/i.test(canalRaw)) {
-                        ufCat = "MG";
-                    } else {
-                        ufCat = ufRaw.toUpperCase() || "SP";
-                    }
+                    if (/sp|são paulo|sao paulo/i.test(ufRaw) || /sp|são paulo|sao paulo/i.test(canalRaw)) ufCat = "SP";
+                    else if (/mg|minas|minas gerais/i.test(ufRaw) || /mg|minas|minas gerais/i.test(canalRaw)) ufCat = "MG";
+                    else ufCat = ufRaw.toUpperCase() || "SP";
 
                     return {
                         canal: canalRaw,
@@ -535,21 +638,35 @@
                 }).filter(d => d.sku !== "");
 
                 dadosFiltrados = [...dadosGlobais];
-                document.getElementById('syncTime').innerText = new Date().toLocaleTimeString();
+                let timeNow = new Date().toLocaleTimeString();
+                
+                // Salva no banco de dados interno sem risco de estouro
+                salvarCacheIDB(dadosGlobais, timeNow);
+
+                document.getElementById('syncTime').innerHTML = `Sincronização: <strong>${timeNow}</strong>`;
                 
                 popularDropdowns();
                 processarResumo();
-                renderTabela();
-            } catch (e) { alert("Erro API: " + e.message); } 
-            finally { document.getElementById('loadingState').style.display = 'none'; }
+                aplicarFiltros(); 
+                
+            } catch (e) { 
+                if(forcarTela) alert("Erro API: " + e.message); 
+                else console.warn("Erro no sync de fundo", e);
+            } 
+            finally { 
+                document.getElementById('loadingState').style.display = 'none'; 
+                document.getElementById('btnSync').innerText = "🔄 Atualizar Dados";
+                document.getElementById('btnSync').disabled = false;
+            }
         }
 
         function popularDropdowns() {
             let canais = [...new Set(dadosGlobais.map(d=>d.canal))].sort();
-            
             let cSel = document.getElementById('filtroAba');
+            let currentCanal = cSel.value;
             cSel.innerHTML = '<option value="">Todos os Canais</option>';
             canais.forEach(c => cSel.innerHTML += `<option value="${c}">${c}</option>`);
+            if(canais.includes(currentCanal)) cSel.value = currentCanal;
 
             let wCanais = document.getElementById('wizardCanais');
             wCanais.innerHTML = `<label class="checkbox-label" style="background:var(--primary); color:white; border:none;"><input type="checkbox" onchange="document.querySelectorAll('.wz-canal').forEach(cb=>cb.checked=this.checked)" checked> Todos os Canais</label>`;
@@ -557,8 +674,10 @@
 
             let curvas = [...new Set(dadosGlobais.map(d=>d.curva).filter(c=>c!=="-"))].sort();
             let cvSel = document.getElementById('filtroCurva');
+            let currentCurva = cvSel.value;
             cvSel.innerHTML = '<option value="">Todas as Curvas</option>';
             curvas.forEach(c => cvSel.innerHTML += `<option value="${c}">${c}</option>`);
+            if(curvas.includes(currentCurva)) cvSel.value = currentCurva;
         }
 
         function processarResumo() {
@@ -604,8 +723,13 @@
 
         /* --- CONTROLES DE TABELA E FILTROS DO CATÁLOGO --- */
         function configurarFiltros() {
-            ['filtroAba', 'filtroStatus', 'filtroCurva', 'inputBusca'].forEach(id => {
-                document.getElementById(id).addEventListener('input', () => { pAtual = 1; aplicarFiltros(); });
+            ['filtroAba', 'filtroCurva', 'inputBusca'].forEach(id => {
+                let el = document.getElementById(id);
+                if (el) el.addEventListener('input', () => { pAtual = 1; aplicarFiltros(); });
+            });
+
+            document.querySelectorAll('.chk-status').forEach(cb => {
+                cb.addEventListener('change', () => { pAtual = 1; aplicarFiltros(); });
             });
         }
 
@@ -623,11 +747,17 @@
         }
 
         function aplicarFiltros() {
-            let a = document.getElementById('filtroAba').value, s = document.getElementById('filtroStatus').value, 
-                c = document.getElementById('filtroCurva').value, q = document.getElementById('inputBusca').value.toLowerCase();
+            let a = document.getElementById('filtroAba').value, 
+                c = document.getElementById('filtroCurva').value, 
+                q = document.getElementById('inputBusca').value.toLowerCase();
+
+            let statusSelecionados = Array.from(document.querySelectorAll('.chk-status:checked')).map(cb => cb.value);
 
             dadosFiltrados = dadosGlobais.filter(d => {
-                return (a==="" || d.canal===a) && (s==="" || d.status===s) && (c==="" || d.curva===c) &&
+                let passaStatus = statusSelecionados.includes(d.status);
+                return (a==="" || d.canal===a) && 
+                       passaStatus && 
+                       (c==="" || d.curva===c) &&
                        (q==="" || d.sku.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q) || d.marca.toLowerCase().includes(q));
             });
 
