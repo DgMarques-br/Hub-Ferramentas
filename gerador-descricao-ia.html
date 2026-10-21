@@ -229,9 +229,9 @@ ${regrasExternas}
 INSTRUÇÕES CRÍTICAS DE DESIGN E SOBREPOSIÇÃO:
 1. Os Títulos 'DIMENSÕES' e 'ITENS INCLUSOS' devem obrigatoriamente ter font-size:12px.
 2. NUNCA OMita a secção ITENS INCLUSOS. Se não achar, deduza o básico (Ex: 1 Produto, 1 Manual).
-3. Procure por DIMENSÕES na web. Se não achar, coloque '[A confirmar] cm'. Não apague a secção.
+3. DIMENSÕES E FORMATO (EXCEÇÃO): Para hardwares (como Placa-Mãe, Gabinete), o 'Formato' ou 'Fator de Forma' (ex: ATX, Micro-ATX) DEVE ser listado na secção ESPECIFICAÇÕES. Na secção DIMENSÕES, procure as medidas em cm. Se não achar os centímetros exatos, escreva obrigatoriamente '[A confirmar] cm x [A confirmar] cm x [A confirmar] cm'. Não apague a secção DIMENSÕES.
 4. EAN, Anatel e NAC: Para EAN e Anatel, só o rótulo é negrito (<strong>EAN:</strong> 12345). Para o NAC, TODO o texto e números são negrito (<strong>NAC000000</strong>). Não adicione linhas em branco extras antes do NAC.
-5. FONTES DE PESQUISA: Priorize ABSOLUTAMENTE extrair as informações do link que pertencer ao site oficial do fabricante (maximo 2). Se o fabricante não estiver nas fontes, confie nos dados dos marketplaces confiáveis listados no 'Resumo da Web' (maximo 3 sites confiavei, como Amazon, mercado livre, Shoppe entre outros).
+5. FONTES DE PESQUISA: Priorize ABSOLUTAMENTE extrair as informações do link que pertencer ao site oficial do fabricante (máximo 2 fontes). Se o fabricante não estiver nas fontes, confie nos dados dos marketplaces confiáveis listados no 'Resumo da Web' (máximo 3 sites confiáveis, como Amazon, Mercado Livre, Shopee).
 
 MOLDE OBRIGATÓRIO DE SAÍDA (HTML):
 Retorne APENAS o código HTML puro abaixo preenchido, respeitando exatamente as quebras de linha (<br>).
@@ -330,17 +330,12 @@ function exportarParaWord() {
   
   let tituloProduto = document.getElementById('tituloInput').value.trim() || 'Descricao_Produto';
   
-  // Tenta extrair o NAC gerado no HTML (Ex: NAC011068)
   const nacMatch = htmlContent.match(/NAC\d+/i);
   let nacPrefixo = nacMatch ? nacMatch[0].toUpperCase() : 'NAC_ND';
 
-  // Monta o nome do arquivo: NAC000000 - Titulo do Produto
   let nomeArquivo = `${nacPrefixo} - ${tituloProduto}`;
-  
-  // Limpa caracteres que o Windows não aceita em nomes de arquivos, mas preserva os espaços e hífens
   nomeArquivo = nomeArquivo.replace(/[\\/:*?"<>|]/g, '').trim();
 
-  // Força a fonte Arial em todo o documento do Word
   const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title><style>body { font-family: Arial, sans-serif; }</style></head><body>";
   const postHtml = "</body></html>";
   const htmlDoc = preHtml + htmlContent + postHtml;
