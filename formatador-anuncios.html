@@ -487,7 +487,7 @@ function processarHTML() {
 
   // Bloco Dimensões Dinâmicas (Só exibe se houver preenchimento)
   if(dadosDimensoes.length > 0) {
-    html += `<span style="font-size:14px;"><strong>DIMENSÕES E PESO</strong></span><br>\n`;
+    html += `<span style="font-size:12px;"><strong>DIMENSÕES E PESO</strong></span><br>\n`;
     html += `<span style="font-size:12px;">\n`;
     
     const multiplos = dadosDimensoes.length > 1 || dadosDimensoes[0].nome !== "";
@@ -504,7 +504,7 @@ function processarHTML() {
   }
 
   // Bloco Itens Inclusos
-  html += `<span style="font-size:14px;"><strong>ITENS INCLUSOS</strong></span><br>\n`;
+  html += `<span style="font-size:12px;"><strong>ITENS INCLUSOS</strong></span><br>\n`;
   html += `<span style="font-size:12px;">\n`;
   if(blocoItens.length > 0) {
     blocoItens.forEach(item => {
