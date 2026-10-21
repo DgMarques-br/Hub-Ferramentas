@@ -118,7 +118,7 @@
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
       <p class="brand-eyebrow">Padrão Definitivo (Tavily + Groq)</p>
       <h1>Gerador de Descrições IA</h1>
-      <p class="subtitle">Pesquisa automática consumindo as regras externas do PADRÃO-DE-DESCRIÇÃO.txt.</p>
+      <p class="subtitle">Pesquisa automática obedecendo rigorosamente às regras de negócio da Inpower.</p>
     </div>
     <div>
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
@@ -168,7 +168,7 @@
       </div>
       <div class="sources-box" id="sourcesBox" style="display:none;">
         <div class="sources-title">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
           Fontes e Links Utilizados na Pesquisa:
         </div>
         <ul class="sources-list" id="sourcesList"></ul>
@@ -241,7 +241,7 @@ async function executarAutomacao() {
   sourcesList.innerHTML = '';
 
   try {
-    // PASSO 1: LER O FICHEIRO DE REGRAS EXTERNO (PADRÃO-DE-DESCRIÇÃO.txt)
+    // PASSO 1: LER O FICHEIRO DE REGRAS EXTERNO
     btn.textContent = "📖 A ler regras do servidor...";
     let regrasExternas = "";
     try {
@@ -298,19 +298,26 @@ async function executarAutomacao() {
       });
     }
 
-    // PASSO 3: GROQ ALIMENTADO PELAS REGRAS DO TXT
+    // PASSO 3: GROQ ALIMENTADO PELAS REGRAS DO TXT + SUPER PROMPT
     btn.textContent = "✨ A formatar com Groq...";
     const promptGroq = `
 Você é um especialista rigoroso na criação de descrições para e-commerce.
 
 REGRAS DE NEGÓCIO OBRIGATÓRIAS (LEI ABSOLUTA):
-Leia e aplique CADA UMA das regras abaixo com atenção meticulosa. Não invente nada que viole este padrão.
+Leia e aplique CADA UMA das regras abaixo com atenção meticulosa.
 =========================================
 ${regrasExternas}
 =========================================
 
+INSTRUÇÕES CRÍTICAS DE SOBREPOSIÇÃO (NÃO IGNORE):
+1. Os Títulos 'DIMENSÕES' e 'ITENS INCLUSOS' devem obrigatoriamente ter font-size:12px.
+2. NUNCA OMita a secção ITENS INCLUSOS. Se não achar na web, deduza o básico pelo nome do produto (Ex: 1 Headset, 1 Manual).
+3. Procure intensamente por DIMENSÕES na web. Se realmente não achar, coloque '[A confirmar] cm' para o utilizador preencher depois. Não apague a secção.
+4. EAN, Anatel e NAC: As palavras que dão nome à chave DEVEM estar em negrito (<strong>), mas os números que vêm a seguir NÃO PODEM estar em negrito. (Exemplo correto: <strong>EAN:</strong> 123456789).
+5. O NAC não tem dois pontos. Exemplo correto: <strong>NAC</strong>000000.
+
 MOLDE OBRIGATÓRIO DE SAÍDA (HTML):
-Retorne APENAS o código HTML puro abaixo preenchido, sem blocos markdown. Não coloque NADA antes ou depois do HTML.
+Retorne APENAS o código HTML puro abaixo preenchido.
 
 <span style="font-size:14px;"><strong>[TÍTULO DO PRODUTO EM TITLE CASE]</strong></span><br><br>
 <span style="font-size:12px;">
@@ -319,7 +326,7 @@ Retorne APENAS o código HTML puro abaixo preenchido, sem blocos markdown. Não 
 <span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br>
 <span style="font-size:12px;">
 <strong>[Chave]:</strong> [Valor]<br>
-</span><br>
+</span><br><br>
 <span style="font-size:12px;"><strong>DIMENSÕES</strong></span><br>
 <span style="font-size:12px;">
 [Comp] x [Larg] x [Alt] cm
@@ -327,15 +334,16 @@ Retorne APENAS o código HTML puro abaixo preenchido, sem blocos markdown. Não 
 <span style="font-size:12px;"><strong>ITENS INCLUSOS</strong></span><br>
 <span style="font-size:12px;">
 [Qtd] [Item]<br>
-</span><br>
+</span><br><br>
 <span style="font-size:12px;">
 Imagens de caráter ilustrativo.<br>
 Informações divulgadas de acordo com o manual do fabricante.<br>
 Produto novo na caixa, lacrado, com nota fiscal e garantia do fabricante de [PRAZO CONVERTIDO].<br>
-Em caso de dúvidas sobre informações técnicas, consulte o manual do fabricante.<br>
-EAN: [Se fornecido/encontrado, senão remover linha]<br>
-Anatel: [00000-00-00000 - Só se encontrado ou fornecido, senão remover linha]
-NACxxxx [Se fornecido/encontrado, senão remover linha]</snpa>
+Em caso de dúvidas sobre informações técnicas, consulte o manual do fabricante.<br><br>
+<strong>EAN:</strong> [Valor, ou apagar linha se não achar]<br>
+<strong>Anatel:</strong> [Valor, ou apagar linha se não achar]
+</span><br><br>
+<span style="font-size:12px;"><strong>NAC</strong>000000</span>
 
 DADOS DO PRODUTO:
 Nome: ${titulo}
@@ -354,7 +362,7 @@ ${contextoWeb}
       body: JSON.stringify({
         model: 'openai/gpt-oss-120b',
         messages: [{ role: 'user', content: promptGroq }],
-        temperature: 0.1 // Temperatura mínima para seguir regras à risca
+        temperature: 0.1
       })
     });
 
