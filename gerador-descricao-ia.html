@@ -184,7 +184,7 @@ async function executarAutomacao() {
     } catch(err) { console.warn("Aviso: TXT não encontrado, prosseguindo sem as regras rígidas extras."); }
 
     const queryLimpa = titulo.replace(/para PC|Iluminado|Preto|Branco|Com Fio/gi, '').trim();
-    const queryFinal = `"${queryLimpa}" site oficial fabricante especificacoes ficha tecnica`;
+    const queryFinal = `${queryLimpa} site oficial especificações ficha técnica`;
 
     btn.textContent = "🔍 A pesquisar na web...";
     const tavilyRes = await fetch('https://api.tavily.com/search', {
