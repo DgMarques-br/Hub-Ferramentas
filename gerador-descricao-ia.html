@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gerador de Descrições com IA (Tavily + Groq)</title>
+<title>Gerador de Descrições Rígido (Tavily + Groq)</title>
 <style>
   :root{
     --bg: #EEF0EF;
@@ -80,21 +80,19 @@
   .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
   .btn-secondary:hover { background: var(--line-soft); }
 
-  /* Tabs e Result */
   .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
   .tab-btn { background: none; border: none; padding: 0 0 10px 0; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; }
   .tab-btn.active { color: var(--plum); border-bottom-color: var(--plum); }
   .tab-content { display: none; flex-grow: 1; flex-direction: column; }
   .tab-content.active { display: flex; }
 
-  #htmlOutput { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink-soft); background: var(--bg); height: 100%; min-height: 380px; }
+  #htmlOutput { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink-soft); background: var(--bg); height: 100%; min-height: 480px; }
   
   .preview-box {
     border: 1.5px solid var(--line); border-radius: 8px; padding: 20px; background: var(--paper);
-    min-height: 380px; font-family: Arial, sans-serif; flex-grow: 1;
+    min-height: 480px; font-family: Arial, sans-serif; flex-grow: 1;
   }
   
-  /* Bloco de Fontes (Links da Tavily) */
   .sources-box {
     margin-top: 16px;
     padding: 14px;
@@ -118,9 +116,9 @@
   <div class="top-inner">
     <div>
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
-      <p class="brand-eyebrow">Inteligência Artificial (Tavily + Groq)</p>
+      <p class="brand-eyebrow">Padrão Definitivo (Tavily + Groq)</p>
       <h1>Gerador de Descrições IA</h1>
-      <p class="subtitle">Pesquisa automática na web e formatação técnica estruturada.</p>
+      <p class="subtitle">Pesquisa automática consumindo as regras externas do PADRÃO-DE-DESCRIÇÃO.txt.</p>
     </div>
     <div>
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
@@ -132,28 +130,23 @@
   <div class="split-view">
     <!-- COLUNA 1: ENTRADA -->
     <div class="card">
-      
       <div class="form-group">
         <label for="apiKeyGroq">Chave API Groq (gsk_...)</label>
         <input type="password" id="apiKeyGroq" placeholder="Cole sua chave Groq aqui">
       </div>
-
       <div class="form-group">
         <label for="apiKeyTavily">Chave API Tavily (tvly-...)</label>
         <input type="password" id="apiKeyTavily" placeholder="Cole sua chave Tavily aqui">
       </div>
-
       <div class="form-group">
         <label for="tituloInput">Nome do Produto / Modelo</label>
-        <input type="text" id="tituloInput" placeholder="Ex: Headset Gamer JBL Quantum 100 Preto">
+        <input type="text" id="tituloInput" placeholder="Ex: Headset Gamer Trust Varzz GXT 460 T23380">
       </div>
-
       <div class="form-group" style="flex-grow: 1; display: flex; flex-direction: column;">
-        <label for="rawInfoInput">Instruções Adicionais (Opcional)</label>
-        <textarea id="rawInfoInput" placeholder="Ex: 'Focar na compatibilidade com PC e PS5. Remover peso se não encontrar.'"></textarea>
-        <span class="hint">A Tavily pesquisará na web pelo produto e a Groq formatará o resultado final.</span>
+        <label for="rawInfoInput">Instruções Manuais / Forçar Dados (Opcional)</label>
+        <textarea id="rawInfoInput" placeholder="Ex: 'EAN: 8713439233804. Anatel: 12345-67-89012. Garantia de 3 anos.'"></textarea>
+        <span class="hint">A IA irá consultar automaticamente o documento de regras externo para formatar o texto final.</span>
       </div>
-
       <div class="actions">
         <button type="button" class="btn-primary" id="btnGerar" onclick="executarAutomacao()">✨ Pesquisar na Web e Gerar</button>
       </div>
@@ -165,18 +158,14 @@
         <button class="tab-btn active" onclick="switchTab('html')">&lt;/&gt; Código HTML</button>
         <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização e Texto Limpo</button>
       </div>
-
       <div id="tab-html" class="tab-content active">
         <textarea id="htmlOutput" readonly placeholder="A descrição formatada em HTML aparecerá aqui..."></textarea>
       </div>
-      
       <div id="tab-preview" class="tab-content">
         <div class="preview-box" id="previewOutput">
           <span style="color: var(--ink-soft); font-size: 14px;">Preencha os dados e clique em 'Pesquisar na Web e Gerar'.</span>
         </div>
       </div>
-
-      <!-- Bloco de Fontes e Links Separado -->
       <div class="sources-box" id="sourcesBox" style="display:none;">
         <div class="sources-title">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
@@ -184,7 +173,6 @@
         </div>
         <ul class="sources-list" id="sourcesList"></ul>
       </div>
-
       <div class="actions" style="margin-top: 16px;">
         <button type="button" class="btn-primary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
         <button type="button" class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto s/ HTML</button>
@@ -196,7 +184,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-// --- TEMA ---
+// --- TEMA E PERSISTÊNCIA DAS CHAVES ---
 const themeToggleBtn = document.getElementById('themeToggle');
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
@@ -210,17 +198,13 @@ themeToggleBtn.addEventListener('click', () => {
   localStorage.setItem('sapCatalogTheme', next);
 });
 
-// --- PERSISTÊNCIA DAS CHAVES API ---
 const keyGroq = document.getElementById('apiKeyGroq');
 const keyTavily = document.getElementById('apiKeyTavily');
-
 keyGroq.value = localStorage.getItem('groq_api_key') || '';
 keyTavily.value = localStorage.getItem('tavily_api_key') || '';
-
 keyGroq.addEventListener('input', () => localStorage.setItem('groq_api_key', keyGroq.value.trim()));
 keyTavily.addEventListener('input', () => localStorage.setItem('tavily_api_key', keyTavily.value.trim()));
 
-// --- TROCA DE TABS ---
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -233,7 +217,7 @@ function switchTab(tab) {
   }
 }
 
-// --- FLUXO PRINCIPAL: TAVILY + GROQ ---
+// --- FLUXO PRINCIPAL: LEITURA TXT + TAVILY + GROQ ---
 async function executarAutomacao() {
   const groqKey = keyGroq.value.trim();
   const tavilyKey = keyTavily.value.trim();
@@ -257,73 +241,108 @@ async function executarAutomacao() {
   sourcesList.innerHTML = '';
 
   try {
-    // PASSO 1: Pesquisa na Web via Tavily API
+    // PASSO 1: LER O FICHEIRO DE REGRAS EXTERNO (PADRÃO-DE-DESCRIÇÃO.txt)
+    btn.textContent = "📖 A ler regras do servidor...";
+    let regrasExternas = "";
+    try {
+      const resRegras = await fetch('PADRÃO-DE-DESCRIÇÃO.txt');
+      if(resRegras.ok) {
+        regrasExternas = await resRegras.text();
+      } else {
+        throw new Error("O ficheiro PADRÃO-DE-DESCRIÇÃO.txt não foi encontrado.");
+      }
+    } catch(err) {
+      alert("Aviso crítico: " + err.message + " Verifique se enviou o ficheiro para o GitHub.");
+      throw err; 
+    }
+
+    // PASSO 2: PESQUISA NA WEB VIA TAVILY
+    const queryLimpa = titulo.replace(/para PC|Iluminado|Preto|Branco|Com Fio/gi, '').trim();
+    const queryFinal = `"${queryLimpa}" ficha tecnica especificacoes`;
+
     btn.textContent = "🔍 A pesquisar na web...";
     const tavilyRes = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         api_key: tavilyKey,
-        query: `Ficha técnica especificações ${titulo}`,
-        search_depth: "basic",
+        query: queryFinal,
+        search_depth: "advanced",
         include_answer: true,
-        max_results: 4
+        max_results: 6
       })
     });
 
     const tavilyData = await tavilyRes.json();
-    if (!tavilyRes.ok) {
-      throw new Error(tavilyData.message || "Erro ao consultar a Tavily API.");
-    }
+    if (!tavilyRes.ok) throw new Error(tavilyData.message || "Erro ao consultar a Tavily API.");
 
-    // Organiza os dados e os links recolhidos pela Tavily
+    const palavrasChave = titulo.toLowerCase().split(/\s+/).filter(p => p.length > 3);
     let contextoWeb = tavilyData.answer ? `Resumo da Web: ${tavilyData.answer}\n\n` : "";
     const linksUteis = [];
 
     if (tavilyData.results && tavilyData.results.length > 0) {
       tavilyData.results.forEach(res => {
-        contextoWeb += `- Fonte: ${res.title}\nConteúdo: ${res.content}\n\n`;
-        if (res.url) {
-          linksUteis.push({ title: res.title || res.url, url: res.url });
+        const textoParaVerificacao = (res.title + " " + res.content).toLowerCase();
+        const correspondencias = palavrasChave.filter(palavra => textoParaVerificacao.includes(palavra));
+        if (correspondencias.length >= 2 || textoParaVerificacao.includes(queryLimpa.toLowerCase())) {
+          contextoWeb += `- Fonte: ${res.title}\nConteúdo: ${res.content}\n\n`;
+          if (res.url) linksUteis.push({ title: res.title || res.url, url: res.url });
         }
       });
     }
 
-    // PASSO 2: Formatação via Groq API
+    if (linksUteis.length === 0 && tavilyData.results) {
+      tavilyData.results.slice(0, 3).forEach(res => {
+        contextoWeb += `- Fonte: ${res.title}\nConteúdo: ${res.content}\n\n`;
+        if (res.url) linksUteis.push({ title: res.title || res.url, url: res.url });
+      });
+    }
+
+    // PASSO 3: GROQ ALIMENTADO PELAS REGRAS DO TXT
     btn.textContent = "✨ A formatar com Groq...";
     const promptGroq = `
-Você é um especialista em e-commerce e redação técnica de produtos. Com base nas INFORMAÇÕES DA WEB recolhidas abaixo e nas INSTRUÇÕES do utilizador, crie uma descrição profissional em HTML limpo.
+Você é um especialista rigoroso na criação de descrições para e-commerce.
 
-REGRAS RÍGIDAS DE FORMATAÇÃO HTML:
-1. Retorne APENAS o código HTML puro, sem blocos de código markdown (sem \`\`\`html e sem \`\`\`).
-2. Utilize exatamente a estrutura abaixo:
+REGRAS DE NEGÓCIO OBRIGATÓRIAS (LEI ABSOLUTA):
+Leia e aplique CADA UMA das regras abaixo com atenção meticulosa. Não invente nada que viole este padrão.
+=========================================
+${regrasExternas}
+=========================================
+
+MOLDE OBRIGATÓRIO DE SAÍDA (HTML):
+Retorne APENAS o código HTML puro abaixo preenchido, sem blocos markdown. Não coloque NADA antes ou depois do HTML.
 
 <span style="font-size:14px;"><strong>[TÍTULO DO PRODUTO EM TITLE CASE]</strong></span><br><br>
 <span style="font-size:12px;">
-[Texto descritivo e comercial envolvente de 2 a 3 parágrafos curtos explicando os benefícios do produto com base nas fontes, usando quebras de linha <br>]
-</span><br>
+[Parágrafo único comercial e objetivo sobre o produto]
+</span><br><br>
 <span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br>
 <span style="font-size:12px;">
-<strong>Chave 1:</strong> Valor 1<br>
-<strong>Chave 2:</strong> Valor 2<br>
-</span><br>
+<strong>[Chave]:</strong> [Valor]<br>
+</span><br><br>
+<span style="font-size:14px;"><strong>DIMENSÕES</strong></span><br>
+<span style="font-size:12px;">
+[Comp] x [Larg] x [Alt] cm
+</span><br><br>
 <span style="font-size:14px;"><strong>ITENS INCLUSOS</strong></span><br>
 <span style="font-size:12px;">
-1x Item A<br>
-1x Item B<br>
-</span><br>
+[Qtd] [Item]<br>
+</span><br><br>
 <span style="font-size:12px;">
 Imagens de caráter ilustrativo.<br>
 Informações divulgadas de acordo com o manual do fabricante.<br>
-Produto novo na caixa, lacrado com NF e garantia do fabricante.<br>
-Em caso de dúvidas sobre informações técnicas, utilização, limitações e manuseio do produto, verifique o manual do fabricante.<br>
-</span>
+Produto novo na caixa, lacrado, com nota fiscal e garantia do fabricante de [PRAZO CONVERTIDO].<br>
+Em caso de dúvidas sobre informações técnicas, consulte o manual do fabricante.<br><br>
+EAN: [Se fornecido/encontrado, senão remover linha]<br>
+Anatel: [00000-00-00000 - Só se encontrado, senão remover linha]
+</span><br><br>
+<span style="font-size:12px;">NAC000000</span>
 
 DADOS DO PRODUTO:
 Nome: ${titulo}
-Instruções extra: ${instrucoes}
+Instruções extras do usuário: ${instrucoes}
 
-INFORMAÇÕES RECOLHIDAS DA WEB:
+INFORMAÇÕES RECOLHIDAS DA WEB (Base de Extração):
 ${contextoWeb}
 `;
 
@@ -336,24 +355,20 @@ ${contextoWeb}
       body: JSON.stringify({
         model: 'openai/gpt-oss-120b',
         messages: [{ role: 'user', content: promptGroq }],
-        temperature: 0.3
+        temperature: 0.1 // Temperatura mínima para seguir regras à risca
       })
     });
 
     const groqData = await groqRes.json();
-    if (groqData.error) {
-      throw new Error(groqData.error.message || "Erro na comunicação com a Groq.");
-    }
+    if (groqData.error) throw new Error(groqData.error.message || "Erro na comunicação com a Groq.");
 
     if (groqData.choices && groqData.choices[0]?.message?.content) {
       let htmlGerado = groqData.choices[0].message.content;
       htmlGerado = htmlGerado.replace(/```html/g, '').replace(/```/g, '').trim();
 
-      // Preenche os outputs de HTML e Visualização
       document.getElementById('htmlOutput').value = htmlGerado;
       document.getElementById('previewOutput').innerHTML = htmlGerado;
 
-      // Preenche o bloco separado com os links da Tavily
       if (linksUteis.length > 0) {
         linksUteis.forEach(item => {
           const li = document.createElement('li');
@@ -367,7 +382,7 @@ ${contextoWeb}
         sourcesBox.style.display = 'block';
       }
 
-      showToast("Descrição gerada com sucesso!");
+      showToast("Descrição validada e gerada com sucesso!");
     } else {
       throw new Error("Resposta inválida recebida da IA.");
     }
@@ -398,15 +413,10 @@ function copiarTexto(elId, label) {
 
 function copiarRenderizado() {
   const prev = document.getElementById('previewOutput');
-  if(!prev.innerText.trim() || prev.innerText.includes('Preencha os dados')) {
-    showToast('Nenhum conteúdo para copiar.');
-    return;
-  }
+  if(!prev.innerText.trim() || prev.innerText.includes('Preencha os dados')) return;
   
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(prev.innerText).then(() => {
-      showToast('Texto limpo copiado!');
-    });
+    navigator.clipboard.writeText(prev.innerText).then(() => showToast('Texto limpo copiado!'));
   } else {
     const ta = document.createElement('textarea');
     ta.value = prev.innerText;

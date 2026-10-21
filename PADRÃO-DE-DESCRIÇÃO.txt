@@ -1,0 +1,698 @@
+PROMPT PADRÃO DEFINITIVO PARA DESCRIÇÕES DE PRODUTOS
+
+Criar descrições de produtos para anúncios de marketplace seguindo RIGOROSAMENTE todas as regras abaixo.
+
+Este padrão deve ser tratado como regra fixa. Não alterar a estrutura, não inventar informações, não preencher campos por suposição e não ignorar regras específicas do produto.
+
+OBJETIVO PRINCIPAL
+
+A descrição deve ser baseada exclusivamente em informações confirmadas e confiáveis.
+
+Priorizar precisão, confiabilidade e compatibilidade com marketplaces em vez de preencher todos os campos disponíveis.
+
+Sempre que possível, confirmar as informações diretamente no fabricante.
+
+Nunca inventar:
+
+* Características técnicas
+* Dimensões
+* Peso
+* EAN/GTIN
+* Código de produto
+* Part number
+* Garantia
+* Compatibilidade
+* Homologação Anatel
+* Conteúdo da embalagem
+* Recursos
+* Tecnologias
+* Especificações elétricas
+* Capacidades
+* Velocidades
+* Certificações
+
+Quando uma informação não puder ser confirmada em fonte confiável, não apresentá-la como fato.
+
+1. TÍTULO
+
+Formato obrigatório:
+
+Produto + Marca + Cor + Modelo
+
+Regras:
+
+* Usar capitalização normal.
+* Não escrever o título inteiro em letras maiúsculas.
+* Não utilizar informações desnecessárias.
+* Não utilizar frases promocionais.
+* Não utilizar informações não confirmadas.
+* Não encurtar o nome do produto quando isso alterar sua identificação.
+* Manter modelo, part number, código e identificação do fabricante exatamente como informado pelo fabricante.
+* Não alterar números, letras, hífens ou códigos do modelo.
+* Quando a cor fizer parte da identificação do produto ou for informada pelo fabricante, incluí-la.
+* Não inventar cor quando ela não estiver confirmada.
+
+2. INTRODUÇÃO
+
+Criar somente 1 parágrafo introdutório.
+
+O texto deve ser:
+
+* Profissional
+* Claro
+* Comercial
+* Objetivo
+* Baseado em características reais
+* Baseado em benefícios comprovados
+
+Não:
+
+* Inventar características.
+* Fazer promessas não comprovadas.
+* Exagerar desempenho.
+* Utilizar informações promocionais sem comprovação.
+* Repetir desnecessariamente todas as especificações técnicas.
+
+3. ESTRUTURA OBRIGATÓRIA
+
+Seguir exatamente esta ordem:
+
+Título
+
+Parágrafo introdutório
+
+ESPECIFICAÇÕES
+
+DIMENSÕES
+
+ITENS INCLUSOS
+
+ALÉRGICOS, somente quando aplicável
+
+Texto final padrão
+
+EAN
+
+Homologação Anatel, somente quando aplicável e confirmada
+
+NAC
+
+Não criar seções que não sejam necessárias.
+
+A seção DIMENSÕES deve ser eliminada completamente quando não houver dimensões confiáveis.
+
+A seção ALÉRGICOS deve ser utilizada somente para produtos que possuam informações de alergênicos, especialmente produtos Havanna.
+
+A seção Homologação Anatel deve ser utilizada somente quando o produto depender de homologação Anatel e o número tiver sido confirmado.
+
+4. ESPECIFICAÇÕES
+
+Utilizar lista simples.
+
+Uma informação por linha.
+
+Não utilizar:
+
+* Tabelas
+* Negrito
+* Linhas divisórias
+* Separadores gráficos
+* Excesso de subseções
+
+Organizar as informações de maneira lógica e objetiva.
+
+Corrigir:
+
+* Português
+* Ortografia
+* Nomenclatura
+* Unidades
+* Capitalização
+
+Não inventar nenhuma especificação.
+
+Quando houver diversas categorias técnicas, organizar as informações de forma lógica dentro da seção ESPECIFICAÇÕES, sem criar excesso de seções.
+
+5. DIMENSÕES
+
+Sempre informar as dimensões em centímetros.
+
+Conversões:
+
+* Milímetros devem ser convertidos para centímetros.
+* Metros devem ser convertidos para centímetros, quando necessário.
+* Peso deve permanecer em g ou kg.
+
+Ordem obrigatória:
+
+Comprimento x Largura x Altura
+
+Exemplo:
+
+Dimensões: 20 x 15 x 5 cm
+
+Regras:
+
+* Priorizar dimensões oficiais do fabricante.
+* Consultar manual, datasheet, ficha técnica ou documentação oficial.
+* Quando não houver informação oficial, procurar fonte confiável e independente.
+* Nunca inventar dimensões.
+* Nunca estimar dimensões.
+* Nunca utilizar dimensões de outro modelo.
+* Nunca confundir dimensão do produto com dimensão da embalagem.
+
+Se não for possível confirmar dimensões confiáveis, eliminar completamente a seção DIMENSÕES.
+
+Nunca escrever:
+
+* Não informado
+* Não informado pelo fabricante
+* A consultar
+* Aproximadamente, quando a medida não tiver sido confirmada
+
+6. FONTES E CONFERÊNCIA
+
+Sempre pesquisar e confirmar as informações técnicas antes de montar a descrição.
+
+Prioridade das fontes:
+
+1. Site oficial do fabricante
+2. Manual oficial
+3. Datasheet oficial
+4. Ficha técnica oficial
+5. Documentação oficial
+6. Distribuidor oficial ou fonte técnica confiável
+7. Outra fonte independente confiável, somente quando necessário
+
+Não utilizar informações de anúncios de terceiros como fonte principal quando houver documentação do fabricante disponível.
+
+Se houver conflito entre informações:
+
+* Priorizar o fabricante.
+* Não escolher automaticamente a informação mais comum em lojas.
+* Não combinar informações de versões diferentes do produto.
+
+Conferir especialmente:
+
+* Marca
+* Modelo
+* Part number
+* Código do fabricante
+* EAN/GTIN
+* Dimensões
+* Peso
+* Dimensões da embalagem, quando necessárias
+* Velocidades
+* Capacidades
+* Compatibilidade
+* Conectividade
+* Garantia
+* Especificações elétricas
+* Recursos
+* Tecnologias
+* Conteúdo da embalagem
+* Certificações
+* Homologações
+
+7. ITENS INCLUSOS
+
+Informar somente os itens que realmente acompanham o produto.
+
+Utilizar:
+
+1 unidade - item
+
+ou
+
+1 unidade - item
+2 unidades - item
+
+Regras:
+
+* Informar quantidade.
+* Utilizar nomenclatura clara.
+* Não incluir acessórios vendidos separadamente.
+* Não presumir que determinado acessório acompanha o produto.
+* Conferir o conteúdo da embalagem no fabricante ou manual oficial sempre que possível.
+
+8. TEXTO FINAL PADRÃO
+
+Utilizar exatamente:
+
+Imagens de caráter ilustrativo.
+Informações divulgadas de acordo com o manual do fabricante.
+Produto novo na caixa, lacrado, com nota fiscal e garantia do fabricante de [PRAZO].
+Em caso de dúvidas sobre informações técnicas, consulte o manual do fabricante.
+
+Substituir [PRAZO] pelo prazo de garantia confirmado.
+
+Não assumir automaticamente qualquer prazo de garantia.
+
+A garantia deve ser confirmada antes de ser informada.
+
+9. REGRA DE FORMATAÇÃO DA GARANTIA
+
+Garantias inferiores a 11 meses devem ser informadas em meses.
+
+Garantias de 11 meses ou mais devem ser expressas em anos.
+
+Exemplos:
+
+3 meses → 3 meses
+6 meses → 6 meses
+9 meses → 9 meses
+10 meses → 10 meses
+11 meses → aproximadamente 1 ano
+12 meses → 1 ano
+24 meses → 2 anos
+36 meses → 3 anos
+60 meses → 5 anos
+
+Não converter uma garantia sem confirmação.
+
+Não inventar garantia.
+
+Quando o fabricante possuir condições diferentes de garantia para determinado produto, utilizar a condição correspondente ao modelo correto.
+
+10. EAN
+
+O EAN deve aparecer depois do texto final padrão.
+
+Formato:
+
+EAN: 0000000000000
+
+Regras:
+
+* Utilizar somente EAN confiável.
+* Conferir o EAN sempre que possível.
+* Priorizar fabricante, distribuidor confiável ou base fiscal.
+* Não inventar EAN.
+* Não utilizar EAN de outro modelo.
+* Não utilizar EAN de outra cor ou versão.
+* Se o EAN não puder ser confirmado, não inventar.
+
+11. HOMOLOGAÇÃO ANATEL
+
+Quando o produto depender de homologação Anatel, pesquisar e confirmar o número de homologação.
+
+Priorizar:
+
+* Base oficial da Anatel
+* Documentação oficial
+* Certificado oficial
+* Fabricante, quando disponibilizar o número correspondente
+
+O número de homologação Anatel deve aparecer obrigatoriamente no final da descrição, imediatamente abaixo do EAN e antes do NAC.
+
+Ordem obrigatória:
+
+EAN: 0000000000000
+Homologação Anatel: 00000-00-00000
+
+NAC000000
+
+Regras:
+
+* Nunca inventar número de homologação.
+* Nunca deduzir número Anatel pelo modelo.
+* Nunca utilizar número de outro produto.
+* Nunca utilizar número de outro modelo sem comprovar a correspondência.
+* Nunca utilizar número encontrado em anúncio de terceiro sem confirmação.
+* Conferir fabricante e modelo antes de informar a homologação.
+* Quando houver mais de uma versão do produto, confirmar qual certificado corresponde exatamente à versão anunciada.
+* Se a homologação Anatel for necessária, mas não puder ser confirmada, não inventar o número.
+* Se o produto não depender de homologação Anatel, não criar a informação.
+* Não colocar informações de Anatel dentro da seção ESPECIFICAÇÕES quando a regra for apresentar o número no final.
+* O número de homologação deve ficar abaixo do EAN.
+
+12. NAC
+
+O NAC deve ser sempre o último elemento da descrição.
+
+Não escrever:
+
+* NAC:
+* Código NAC:
+* SKU:
+* Produto:
+
+Utilizar somente:
+
+NAC000000
+
+13. FORMATAÇÃO DA ENTREGA
+
+Entregar tudo em um único bloco de texto, pronto para copiar e colar.
+
+Não utilizar:
+
+* Tabelas
+* Negrito
+* Linhas divisórias
+* Caixas de código
+* Blocos de programação
+* Comentários antes da descrição
+* Comentários depois da descrição
+* Explicações fora da descrição quando for solicitada somente a descrição
+
+Manter a estrutura limpa e padronizada.
+
+Utilizar uma linha em branco entre:
+
+* Título e introdução
+* Introdução e ESPECIFICAÇÕES
+* ESPECIFICAÇÕES e DIMENSÕES
+* DIMENSÕES e ITENS INCLUSOS
+* ITENS INCLUSOS e ALÉRGICOS, quando aplicável
+* Última seção e texto final padrão
+* Texto final padrão e EAN
+
+Após o EAN, colocar a Homologação Anatel somente quando aplicável e confirmada.
+
+O NAC deve ser sempre o último elemento.
+
+14. CARACTERES PERMITIDOS
+
+A descrição deve ser compatível com os marketplaces e sistemas utilizados, incluindo:
+
+* Mercado Livre
+* Shopee
+* Magazine Luiza
+* TikTok Shop
+* Amazon
+* SAP
+* ERP
+
+Evitar caracteres especiais não aceitos pelos sistemas.
+
+São permitidos caracteres do português, incluindo:
+
+ç
+ã
+õ
+á
+é
+í
+ó
+ú
+à
+â
+ê
+ô
+ü
+
+Também são permitidos os acentos e caracteres normalmente utilizados na língua portuguesa.
+
+Quando for necessário utilizar aspas, NÃO utilizar aspas duplas.
+
+Proibido utilizar:
+
+"
+
+Quando houver necessidade de aspas, utilizar:
+
+''
+
+Não utilizar emojis.
+
+Não utilizar símbolos decorativos.
+
+Não utilizar caracteres especiais desnecessários.
+
+15. PRODUTOS RECONDICIONADOS
+
+Para produtos recondicionados, iniciar obrigatoriamente com:
+
+ATENÇÃO - PRODUTO RECONDICIONADO
+
+Esse aviso deve aparecer antes do título.
+
+Não utilizar o texto final padrão de produto novo.
+
+Não declarar:
+
+* Produto novo
+* Lacrado
+* Garantia padrão de produto novo
+
+Não adicionar EAN ou NAC automaticamente se eles não forem fornecidos pelo usuário.
+
+Ao final, utilizar exatamente:
+
+ATENÇÃO - PRODUTO RECONDICIONADO
+
+Produtos recondicionados com garantia de 3 meses.
+Todos os itens passam por testes rigorosos de funcionamento.
+As embalagens podem apresentar avarias, sem impacto no produto.
+
+Para placas-mãe recondicionadas, acrescentar:
+
+Para placas-mãe, em alguns casos pode não acompanhar o espelho.
+
+16. GARANTIA DE PRODUTOS RECONDICIONADOS
+
+Produtos recondicionados devem seguir a garantia informada pelo usuário ou a condição comercial definida.
+
+Quando a garantia padrão for 3 meses:
+
+3 meses
+
+Não aplicar conversão para anos em garantias inferiores a 11 meses.
+
+17. PANETONES
+
+Para panetones, informar:
+
+Validade: 150 dias
+
+Não inventar outras informações de validade.
+
+Não alterar o prazo de validade informado nesta regra sem orientação específica do usuário.
+
+18. PRODUTOS COM HOMOLOGAÇÃO
+
+Quando houver necessidade de homologação ou certificação:
+
+* Pesquisar na fonte oficial correspondente.
+* Confirmar fabricante.
+* Confirmar modelo.
+* Confirmar código/modelo relacionado ao certificado.
+* Confirmar o número correto.
+* Não utilizar números de produtos semelhantes.
+* Não utilizar números presumidos.
+
+Para produtos que dependam de homologação Anatel, consultar prioritariamente a base oficial da Anatel.
+
+O número confirmado deve ser colocado no final da descrição, abaixo do EAN e antes do NAC.
+
+19. INFORMAÇÕES ELÉTRICAS
+
+Conferir em fonte oficial:
+
+* Tensão
+* Potência
+* Frequência
+* Corrente
+* Consumo
+* Tipo de alimentação
+* Voltagem de entrada
+* Voltagem de saída
+* Outras características elétricas relevantes
+
+Não confundir:
+
+* 127 V
+* 220 V
+* Bivolt
+* Monovolt
+
+Quando existirem versões diferentes do produto, utilizar somente as informações correspondentes ao modelo enviado.
+
+Nunca utilizar especificações elétricas de outra versão.
+
+20. COMPATIBILIDADE
+
+Confirmar compatibilidade diretamente no fabricante sempre que possível.
+
+Não assumir compatibilidade apenas porque os produtos utilizam o mesmo padrão.
+
+Conferir especificamente, quando aplicável:
+
+* Processadores
+* Placas-mãe
+* Memórias
+* Placas de vídeo
+* Gabinetes
+* Water coolers
+* Fontes
+* Armazenamento
+* Periféricos
+* Cabos
+* Adaptadores
+* Acessórios
+
+21. PRODUTOS HAVANNA
+
+Quando o produto for Havanna, aplicar as regras específicas abaixo.
+
+ALÉRGICOS:
+
+Quando houver informações sobre alergênicos, criar uma seção própria chamada:
+
+ALÉRGICOS
+
+O título deve estar em letras maiúsculas.
+
+Todo o conteúdo da seção ALÉRGICOS também deve estar em letras maiúsculas.
+
+Não colocar informações de alergênicos dentro de ESPECIFICAÇÕES.
+
+GARANTIA:
+
+Quando informado pelo fabricante para produtos Havanna, incluir em ESPECIFICAÇÕES:
+
+Garantia contra defeito de fabricação: 30 dias
+
+Não substituir essa informação pela garantia padrão do fabricante quando a condição específica de 30 dias for aplicável.
+
+TEXTO FINAL HAVANNA:
+
+Utilizar a redação específica definida para produtos Havanna:
+
+Informações divulgadas de acordo com o fabricante
+
+Quando aplicável, utilizar a orientação:
+
+consulte a embalagem
+
+Não substituir informações específicas da Havanna pelas regras genéricas quando houver uma regra própria para o produto.
+
+22. REGRA DE CONFLITO ENTRE INFORMAÇÕES
+
+Quando duas fontes apresentarem informações diferentes:
+
+1. Priorizar o fabricante.
+
+2. Conferir o modelo e part number.
+
+3. Conferir se as informações correspondem à mesma versão.
+
+4. Conferir manual ou datasheet.
+
+5. Não misturar informações de versões diferentes.
+
+6. Se o conflito não puder ser resolvido, não apresentar a informação como confirmada.
+
+7. REGRA PARA PRODUTOS SEM INFORMAÇÃO CONFIRMADA
+
+Se uma característica não puder ser confirmada:
+
+* Não inventar.
+* Não estimar.
+* Não completar por conhecimento genérico.
+* Não utilizar informação de produto semelhante.
+* Não utilizar informação de outro modelo.
+* Não preencher apenas para deixar a descrição mais completa.
+
+Quando uma seção obrigatória não possuir nenhuma informação confiável, eliminá-la quando permitido por estas regras.
+
+24. REGRA FINAL DE VALIDAÇÃO
+
+Antes de entregar qualquer descrição, conferir obrigatoriamente:
+
+[ ] Produto correto
+[ ] Marca correta
+[ ] Modelo correto
+[ ] Part number correto
+[ ] Cor correta, quando aplicável
+[ ] Introdução com apenas 1 parágrafo
+[ ] Especificações confirmadas
+[ ] Dimensões confirmadas ou seção removida
+[ ] Peso confirmado, quando informado
+[ ] Itens inclusos confirmados
+[ ] Garantia confirmada
+[ ] EAN confirmado
+[ ] Homologação Anatel confirmada, quando aplicável
+[ ] Número Anatel colocado abaixo do EAN
+[ ] NAC colocado por último
+[ ] Regras específicas do fabricante aplicadas
+[ ] Regras de produto recondicionado aplicadas, quando necessário
+[ ] Regras Havanna aplicadas, quando necessário
+[ ] Regras de panetone aplicadas, quando necessário
+[ ] Informações elétricas conferidas
+[ ] Compatibilidade conferida
+[ ] Nenhuma informação inventada
+[ ] Nenhuma informação de outro modelo utilizada
+[ ] Nenhum caractere proibido utilizado
+[ ] Nenhuma aspas duplas utilizada
+[ ] Estrutura final respeitada
+
+REGRA PRINCIPAL E ABSOLUTA:
+
+A descrição deve conter somente informações que possam ser sustentadas por uma fonte confiável.
+
+É PROIBIDO inventar, presumir, completar, estimar ou copiar informação duvidosa.
+
+Em caso de dúvida entre preencher um campo ou deixar a informação de fora, priorizar a precisão e deixar a informação de fora.
+
+A confiabilidade da informação é mais importante do que a quantidade de informações na descrição.
+
+25. REGRA DE FORMATAÇÃO DOS ITENS INCLUSOS
+
+Na seção ITENS INCLUSOS, informar somente a quantidade e o nome do item.
+
+Não utilizar as palavras:
+
+* unidade
+* unidades
+* conjunto
+* conjuntos
+* kit, quando a quantidade puder ser informada diretamente
+
+Não utilizar hífen, traço ou marcador entre a quantidade e o item.
+
+Formato obrigatório:
+
+1 Item
+2 Item
+3 Item
+
+Exemplo:
+
+ITENS INCLUSOS
+
+1 Volante
+1 Pedal
+2 Cabos
+1 Manual
+
+A quantidade deve aparecer sempre antes do nome do item.
+
+Quando houver mais de uma unidade do mesmo item, informar o número correspondente.
+
+Não escrever:
+
+1 unidade - Volante
+2 unidades - Cabos
+1 conjunto - Pedais
+
+Utilizar:
+
+1 Volante
+2 Cabos
+1 Pedais
+
+26. REGRA DE HOMOLOGAÇÃO ANATEL NA ENTREGA
+
+Quando a homologação Anatel for aplicável e estiver confirmada em fonte confiável, utilizar exatamente o formato:
+
+EAN: 0000000000000
+Anatel: 00000-00-00000
+
+O termo deve ser escrito como Anatel:, e não como Homologação Anatel:.
+
+A informação deve aparecer imediatamente abaixo do EAN e antes do NAC.
+
+Nunca informar número de Anatel sem confirmação em fonte confiável.
+
