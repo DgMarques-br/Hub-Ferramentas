@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Validador de Links</title>
+<title>Links</title>
+<link rel="icon" type="image/png" href="img/Logotipo.png">
 <style>
   :root{
     --bg: #EEF0EF;
@@ -249,6 +250,34 @@
     .mkt-split { flex-direction: column; }
     .mkt-left { flex: none; width: 100%; position: relative; top: 0; }
   }
+
+  /* Animação de Carregamento (Spinner) */
+  .loading-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 600;
+  }
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.85s linear infinite;
+  }
+  .loading-text {
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
 </style>
 </head>
 <body>
@@ -327,7 +356,7 @@
 
         botao.disabled = true;
         botao.innerText = 'A Pesquisar...';
-        mostrarMensagemGlobal('msg-info', '⚡ A varrer as lojas. Aguarde...');
+        mostrarMensagemGlobal('msg-info', '<div class="loading-container"><div class="spinner"></div><span class="loading-text">A varrer as lojas. Por favor, aguarde...</span></div>');
         dadosAgrupados = {};
         regiaoSelecionada = {};
 
