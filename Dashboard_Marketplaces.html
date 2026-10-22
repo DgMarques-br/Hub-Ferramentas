@@ -83,9 +83,7 @@
             transition: all 0.2s ease;
         }
 
-        .btn-uf:hover {
-            border-color: var(--primary);
-        }
+        .btn-uf:hover { border-color: var(--primary); }
 
         .btn-uf.active {
             background: var(--primary);
@@ -118,7 +116,7 @@
         .kpi b { display: block; font-size: 32px; margin: 8px 0; line-height: 1; }
         
         .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-        .chart-container { position: relative; height: 300px; width: 100%; display: flex; justify-content: center; }
+        .chart-container { position: relative; height: 320px; width: 100%; display: flex; justify-content: center; }
         
         /* TABELA */
         .toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
@@ -274,7 +272,7 @@
                     <div class="chart-container"><canvas id="chartStatus"></canvas></div>
                 </div>
                 <div class="card">
-                    <h3 style="margin-bottom: 16px; font-size: 16px;">Volume por Marketplace</h3>
+                    <h3 style="margin-bottom: 16px; font-size: 16px;">Volume por Marketplace (Publicados vs Estoque)</h3>
                     <div class="chart-container"><canvas id="chartMarketplaces"></canvas></div>
                 </div>
             </div>
@@ -681,8 +679,9 @@
         }
 
         function processarResumo() {
-            let s=0, n=0, v=0, cCount={};
+            let s=0, n=0, v=0;
             let alertaNao = 0;
+            let cBreakdown = {};
 
             let baseResumo = dadosGlobais.filter(d => {
                 if (ufAtual === 'TODOS') return true;
@@ -693,7 +692,18 @@
                 if(d.status==='sim') s++; 
                 else if(d.status==='nao') { n++; if(d.estoque > 0) alertaNao++; } 
                 else v++;
-                cCount[d.canal] = (cCount[d.canal]||0)+1;
+
+                if(!cBreakdown[d.canal]) {
+                    cBreakdown[d.canal] = { pubComEstoque: 0, pubSemEstoque: 0, naoPubComEstoque: 0, naoPubSemEstoque: 0 };
+                }
+
+                if(d.status === 'sim') {
+                    if(d.estoque > 0) cBreakdown[d.canal].pubComEstoque++;
+                    else cBreakdown[d.canal].pubSemEstoque++;
+                } else {
+                    if(d.estoque > 0) cBreakdown[d.canal].naoPubComEstoque++;
+                    else cBreakdown[d.canal].naoPubSemEstoque++;
+                }
             });
 
             document.getElementById('kpiTotal').innerText = baseResumo.length.toLocaleString('pt-BR');
@@ -712,12 +722,53 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
             });
 
-            let sortCanais = Object.entries(cCount).sort((a,b)=>b[1]-a[1]);
+            // Ordenar canais por volume total
+            let canaisOrdenados = Object.keys(cBreakdown).sort((a,b) => {
+                let totalA = Object.values(cBreakdown[a]).reduce((sum, v) => sum + v, 0);
+                let totalB = Object.values(cBreakdown[b]).reduce((sum, v) => sum + v, 0);
+                return totalB - totalA;
+            });
+
+            let labelsCanais = canaisOrdenados;
+            let dataPubComEstoque = canaisOrdenados.map(c => cBreakdown[c].pubComEstoque);
+            let dataPubSemEstoque = canaisOrdenados.map(c => cBreakdown[c].pubSemEstoque);
+            let dataNaoPubComEstoque = canaisOrdenados.map(c => cBreakdown[c].naoPubComEstoque);
+            let dataNaoPubSemEstoque = canaisOrdenados.map(c => cBreakdown[c].naoPubSemEstoque);
+
             if(cMarket) cMarket.destroy();
             cMarket = new Chart(document.getElementById('chartMarketplaces'), {
                 type: 'bar',
-                data: { labels: sortCanais.map(c=>c[0]), datasets: [{ label: 'Qtd Itens', data: sortCanais.map(c=>c[1]), backgroundColor: '#14b8a6' }] },
-                options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins:{legend:{display:false}} }
+                data: { 
+                    labels: labelsCanais, 
+                    datasets: [
+                        { label: 'Publicados c/ Estoque', data: dataPubComEstoque, backgroundColor: '#10b981' },
+                        { label: 'Publicados s/ Estoque', data: dataPubSemEstoque, backgroundColor: '#3b82f6' },
+                        { label: 'Não Publicados c/ Estoque (Alerta)', data: dataNaoPubComEstoque, backgroundColor: '#f59e0b' },
+                        { label: 'Não Publicados s/ Estoque / S/I', data: dataNaoPubSemEstoque, backgroundColor: '#94a3b8' }
+                    ] 
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    indexAxis: 'y',
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'y',
+                        intersect: true
+                    },
+                    scales: {
+                        x: { stacked: true, grid: { color: 'rgba(150, 150, 150, 0.1)' } },
+                        y: { stacked: true, grid: { display: false } }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
+                        tooltip: { 
+                            mode: 'nearest', 
+                            axis: 'y', 
+                            intersect: true 
+                        }
+                    }
+                }
             });
         }
 
