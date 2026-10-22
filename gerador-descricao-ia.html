@@ -183,17 +183,18 @@ async function executarAutomacao() {
       if(resRegras.ok) regrasExternas = await resRegras.text();
     } catch(err) { console.warn("Aviso: TXT não encontrado, prosseguindo sem as regras rígidas extras."); }
 
+    // MUDANÇA: Limpeza e simplificação da pesquisa para evitar confusão no motor de busca
     const queryLimpa = titulo.replace(/para PC|Iluminado|Preto|Branco|Com Fio/gi, '').trim();
-    const queryFinal = `${queryLimpa} site oficial especificações ficha técnica`;
+    const queryFinal = `${queryLimpa} especificações`;
 
-    btn.textContent = "🔍 A pesquisar na web...";
+    btn.textContent = "🔍 A pesquisar na web (Modo Avançado)...";
     const tavilyRes = await fetch('https://api.tavily.com/search', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         api_key: tavilyKey, 
         query: queryFinal, 
-        search_depth: "basic", 
+        search_depth: "advanced", // MUDANÇA: 'advanced' traz uma precisão brutalmente maior que o 'basic'
         include_answer: true, 
         max_results: 4 
       })
@@ -231,7 +232,8 @@ INSTRUÇÕES CRÍTICAS DE DESIGN E SOBREPOSIÇÃO:
 2. NUNCA OMita a secção ITENS INCLUSOS. Se não achar, deduza o básico (Ex: 1 Produto, 1 Manual).
 3. DIMENSÕES E FORMATO (EXCEÇÃO): Para hardwares (como Placa-Mãe, Gabinete), o 'Formato' ou 'Fator de Forma' (ex: ATX, Micro-ATX) DEVE ser listado na secção ESPECIFICAÇÕES. Na secção DIMENSÕES, procure as medidas em cm. Se não achar os centímetros exatos, escreva obrigatoriamente '[A confirmar] cm x [A confirmar] cm x [A confirmar] cm'. Não apague a secção DIMENSÕES.
 4. EAN, Anatel e NAC: Para EAN e Anatel, só o rótulo é negrito (<strong>EAN:</strong> 12345). Para o NAC, TODO o texto e números são negrito (<strong>NAC000000</strong>). Não adicione linhas em branco extras antes do NAC.
-5. FONTES DE PESQUISA: Priorize ABSOLUTAMENTE extrair as informações do link que pertencer ao site oficial do fabricante (máximo 2 fontes). Se o fabricante não estiver nas fontes, confie nos dados dos marketplaces confiáveis listados no 'Resumo da Web' (máximo 3 sites confiáveis, como Amazon, Mercado Livre, Shopee).
+5. FONTES DE PESQUISA: Priorize ABSOLUTAMENTE extrair as informações do link que pertencer ao site oficial do fabricante. Se o fabricante não estiver nas fontes, confie nos dados dos marketplaces confiáveis listados no 'Resumo da Web'.
+6. ESCUDO ANTI-ALUCINAÇÃO (MUITO IMPORTANTE): Se a pesquisa da web retornar resultados bizarros ou produtos de categorias completamente diferentes do que foi pedido (ex: trazer informações de um carro BMW 320i quando o produto é uma câmera C320I, ou um Chevrolet Onix), IGNORE COMPLETAMENTE as informações da web. Nesse caso, confie apenas no seu conhecimento interno seguro sobre o produto ou deixe os campos como '[A confirmar]'.
 
 MOLDE OBRIGATÓRIO DE SAÍDA (HTML):
 Retorne APENAS o código HTML puro abaixo preenchido, respeitando exatamente as quebras de linha (<br>).
@@ -246,12 +248,15 @@ Retorne APENAS o código HTML puro abaixo preenchido, respeitando exatamente as 
 </span><br>
 <span style="font-size:12px;"><strong>DIMENSÕES</strong></span><br>
 <span style="font-size:12px;">
-[Comp] x [Larg] x [Alt] cm
+<strong>Altura: </strong> [Valor] cm <br>
+<strong>Largura: </strong> [Valor] cm <br>
+<strong>Comprimento: </strong> [Valor] cm <br>
+<strong>Peso: </strong> [Valor] Kg [Valor, ou apagar linha se não achar]
 </span><br><br>
 <span style="font-size:12px;"><strong>ITENS INCLUSOS</strong></span><br>
 <span style="font-size:12px;">
 [Qtd] [Item]<br>
-</span><br><br>
+</span><br>
 <span style="font-size:12px;">
 Imagens de caráter ilustrativo.<br>
 Informações divulgadas de acordo com o manual do fabricante.<br>
@@ -259,7 +264,7 @@ Produto novo na caixa, lacrado, com nota fiscal e garantia do fabricante de [PRA
 Em caso de dúvidas sobre informações técnicas, consulte o manual do fabricante.<br><br>
 <strong>EAN:</strong> [Valor, ou apagar linha se não achar]<br>
 <strong>Anatel:</strong> [Valor, ou apagar linha se não achar]<br>
-<strong>NAC000000</strong>
+<strong>NAC000000</strong>[Valor, ou apagar linha se não achar]
 </span>
 
 DADOS DO PRODUTO:
