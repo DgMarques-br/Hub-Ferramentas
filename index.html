@@ -529,10 +529,24 @@ themeToggleBtn.addEventListener('click', () => {
 });
 </script>
 
+<!-- Motor de validação: mantém a validação rodando enquanto você usa o hub -->
+<script src="validador-engine.js"></script>
+<script>
+const validBadge = document.getElementById('validBadge');
+Validador.subscribe(({ status, snap }) => {
+  if (!snap || !snap.abas || status === 'idle') { validBadge.style.display = 'none'; return; }
+  const total = snap.abas.reduce((s, a) => s + a.total, 0);
+  const feitos = snap.abas.reduce((s, a) => s + a.concluidos, 0);
+  const pct = total ? Math.round((feitos / total) * 100) : 0;
+  validBadge.textContent = (status === 'paused' ? '⏸ ' : '⚙️ ') + pct + '%';
+  validBadge.style.display = '';
+});
+Validador.init(); // dispara o primeiro render do selo
+</script>
 
 <!-- Caixa de Sugestões (Firebase / Firestore) -->
 <script type="module">
-// ⚠️ Cole aqui a configuração do seu projeto (Firebase Console → Configurações do projeto → Seus apps → Web)
+// ⚠️ Configuração do Firebase atualizada com as suas credenciais
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA8-qG9BpzYvOnO64Xurk2_hYCh6Y8z0Zo",
   authDomain: "banco-ip-90ae7.firebaseapp.com",
@@ -718,11 +732,6 @@ $("sugLista").addEventListener("click", async (e) => {
 
 // ---------- Firebase ----------
 async function conectar(){
-  if (!FIREBASE_CONFIG.projectId || FIREBASE_CONFIG.projectId === "banco-ip-90ae7") {
-    aviso("Firebase ainda não configurado: cole a configuração do projeto em FIREBASE_CONFIG no final do index.html.");
-    renderLista();
-    return;
-  }
   try {
     const [app, store] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
