@@ -54,26 +54,7 @@
     transition: background .15s ease, color .15s ease;
   }
 
-  /* Botão de Tema */
-  .theme-toggle{
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    border: 1.5px solid var(--line);
-    background: var(--bg);
-    color: var(--ink-soft);
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: var(--sans);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background .15s ease, color .15s ease, border-color .15s ease;
-  }
-  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
-
-  /* ---------- Header ---------- */
+  /* ---------- Header e Ações ---------- */
   header.top{
     background: var(--paper);
     border-bottom: 1px solid var(--line);
@@ -112,6 +93,153 @@
     max-width: 520px;
     line-height: 1.5;
   }
+
+  .header-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 16px;
+  }
+
+  .theme-toggle{
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1.5px solid var(--line);
+    background: var(--bg);
+    color: var(--ink-soft);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: var(--sans);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background .15s ease, color .15s ease, border-color .15s ease;
+  }
+  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
+
+  .btn-panel {
+    background: var(--plum);
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+  }
+  .btn-panel:hover {
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+  }
+
+  /* ---------- Caixa de Sugestões ---------- */
+  .btn-suggest{
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    font-family: var(--sans);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
+  }
+  .btn-suggest:hover{ opacity: .95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+  :root[data-theme="dark"] .btn-suggest{ color: #11201B; }
+  .btn-suggest .count{
+    font-size: 12px; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 99px; display: none;
+  }
+  :root[data-theme="dark"] .btn-suggest .count{ background: rgba(17,32,27,0.18); }
+
+  .sug-overlay{
+    position: fixed; inset: 0; background: rgba(17,32,27,.55);
+    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50;
+  }
+  .sug-overlay.open{ display: flex; }
+  .sug-modal{
+    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
+    width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,.25);
+  }
+  .sug-head{
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 18px 22px; border-bottom: 1px solid var(--line);
+  }
+  .sug-head h2{ margin: 0; font-size: 18px; }
+  .sug-head p{ margin: 2px 0 0; font-size: 12.5px; color: var(--ink-soft); }
+  .sug-close{
+    border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft);
+    width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; font-family: var(--sans);
+  }
+  .sug-close:hover{ border-color: var(--teal); color: var(--ink); }
+  .sug-scroll{ overflow-y: auto; padding: 18px 22px 22px; }
+
+  .sug-form{ background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 18px; }
+  .sug-label{ font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin: 0 0 8px; display: block; }
+  .sug-chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .sug-chip{
+    border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft);
+    padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+    font-family: var(--sans); cursor: pointer; transition: all .15s ease;
+  }
+  .sug-chip:hover{ border-color: var(--teal); color: var(--ink); }
+  .sug-chip.sel{ background: var(--teal-wash); border-color: var(--teal); color: var(--teal-dark); }
+  .sug-text{
+    width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px;
+    border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink);
+    font-family: var(--sans); font-size: 14px; line-height: 1.45;
+  }
+  .sug-text:focus{ outline: none; border-color: var(--teal); }
+  .sug-form-foot{ display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 12px; flex-wrap: wrap; }
+  .sug-counter{ font-size: 12px; color: var(--ink-soft); }
+  .sug-btn{
+    background: var(--teal); color: #fff; border: none; padding: 9px 18px; border-radius: 8px;
+    font-weight: 600; font-size: 13.5px; font-family: var(--sans); cursor: pointer;
+  }
+  :root[data-theme="dark"] .sug-btn{ color: #11201B; }
+  .sug-btn:disabled{ background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
+  .sug-btn.ghost{ background: var(--bg); color: var(--ink-soft); border: 1.5px solid var(--line); }
+  :root[data-theme="dark"] .sug-btn.ghost{ color: var(--ink-soft); }
+  .sug-aviso{ font-size: 13px; color: var(--amber); background: var(--amber-wash); padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; display: none; line-height: 1.45; }
+
+  .sug-filters{ display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+  .sug-filters select{
+    border: 1.5px solid var(--line); background: var(--paper); color: var(--ink);
+    padding: 7px 10px; border-radius: 8px; font-size: 13px; font-family: var(--sans);
+  }
+  .sug-summary{ margin-left: auto; font-size: 12px; color: var(--ink-soft); }
+
+  .sug-list{ list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+  .sug{ display: flex; gap: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--paper); }
+  .sug.done{ background: var(--bg); }
+  .sug.done .sug-content{ text-decoration: line-through; color: var(--ink-soft); }
+  .sug-check{ width: 18px; height: 18px; margin-top: 2px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
+  .sug-body{ flex: 1; min-width: 0; }
+  .sug-meta{ display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
+  .sug-tag{ font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 5px; font-weight: 700; }
+  .sug-tag.t-teal{ background: var(--teal-wash); color: var(--teal-dark); }
+  .sug-tag.t-plum{ background: var(--plum-wash); color: var(--plum); }
+  .sug-tag.t-amber{ background: var(--amber-wash); color: var(--amber); }
+  .sug-date{ font-size: 11.5px; color: var(--ink-soft); }
+  .sug-content{ font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+  .sug-actions{ display: flex; gap: 14px; margin-top: 8px; }
+  .sug-link{ background: none; border: none; padding: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; font-family: var(--sans); }
+  .sug-link:hover{ color: var(--teal); }
+  .sug-link.danger:hover{ color: #C0392B; }
+  .sug-edit-row{ display: flex; gap: 8px; margin-top: 8px; }
+  .sug-empty{ text-align: center; color: var(--ink-soft); font-size: 14px; padding: 24px 0; }
 
   /* ---------- Main Grid ---------- */
   main{
@@ -210,6 +338,7 @@
   @media (max-width: 640px){
     h1{ font-size: 30px; }
     .top-inner{ flex-direction: column; }
+    .header-actions { align-items: flex-start; margin-top: 10px; }
   }
 </style>
 </head>
@@ -222,9 +351,30 @@
       <h1>Central de Ferramentas</h1>
       <p class="subtitle">Acesse rapidamente a todos os sistemas internos para cadastro, formatação, validação, métricas e IA.</p>
     </div>
-    <div>
+    
+    <!-- Novo contêiner de ações no topo direito -->
+    <div class="header-actions">
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+      
+      <!-- Botão Painel de Validação -->
+      <a href="painel-validacao.html" class="btn-panel">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+        </svg>
+        Painel de Validação
+        <span id="validBadge" style="display:none; font-size:12px; background:rgba(255,255,255,0.22); padding:2px 8px; border-radius:99px;"></span>
+      </a>
+
+      <!-- Caixa de Sugestões -->
+      <button class="btn-suggest" id="btnSuggest" type="button">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+        </svg>
+        Caixa de Sugestões
+        <span class="count" id="sugCount"></span>
+      </button>
     </div>
+
   </div>
 </header>
 
@@ -320,6 +470,45 @@
 
 <footer>Interface baseada no padrão visual interno.</footer>
 
+<!-- Modal da Caixa de Sugestões -->
+<div class="sug-overlay" id="sugOverlay" aria-hidden="true">
+  <div class="sug-modal" role="dialog" aria-modal="true" aria-labelledby="sugTitulo">
+    <div class="sug-head">
+      <div>
+        <h2 id="sugTitulo">Caixa de Sugestões</h2>
+        <p>Anônima · visível a todos os usuários</p>
+      </div>
+      <button class="sug-close" id="sugClose" type="button" aria-label="Fechar">✕</button>
+    </div>
+    <div class="sug-scroll">
+      <div class="sug-aviso" id="sugAviso"></div>
+
+      <div class="sug-form">
+        <span class="sug-label">1. Sobre qual ferramenta?</span>
+        <div class="sug-chips" id="sugChips"></div>
+        <span class="sug-label">2. Sua sugestão</span>
+        <textarea class="sug-text" id="sugTexto" maxlength="500" placeholder="Descreva a melhoria, ideia ou problema..."></textarea>
+        <div class="sug-form-foot">
+          <span class="sug-counter" id="sugCounter">0 / 500</span>
+          <button class="sug-btn" id="sugEnviar" type="button" disabled>Enviar sugestão</button>
+        </div>
+      </div>
+
+      <div class="sug-filters">
+        <select id="sugFiltroTag"></select>
+        <select id="sugFiltroStatus">
+          <option value="todas">Todas</option>
+          <option value="abertas">Em aberto</option>
+          <option value="concluidas">Concluídas</option>
+        </select>
+        <span class="sug-summary" id="sugResumo"></span>
+      </div>
+
+      <ul class="sug-list" id="sugLista"></ul>
+    </div>
+  </div>
+</div>
+
 <script>
 // Gestão de Modo Escuro (partilhado com as outras ferramentas via localStorage)
 const themeToggleBtn = document.getElementById('themeToggle');
@@ -338,6 +527,225 @@ themeToggleBtn.addEventListener('click', () => {
   applyTheme(next);
   localStorage.setItem('sapCatalogTheme', next);
 });
+</script>
+
+
+<!-- Caixa de Sugestões (Firebase / Firestore) -->
+<script type="module">
+// ⚠️ Cole aqui a configuração do seu projeto (Firebase Console → Configurações do projeto → Seus apps → Web)
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyA8-qG9BpzYvOnO64Xurk2_hYCh6Y8z0Zo",
+  authDomain: "banco-ip-90ae7.firebaseapp.com",
+  projectId: "banco-ip-90ae7",
+  storageBucket: "banco-ip-90ae7.firebasestorage.app",
+  messagingSenderId: "813997420119",
+  appId: "1:813997420119:web:79ea39c9d7bd1a471d3d12",
+  measurementId: "G-9WDCR689P5"
+};
+const COLECAO = "sugestoes";
+const MAX_CHARS = 500;
+
+const TAGS = [
+  { id: "catalogo",  label: "Catálogo SAP",           c: "teal"  },
+  { id: "validador", label: "Validador de Links",     c: "plum"  },
+  { id: "anuncios",  label: "Formatador de Anúncios", c: "amber" },
+  { id: "imagem",    label: "Formatador de Imagem",   c: "teal"  },
+  { id: "metricas",  label: "Métricas",               c: "amber" },
+  { id: "ia",        label: "IA",                     c: "plum"  },
+  { id: "painel",    label: "Painel de Validação",    c: "teal"  }
+];
+const tagInfo = (id) => TAGS.find(t => t.id === id) || { label: id, c: "teal" };
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+let db = null, fb = null;
+let itens = [];
+let tagForm = null;
+let editId = null, editDraft = "";
+
+// ---------- Abrir / fechar ----------
+const overlay = $("sugOverlay");
+function abrir(){ overlay.classList.add("open"); overlay.setAttribute("aria-hidden","false"); }
+function fechar(){ overlay.classList.remove("open"); overlay.setAttribute("aria-hidden","true"); }
+$("btnSuggest").addEventListener("click", abrir);
+$("sugClose").addEventListener("click", fechar);
+overlay.addEventListener("click", (e) => { if (e.target === overlay) fechar(); });
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") fechar(); });
+
+function aviso(msg){
+  const el = $("sugAviso");
+  el.textContent = msg || "";
+  el.style.display = msg ? "block" : "none";
+}
+
+// ---------- Formulário ----------
+function renderChips(){
+  $("sugChips").innerHTML = TAGS.map(t =>
+    `<button type="button" class="sug-chip ${tagForm === t.id ? 'sel' : ''}" data-tag="${t.id}">${esc(t.label)}</button>`
+  ).join("");
+}
+$("sugChips").addEventListener("click", (e) => {
+  const b = e.target.closest("[data-tag]");
+  if (!b) return;
+  tagForm = b.dataset.tag;
+  renderChips();
+  validarForm();
+});
+function validarForm(){
+  const n = $("sugTexto").value.trim().length;
+  $("sugCounter").textContent = `${$("sugTexto").value.length} / ${MAX_CHARS}`;
+  $("sugEnviar").disabled = !(db && tagForm && n >= 3);
+}
+$("sugTexto").addEventListener("input", validarForm);
+
+$("sugEnviar").addEventListener("click", async () => {
+  const texto = $("sugTexto").value.trim();
+  if (!db || !tagForm || texto.length < 3) return;
+  $("sugEnviar").disabled = true;
+  try {
+    await fb.addDoc(fb.collection(db, COLECAO), {
+      texto, tag: tagForm, concluida: false, criadoEm: fb.serverTimestamp()
+    });
+    $("sugTexto").value = "";
+    tagForm = null;
+    renderChips();
+    aviso("");
+  } catch (err) {
+    aviso("Não foi possível enviar: " + err.message);
+  }
+  validarForm();
+});
+
+// ---------- Filtros ----------
+$("sugFiltroTag").innerHTML =
+  `<option value="todas">Todas as ferramentas</option>` +
+  TAGS.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
+$("sugFiltroTag").addEventListener("change", renderLista);
+$("sugFiltroStatus").addEventListener("change", renderLista);
+
+// ---------- Lista ----------
+function fmtData(ts){
+  try {
+    const d = ts && ts.toDate ? ts.toDate() : null;
+    return d ? d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" }) : "agora";
+  } catch (e) { return ""; }
+}
+
+function renderLista(){
+  const ft = $("sugFiltroTag").value;
+  const fs = $("sugFiltroStatus").value;
+  const abertas = itens.filter(i => !i.concluida).length;
+  const concl = itens.length - abertas;
+
+  // selo do botão
+  const cnt = $("sugCount");
+  cnt.textContent = abertas;
+  cnt.style.display = abertas ? "" : "none";
+  $("sugResumo").textContent = `${abertas} em aberto · ${concl} concluída${concl === 1 ? '' : 's'}`;
+
+  const lista = itens.filter(i =>
+    (ft === "todas" || i.tag === ft) &&
+    (fs === "todas" || (fs === "abertas" ? !i.concluida : i.concluida))
+  );
+
+  if (!lista.length) {
+    $("sugLista").innerHTML = `<li class="sug-empty">${itens.length ? "Nenhuma sugestão neste filtro." : "Nenhuma sugestão ainda. Seja o primeiro! 💡"}</li>`;
+    return;
+  }
+
+  $("sugLista").innerHTML = lista.map(i => {
+    const t = tagInfo(i.tag);
+    const editando = editId === i.id;
+    const corpo = editando
+      ? `<textarea class="sug-text" id="sugEditText" maxlength="${MAX_CHARS}">${esc(editDraft)}</textarea>
+         <div class="sug-edit-row">
+           <button class="sug-btn" data-act="salvar" data-id="${i.id}" type="button">Salvar</button>
+           <button class="sug-btn ghost" data-act="cancelar" type="button">Cancelar</button>
+         </div>`
+      : `<div class="sug-content">${esc(i.texto)}</div>
+         <div class="sug-actions">
+           <button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>
+           <button class="sug-link danger" data-act="excluir" data-id="${i.id}" type="button">Excluir</button>
+         </div>`;
+    return `
+      <li class="sug ${i.concluida ? 'done' : ''}">
+        <input type="checkbox" class="sug-check" data-act="toggle" data-id="${i.id}" ${i.concluida ? 'checked' : ''} title="Marcar como concluída">
+        <div class="sug-body">
+          <div class="sug-meta">
+            <span class="sug-tag t-${t.c}">${esc(t.label)}</span>
+            <span class="sug-date">${fmtData(i.criadoEm)}${i.editadoEm ? ' · editada' : ''}</span>
+          </div>
+          ${corpo}
+        </div>
+      </li>`;
+  }).join("");
+}
+
+$("sugLista").addEventListener("input", (e) => {
+  if (e.target.id === "sugEditText") editDraft = e.target.value;
+});
+
+$("sugLista").addEventListener("click", async (e) => {
+  const el = e.target.closest("[data-act]");
+  if (!el || !db) return;
+  const act = el.dataset.act, id = el.dataset.id;
+  const ref = id ? fb.doc(db, COLECAO, id) : null;
+  const item = itens.find(i => i.id === id);
+  try {
+    if (act === "toggle") {
+      await fb.updateDoc(ref, { concluida: el.checked });
+    } else if (act === "editar") {
+      editId = id; editDraft = item ? item.texto : "";
+      renderLista();
+      const ta = $("sugEditText"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+    } else if (act === "cancelar") {
+      editId = null; editDraft = ""; renderLista();
+    } else if (act === "salvar") {
+      const texto = editDraft.trim();
+      if (texto.length < 3) { aviso("A sugestão precisa ter pelo menos 3 caracteres."); return; }
+      await fb.updateDoc(ref, { texto, editadoEm: fb.serverTimestamp() });
+      editId = null; editDraft = ""; aviso("");
+    } else if (act === "excluir") {
+      if (!confirm("Excluir esta sugestão? Isso não pode ser desfeito.")) return;
+      await fb.deleteDoc(ref);
+    }
+  } catch (err) {
+    aviso("Não foi possível concluir a ação: " + err.message);
+    if (act === "toggle") renderLista();
+  }
+});
+
+// ---------- Firebase ----------
+async function conectar(){
+  if (!FIREBASE_CONFIG.projectId || FIREBASE_CONFIG.projectId === "banco-ip-90ae7") {
+    aviso("Firebase ainda não configurado: cole a configuração do projeto em FIREBASE_CONFIG no final do index.html.");
+    renderLista();
+    return;
+  }
+  try {
+    const [app, store] = await Promise.all([
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
+    ]);
+    fb = store;
+    db = store.getFirestore(app.initializeApp(FIREBASE_CONFIG));
+    const q = store.query(store.collection(db, COLECAO), store.orderBy("criadoEm", "desc"));
+    store.onSnapshot(q, (snap) => {
+      itens = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
+      aviso("");
+      renderLista();
+      validarForm();
+    }, (err) => aviso("Não foi possível ler as sugestões: " + err.message));
+  } catch (err) {
+    aviso("Não foi possível carregar o Firebase: " + err.message);
+  }
+}
+
+renderChips();
+renderLista();
+validarForm();
+conectar();
 </script>
 </body>
 </html>
