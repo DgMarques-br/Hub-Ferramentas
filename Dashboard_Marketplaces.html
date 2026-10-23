@@ -43,6 +43,51 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
         body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
+        /* NOTIFICAÇÕES TOAST BONITAS */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            pointer-events: auto;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-left: 4px solid var(--primary);
+            padding: 14px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            max-width: 380px;
+            animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1), toastOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation-delay: 0s, var(--toast-delay, 4.6s);
+        }
+
+        .toast.info { border-left-color: #3b82f6; }
+        .toast.sucesso { border-left-color: #10b981; }
+        .toast.erro { border-left-color: #ef4444; }
+
+        @keyframes toastIn { 
+            from { opacity: 0; transform: translateY(-20px) scale(0.95); } 
+            to { opacity: 1; transform: translateY(0) scale(1); } 
+        }
+        @keyframes toastOut { 
+            from { opacity: 1; transform: translateY(0) scale(1); } 
+            to { opacity: 0; transform: translateY(-20px) scale(0.95); } 
+        }
+
         /* SIDEBAR */
         .sidebar { width: 260px; background-color: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; z-index: 20; }
         .sidebar-title { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 24px 12px; }
@@ -195,6 +240,9 @@
 </head>
 <body>
 
+    <!-- CONTAINER DE NOTIFICAÇÕES TOAST -->
+    <div id="toastContainer"></div>
+
     <!-- SIDEBAR -->
     <aside class="sidebar">
         <div>
@@ -240,7 +288,7 @@
                 <a href="./index.html" class="btn-outline">← Voltar</a>
                 <div style="font-size: 13px; color: var(--text-muted);" id="syncTime">--</div>
             </div>
-            <button class="btn-sync" id="btnSync" onclick="buscarDadosAPI(true)">🔄 Atualizar Dados</button>
+            <button class="btn-sync" id="btnSync" onclick="buscarDadosAPI(false)">🔄 Atualizar Dados</button>
         </div>
 
         <!-- 1. RESUMO -->
@@ -447,6 +495,27 @@
         // Modo Cadastro
         let modoCadastroAtivo = false;
 
+        // GERENCIADOR DE NOTIFICAÇÕES TOAST
+        function mostrarNotificacao(mensagem, tipo = 'info', duracao = 5000) {
+            let container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${tipo}`;
+            toast.style.setProperty('--toast-delay', `${(duracao - 400) / 1000}s`);
+
+            let icone = tipo === 'sucesso' ? '✅' : tipo === 'erro' ? '❌' : 'ℹ️';
+            toast.innerHTML = `<span style="font-size: 16px;">${icone}</span> <div>${mensagem}</div>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast && toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, duracao);
+        }
+
         // HELPER BANCO DE DADOS INTERNO (IndexedDB - Suporta grandes volumes sem erro de quota)
         function salvarCacheIDB(dados, tempo) {
             try {
@@ -503,11 +572,16 @@
                     popularDropdowns();
                     processarResumo();
                     aplicarFiltros();
-                    buscarDadosAPI(false); // Atualiza no fundo sem travar
+                    buscarDadosAPI(false, false); // Atualiza no fundo na abertura sem avisos popups
                 } else {
-                    buscarDadosAPI(true); // Se não tem cache, mostra tela de carregamento
+                    buscarDadosAPI(true, true); // Se não tem cache, mostra tela de carregamento na 1ª vez
                 }
             });
+
+            // Sincronização automática a cada 10 minutos (600.000 ms) em segundo plano
+            setInterval(() => {
+                buscarDadosAPI(false, false);
+            }, 10 * 60 * 1000);
         };
 
         /* --- CONTROLE DE MODO PÚBLICO / CADASTRO --- */
@@ -585,7 +659,11 @@
             processarResumo();
         }
 
-        async function buscarDadosAPI(forcarTela = false) {
+        async function buscarDadosAPI(forcarTela = false, mostrarNotifInício = true) {
+            if (mostrarNotifInício) {
+                mostrarNotificacao('Os dados serão atualizados em breve, aguarde...', 'info', 5000);
+            }
+
             if (forcarTela) {
                 document.getElementById('loadingState').style.display = 'flex';
                 document.getElementById('loadingMsg').innerText = "Sincronizando Google Sheets...";
@@ -648,7 +726,11 @@
                 processarResumo();
                 aplicarFiltros(); 
                 
+                // Notificação de Sucesso após a conclusão
+                mostrarNotificacao('Dados atualizados com sucesso!', 'sucesso', 4000);
+
             } catch (e) { 
+                mostrarNotificacao('Erro ao sincronizar dados do Google Sheets.', 'erro', 5000);
                 if(forcarTela) alert("Erro API: " + e.message); 
                 else console.warn("Erro no sync de fundo", e);
             } 
