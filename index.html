@@ -21,7 +21,7 @@
     --amber-wash: #F7ECDE;
     --plum: #5B4B8A;
     --plum-wash: #ECE8F5;
-    --mark: #FCE6A6;
+    --red: #D93025;
     --radius: 10px;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -41,7 +41,7 @@
     --amber-wash: #39301A;
     --plum: #C2B0EC;
     --plum-wash: #2B2440;
-    --mark: #4F3C14;
+    --red: #F28B82;
   }
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; }
@@ -55,159 +55,59 @@
   }
 
   /* ---------- Header e Ações ---------- */
-  header.top{
-    background: var(--paper);
-    border-bottom: 1px solid var(--line);
-  }
-  .top-inner{
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 38px 24px 32px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .brand-eyebrow{
-    font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--teal-dark);
-    font-weight: 600;
-    margin: 0 0 8px;
-  }
-  h1{
-    font-family: var(--serif);
-    font-size: 38px;
-    line-height: 1.1;
-    margin: 0 0 10px;
-    letter-spacing: -0.01em;
-    color: var(--ink);
-  }
-  .subtitle{
-    margin:0;
-    color: var(--ink-soft);
-    font-size: 15.5px;
-    max-width: 520px;
-    line-height: 1.5;
-  }
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
+  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 38px 24px 32px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-dark); font-weight: 600; margin: 0 0 8px; }
+  h1{ font-family: var(--serif); font-size: 38px; line-height: 1.1; margin: 0 0 10px; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 15.5px; max-width: 520px; line-height: 1.5; }
 
-  .header-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 16px;
-  }
+  .header-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
+  .actions-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
 
-  .theme-toggle{
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    border: 1.5px solid var(--line);
-    background: var(--bg);
-    color: var(--ink-soft);
-    padding: 8px 14px;
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 600;
-    font-family: var(--sans);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: background .15s ease, color .15s ease, border-color .15s ease;
-  }
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: all .15s ease; }
   .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
 
-  .btn-panel {
-    background: var(--plum);
-    color: #fff;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
-  }
-  .btn-panel:hover {
-    opacity: 0.95;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.12);
-  }
+  /* Login Styles */
+  .btn-login { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: var(--sans); }
+  .btn-login:hover { border-color: var(--plum); color: var(--plum); }
+  .user-badge { display: none; align-items: center; gap: 10px; background: var(--paper); border: 1.5px solid var(--line); padding: 4px 6px 4px 14px; border-radius: 999px; }
+  .user-email { font-size: 12.5px; font-weight: 600; color: var(--ink); }
+  .btn-logout { background: var(--red); color: white; border: none; padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  .btn-logout:hover { opacity: 0.8; }
+
+  .btn-panel { background: var(--plum); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s ease; }
+  .btn-panel:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
 
   /* ---------- Caixa de Sugestões ---------- */
-  .btn-suggest{
-    background: var(--teal);
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
-    font-family: var(--sans);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform .2s ease, opacity .2s ease, box-shadow .2s ease;
-  }
+  .btn-suggest{ background: var(--teal); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all .2s ease; }
   .btn-suggest:hover{ opacity: .95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
   :root[data-theme="dark"] .btn-suggest{ color: #11201B; }
-  .btn-suggest .count{
-    font-size: 12px; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 99px; display: none;
-  }
+  .btn-suggest .count{ font-size: 12px; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 99px; display: none; }
   :root[data-theme="dark"] .btn-suggest .count{ background: rgba(17,32,27,0.18); }
 
-  .sug-overlay{
-    position: fixed; inset: 0; background: rgba(17,32,27,.55);
-    display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50;
-  }
+  .sug-overlay{ position: fixed; inset: 0; background: rgba(17,32,27,.55); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
   .sug-overlay.open{ display: flex; }
-  .sug-modal{
-    background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
-    width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column;
-    box-shadow: 0 20px 50px rgba(0,0,0,.25);
-  }
-  .sug-head{
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 18px 22px; border-bottom: 1px solid var(--line);
-  }
+  .sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+  .sug-head{ display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); }
   .sug-head h2{ margin: 0; font-size: 18px; }
   .sug-head p{ margin: 2px 0 0; font-size: 12.5px; color: var(--ink-soft); }
-  .sug-close{
-    border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft);
-    width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; font-family: var(--sans);
-  }
+  .sug-close{ border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; font-family: var(--sans); }
   .sug-close:hover{ border-color: var(--teal); color: var(--ink); }
   .sug-scroll{ overflow-y: auto; padding: 18px 22px 22px; }
 
   .sug-form{ background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 18px; }
   .sug-label{ font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin: 0 0 8px; display: block; }
   .sug-chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .sug-chip{
-    border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft);
-    padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
-    font-family: var(--sans); cursor: pointer; transition: all .15s ease;
-  }
-  .sug-chip:hover{ border-color: var(--teal); color: var(--ink); }
+  .sug-chip{ border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft); padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; transition: all .15s ease; }
+  .sug-chip:hover:not(:disabled){ border-color: var(--teal); color: var(--ink); }
+  .sug-chip:disabled{ cursor: not-allowed; opacity: 0.6; }
   .sug-chip.sel{ background: var(--teal-wash); border-color: var(--teal); color: var(--teal-dark); }
-  .sug-text{
-    width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px;
-    border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink);
-    font-family: var(--sans); font-size: 14px; line-height: 1.45;
-  }
+  .sug-text{ width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; }
   .sug-text:focus{ outline: none; border-color: var(--teal); }
+  .sug-text:disabled{ background: var(--bg); color: var(--ink-soft); cursor: not-allowed; }
   .sug-form-foot{ display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 12px; flex-wrap: wrap; }
   .sug-counter{ font-size: 12px; color: var(--ink-soft); }
-  .sug-btn{
-    background: var(--teal); color: #fff; border: none; padding: 9px 18px; border-radius: 8px;
-    font-weight: 600; font-size: 13.5px; font-family: var(--sans); cursor: pointer;
-  }
+  .sug-btn{ background: var(--teal); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 13.5px; font-family: var(--sans); cursor: pointer; }
   :root[data-theme="dark"] .sug-btn{ color: #11201B; }
   .sug-btn:disabled{ background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
   .sug-btn.ghost{ background: var(--bg); color: var(--ink-soft); border: 1.5px solid var(--line); }
@@ -215,10 +115,7 @@
   .sug-aviso{ font-size: 13px; color: var(--amber); background: var(--amber-wash); padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; display: none; line-height: 1.45; }
 
   .sug-filters{ display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-  .sug-filters select{
-    border: 1.5px solid var(--line); background: var(--paper); color: var(--ink);
-    padding: 7px 10px; border-radius: 8px; font-size: 13px; font-family: var(--sans);
-  }
+  .sug-filters select{ border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); padding: 7px 10px; border-radius: 8px; font-size: 13px; font-family: var(--sans); }
   .sug-summary{ margin-left: auto; font-size: 12px; color: var(--ink-soft); }
 
   .sug-list{ list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
@@ -226,6 +123,7 @@
   .sug.done{ background: var(--bg); }
   .sug.done .sug-content{ text-decoration: line-through; color: var(--ink-soft); }
   .sug-check{ width: 18px; height: 18px; margin-top: 2px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
+  .sug-check:disabled { cursor: not-allowed; opacity: 0.5; }
   .sug-body{ flex: 1; min-width: 0; }
   .sug-meta{ display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
   .sug-tag{ font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 5px; font-weight: 700; }
@@ -237,103 +135,28 @@
   .sug-actions{ display: flex; gap: 14px; margin-top: 8px; }
   .sug-link{ background: none; border: none; padding: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; font-family: var(--sans); }
   .sug-link:hover{ color: var(--teal); }
-  .sug-link.danger:hover{ color: #C0392B; }
+  .sug-link.danger:hover{ color: var(--red); }
   .sug-edit-row{ display: flex; gap: 8px; margin-top: 8px; }
   .sug-empty{ text-align: center; color: var(--ink-soft); font-size: 14px; padding: 24px 0; }
 
   /* ---------- Main Grid ---------- */
-  main{
-    max-width: 1180px;
-    margin: 40px auto;
-    padding: 0 24px 60px;
-  }
-  .hub-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 24px;
-  }
-
-  /* ---------- Cards ---------- */
-  .card-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-  }
-  .card {
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    padding: 24px;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-  .card-link:hover .card {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
-    border-color: var(--teal);
-  }
+  main{ max-width: 1180px; margin: 40px auto; padding: 0 24px 60px; }
+  .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
+  .card-link { text-decoration: none; color: inherit; display: block; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; height: 100%; display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+  .card-link:hover .card { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: var(--teal); }
   
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 16px;
-  }
-  .card-icon {
-    width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    background: var(--teal-wash);
-    color: var(--teal-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .card-icon svg {
-    width: 22px;
-    height: 22px;
-    stroke: currentColor;
-    stroke-width: 2;
-    fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .card-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--teal-wash); color: var(--teal-dark); display: flex; align-items: center; justify-content: center; }
+  .card-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
   
-  .tag {
-    font-family: var(--mono);
-    font-size: 10.5px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    padding: 4px 8px;
-    border-radius: 5px;
-    font-weight: 700;
-  }
+  .tag { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; padding: 4px 8px; border-radius: 5px; font-weight: 700; }
   .tag.active { background: var(--teal-wash); color: var(--teal-dark); }
-  .tag.pending { background: var(--amber-wash); color: var(--amber); }
-  .tag.locked { background: var(--line-soft); color: var(--ink-soft); }
 
-  .card-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 8px;
-    color: var(--ink);
-  }
-  .card-desc {
-    font-size: 13.5px;
-    color: var(--ink-soft);
-    line-height: 1.5;
-    margin: 0;
-    flex-grow: 1;
-  }
+  .card-title { font-size: 18px; font-weight: 600; margin: 0 0 8px; color: var(--ink); }
+  .card-desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; margin: 0; flex-grow: 1; }
 
-  footer{
-    text-align: center;
-    padding: 18px 24px 34px;
-    color: var(--ink-soft);
-    font-size: 12px;
-  }
+  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
 
   @media (max-width: 640px){
     h1{ font-size: 30px; }
@@ -352,119 +175,103 @@
       <p class="subtitle">Acesse rapidamente a todos os sistemas internos para cadastro, formatação, validação, métricas e IA.</p>
     </div>
     
-    <!-- Novo contêiner de ações no topo direito -->
     <div class="header-actions">
-      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+      <!-- Módulo de Login / Tema -->
+      <div class="actions-row">
+        <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
+        
+        <!-- Botão de Login deslogado -->
+        <button class="btn-login" id="btnLogin">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+          Login
+        </button>
+
+        <!-- Selo de Usuário Logado -->
+        <div class="user-badge" id="userBadge">
+          <span class="user-email" id="userEmailTxt">carregando...</span>
+          <button class="btn-logout" id="btnLogout">Sair</button>
+        </div>
+      </div>
       
-      <!-- Botão Painel de Validação -->
-      <a href="painel-validacao.html" class="btn-panel">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-        </svg>
-        Painel de Validação
-        <span id="validBadge" style="display:none; font-size:12px; background:rgba(255,255,255,0.22); padding:2px 8px; border-radius:99px;"></span>
-      </a>
+      <div class="actions-row">
+        <a href="painel-validacao.html" class="btn-panel">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+          Painel de Validação
+          <span id="validBadge" style="display:none; font-size:12px; background:rgba(255,255,255,0.22); padding:2px 8px; border-radius:99px;"></span>
+        </a>
 
-      <!-- Caixa de Sugestões -->
-      <button class="btn-suggest" id="btnSuggest" type="button">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-        </svg>
-        Caixa de Sugestões
-        <span class="count" id="sugCount"></span>
-      </button>
+        <button class="btn-suggest" id="btnSuggest" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          Caixa de Sugestões
+          <span class="count" id="sugCount"></span>
+        </button>
+      </div>
     </div>
-
   </div>
 </header>
 
 <main>
   <div class="hub-grid">
-    
-    <!-- 1. Catálogo SAP -->
     <a href="catalogo-busca-sap.html" class="card-link">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon">
-            <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-          </div>
+          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg></div>
           <span class="tag active">Operacional</span>
         </div>
         <h2 class="card-title">Catálogo SAP</h2>
         <p class="card-desc">Consulta offline rápida de Hierarquia de Grupos de Item, Marca e Categoria para preenchimento no SAP.</p>
       </div>
     </a>
-
-    <!-- 2. Buscador de Links -->
     <a href="buscador-links.html" class="card-link">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--plum-wash); color: var(--plum);">
-            <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
-          </div>
+          <div class="card-icon" style="background: var(--plum-wash); color: var(--plum);"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg></div>
           <span class="tag active">Operacional</span>
         </div>
         <h2 class="card-title">Validador de Links</h2>
-        <p class="card-desc">Pesquisa unificada em múltiplas abas de e-commerce e verificação de integridade de URLs (ativos/quebrados).</p>
+        <p class="card-desc">Pesquisa unificada em múltiplas abas de e-commerce e verificação de integridade de URLs.</p>
       </div>
     </a>
-
-    <!-- 3. Formatador de Anúncios -->
     <a href="formatador-anuncios.html" class="card-link">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);">
-            <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-          </div>
+          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
           <span class="tag active">Operacional</span>
         </div>
         <h2 class="card-title">Formatador de Anúncios</h2>
-        <p class="card-desc">Gerador de descrições HTML com extração de especificações, dimensões e termos de garantia do fabricante.</p>
+        <p class="card-desc">Gerador de descrições HTML com extração de especificações, dimensões e termos de garantia.</p>
       </div>
     </a>
-
-    <!-- 4. Formatador de Imagem -->
     <a href="formatador-imagem.html" class="card-link">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon">
-            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-          </div>
+          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
           <span class="tag active">Mídia</span>
         </div>
         <h2 class="card-title">Formatador de Imagem</h2>
-        <p class="card-desc">Enquadramento automático para 1200x1200px sem cortar a imagem, com preenchimento de fundo branco.</p>
+        <p class="card-desc">Enquadramento automático para 1200x1200px sem cortar a imagem, com preenchimento de fundo.</p>
       </div>
     </a>
-
-    <!-- 5. Métricas -->
     <a href="Dashboard_Marketplaces.html" class="card-link">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);">
-            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </div>
+          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
           <span class="tag active" style="background: var(--amber-wash); color: var(--amber);">Analytics</span>
         </div>
         <h2 class="card-title">Dashboard de Métricas</h2>
-        <p class="card-desc">Visualização de dados analíticos, acompanhamento de KPIs e métricas de desempenho da equipe.</p>
+        <p class="card-desc">Visualização de dados analíticos, acompanhamento de KPIs e métricas de desempenho.</p>
       </div>
     </a>
-
-    <!-- 6. Gerador de Descrições IA -->
     <a href="gerador-descricao-ia.html" class="card-link">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--plum-wash); color: var(--plum);">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-          </div>
+          <div class="card-icon" style="background: var(--plum-wash); color: var(--plum);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
           <span class="tag active" style="background: var(--plum-wash); color: var(--plum);">IA (Testes finais)</span>
         </div>
         <h2 class="card-title">Gerador de Descrições IA</h2>
-        <p class="card-desc">Criação automática de descrições e especificações técnicas otimizadas usando a API Groq e Tavily.</p>
+        <p class="card-desc">Criação automática de descrições e especificações técnicas otimizadas.</p>
       </div>
     </a>
-
   </div>
 </main>
 
@@ -476,7 +283,7 @@
     <div class="sug-head">
       <div>
         <h2 id="sugTitulo">Caixa de Sugestões</h2>
-        <p>Anônima · visível a todos os usuários</p>
+        <p>Compartilhe melhorias e ideias com a equipe</p>
       </div>
       <button class="sug-close" id="sugClose" type="button" aria-label="Fechar">✕</button>
     </div>
@@ -487,7 +294,7 @@
         <span class="sug-label">1. Sobre qual ferramenta?</span>
         <div class="sug-chips" id="sugChips"></div>
         <span class="sug-label">2. Sua sugestão</span>
-        <textarea class="sug-text" id="sugTexto" maxlength="500" placeholder="Descreva a melhoria, ideia ou problema..."></textarea>
+        <textarea class="sug-text" id="sugTexto" maxlength="500" placeholder="Faça login no topo da página para enviar sugestões..." disabled></textarea>
         <div class="sug-form-foot">
           <span class="sug-counter" id="sugCounter">0 / 500</span>
           <button class="sug-btn" id="sugEnviar" type="button" disabled>Enviar sugestão</button>
@@ -510,18 +317,14 @@
 </div>
 
 <script>
-// Gestão de Modo Escuro (partilhado com as outras ferramentas via localStorage)
+// Gestão de Modo Escuro
 const themeToggleBtn = document.getElementById('themeToggle');
-
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
   themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
 }
-
-// Verifica preferência guardada ou preferência do sistema
 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
-
 themeToggleBtn.addEventListener('click', () => {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   applyTheme(next);
@@ -529,7 +332,6 @@ themeToggleBtn.addEventListener('click', () => {
 });
 </script>
 
-<!-- Motor de validação: mantém a validação rodando enquanto você usa o hub -->
 <script src="validador-engine.js"></script>
 <script>
 const validBadge = document.getElementById('validBadge');
@@ -541,12 +343,11 @@ Validador.subscribe(({ status, snap }) => {
   validBadge.textContent = (status === 'paused' ? '⏸ ' : '⚙️ ') + pct + '%';
   validBadge.style.display = '';
 });
-Validador.init(); // dispara o primeiro render do selo
+Validador.init();
 </script>
 
-<!-- Caixa de Sugestões (Firebase / Firestore) -->
+<!-- Firebase / Firestore / Auth -->
 <script type="module">
-// ⚠️ Configuração do Firebase atualizada com as suas credenciais
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA8-qG9BpzYvOnO64Xurk2_hYCh6Y8z0Zo",
   authDomain: "banco-ip-90ae7.firebaseapp.com",
@@ -556,6 +357,10 @@ const FIREBASE_CONFIG = {
   appId: "1:813997420119:web:79ea39c9d7bd1a471d3d12",
   measurementId: "G-9WDCR689P5"
 };
+
+// ⚠️ COLOQUE AQUI O E-MAIL DO ADMINISTRADOR (QUE PODE MARCAR COMO CONCLUÍDO)
+const ADMIN_EMAIL = "diogo.moreira2777@gmail.com"; 
+
 const COLECAO = "sugestoes";
 const MAX_CHARS = 500;
 
@@ -573,7 +378,8 @@ const tagInfo = (id) => TAGS.find(t => t.id === id) || { label: id, c: "teal" };
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
-let db = null, fb = null;
+let db = null, fb = null, authInstance = null, authProvider = null;
+let currentUser = null;
 let itens = [];
 let tagForm = null;
 let editId = null, editDraft = "";
@@ -596,30 +402,48 @@ function aviso(msg){
 // ---------- Formulário ----------
 function renderChips(){
   $("sugChips").innerHTML = TAGS.map(t =>
-    `<button type="button" class="sug-chip ${tagForm === t.id ? 'sel' : ''}" data-tag="${t.id}">${esc(t.label)}</button>`
+    `<button type="button" class="sug-chip ${tagForm === t.id ? 'sel' : ''}" data-tag="${t.id}" ${!currentUser ? 'disabled' : ''}>${esc(t.label)}</button>`
   ).join("");
 }
 $("sugChips").addEventListener("click", (e) => {
+  if(!currentUser) return;
   const b = e.target.closest("[data-tag]");
   if (!b) return;
   tagForm = b.dataset.tag;
   renderChips();
   validarForm();
 });
+
 function validarForm(){
-  const n = $("sugTexto").value.trim().length;
-  $("sugCounter").textContent = `${$("sugTexto").value.length} / ${MAX_CHARS}`;
+  const ta = $("sugTexto");
+  if(!currentUser) {
+    ta.disabled = true;
+    ta.placeholder = "🔒 Faça login no topo da página para enviar sugestões...";
+    $("sugEnviar").disabled = true;
+    return;
+  }
+  
+  ta.disabled = false;
+  ta.placeholder = "Descreva a melhoria, ideia ou problema...";
+  const n = ta.value.trim().length;
+  $("sugCounter").textContent = `${ta.value.length} / ${MAX_CHARS}`;
   $("sugEnviar").disabled = !(db && tagForm && n >= 3);
 }
 $("sugTexto").addEventListener("input", validarForm);
 
 $("sugEnviar").addEventListener("click", async () => {
+  if (!currentUser) return;
   const texto = $("sugTexto").value.trim();
   if (!db || !tagForm || texto.length < 3) return;
   $("sugEnviar").disabled = true;
   try {
     await fb.addDoc(fb.collection(db, COLECAO), {
-      texto, tag: tagForm, concluida: false, criadoEm: fb.serverTimestamp()
+      texto, 
+      tag: tagForm, 
+      concluida: false, 
+      criadoEm: fb.serverTimestamp(),
+      autorId: currentUser.uid,          // Salva o ID do usuário
+      autorEmail: currentUser.email      // Salva o e-mail do usuário
     });
     $("sugTexto").value = "";
     tagForm = null;
@@ -632,9 +456,7 @@ $("sugEnviar").addEventListener("click", async () => {
 });
 
 // ---------- Filtros ----------
-$("sugFiltroTag").innerHTML =
-  `<option value="todas">Todas as ferramentas</option>` +
-  TAGS.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
+$("sugFiltroTag").innerHTML = `<option value="todas">Todas as ferramentas</option>` + TAGS.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
 $("sugFiltroTag").addEventListener("change", renderLista);
 $("sugFiltroStatus").addEventListener("change", renderLista);
 
@@ -652,10 +474,8 @@ function renderLista(){
   const abertas = itens.filter(i => !i.concluida).length;
   const concl = itens.length - abertas;
 
-  // selo do botão
-  const cnt = $("sugCount");
-  cnt.textContent = abertas;
-  cnt.style.display = abertas ? "" : "none";
+  $("sugCount").textContent = abertas;
+  $("sugCount").style.display = abertas ? "" : "none";
   $("sugResumo").textContent = `${abertas} em aberto · ${concl} concluída${concl === 1 ? '' : 's'}`;
 
   const lista = itens.filter(i =>
@@ -668,23 +488,38 @@ function renderLista(){
     return;
   }
 
+  // Verifica se o usuário atual é o admin
+  const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+
   $("sugLista").innerHTML = lista.map(i => {
     const t = tagInfo(i.tag);
+    const isOwner = currentUser && i.autorId === currentUser.uid;
+    const canEditOrDelete = isOwner || isAdmin;
+
     const editando = editId === i.id;
-    const corpo = editando
-      ? `<textarea class="sug-text" id="sugEditText" maxlength="${MAX_CHARS}">${esc(editDraft)}</textarea>
+    let corpo = '';
+
+    if (editando) {
+      corpo = `
+         <textarea class="sug-text" id="sugEditText" maxlength="${MAX_CHARS}">${esc(editDraft)}</textarea>
          <div class="sug-edit-row">
            <button class="sug-btn" data-act="salvar" data-id="${i.id}" type="button">Salvar</button>
            <button class="sug-btn ghost" data-act="cancelar" type="button">Cancelar</button>
-         </div>`
-      : `<div class="sug-content">${esc(i.texto)}</div>
+         </div>`;
+    } else {
+      corpo = `<div class="sug-content">${esc(i.texto)}</div>`;
+      if (canEditOrDelete) {
+        corpo += `
          <div class="sug-actions">
            <button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>
            <button class="sug-link danger" data-act="excluir" data-id="${i.id}" type="button">Excluir</button>
          </div>`;
+      }
+    }
+
     return `
       <li class="sug ${i.concluida ? 'done' : ''}">
-        <input type="checkbox" class="sug-check" data-act="toggle" data-id="${i.id}" ${i.concluida ? 'checked' : ''} title="Marcar como concluída">
+        <input type="checkbox" class="sug-check" data-act="toggle" data-id="${i.id}" ${i.concluida ? 'checked' : ''} ${!isAdmin ? 'disabled title="Apenas o administrador pode concluir"' : 'title="Marcar como concluída"'}>
         <div class="sug-body">
           <div class="sug-meta">
             <span class="sug-tag t-${t.c}">${esc(t.label)}</span>
@@ -706,6 +541,7 @@ $("sugLista").addEventListener("click", async (e) => {
   const act = el.dataset.act, id = el.dataset.id;
   const ref = id ? fb.doc(db, COLECAO, id) : null;
   const item = itens.find(i => i.id === id);
+  
   try {
     if (act === "toggle") {
       await fb.updateDoc(ref, { concluida: el.checked });
@@ -725,35 +561,71 @@ $("sugLista").addEventListener("click", async (e) => {
       await fb.deleteDoc(ref);
     }
   } catch (err) {
-    aviso("Não foi possível concluir a ação: " + err.message);
+    aviso("Não foi possível concluir a ação: Você não tem permissão.");
     if (act === "toggle") renderLista();
   }
 });
 
-// ---------- Firebase ----------
+// ---------- Firebase Inicialização e Autenticação ----------
 async function conectar(){
   try {
-    const [app, store] = await Promise.all([
+    const [appModule, storeModule, authModule] = await Promise.all([
       import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"),
-      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js")
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"),
+      import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js")
     ]);
-    fb = store;
-    db = store.getFirestore(app.initializeApp(FIREBASE_CONFIG));
-    const q = store.query(store.collection(db, COLECAO), store.orderBy("criadoEm", "desc"));
-    store.onSnapshot(q, (snap) => {
+    
+    fb = storeModule;
+    const app = appModule.initializeApp(FIREBASE_CONFIG);
+    db = storeModule.getFirestore(app);
+    authInstance = authModule.getAuth(app);
+    authProvider = new authModule.GoogleAuthProvider();
+
+    // Observador de Sessão (Login/Logout)
+    authModule.onAuthStateChanged(authInstance, (user) => {
+      currentUser = user;
+      
+      if (user) {
+        $("btnLogin").style.display = "none";
+        $("userBadge").style.display = "flex";
+        $("userEmailTxt").textContent = user.email;
+      } else {
+        $("btnLogin").style.display = "inline-flex";
+        $("userBadge").style.display = "none";
+        $("userEmailTxt").textContent = "";
+      }
+      
+      renderChips();
+      validarForm();
+      renderLista();
+    });
+
+    // Botões de Autenticação
+    $("btnLogin").addEventListener("click", async () => {
+      try {
+        await authModule.signInWithPopup(authInstance, authProvider);
+      } catch (err) {
+        alert("Erro ao fazer login: " + err.message);
+      }
+    });
+
+    $("btnLogout").addEventListener("click", () => {
+      authModule.signOut(authInstance);
+    });
+
+    // Carregar sugestões
+    const q = storeModule.query(storeModule.collection(db, COLECAO), storeModule.orderBy("criadoEm", "desc"));
+    storeModule.onSnapshot(q, (snap) => {
       itens = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
       aviso("");
       renderLista();
-      validarForm();
     }, (err) => aviso("Não foi possível ler as sugestões: " + err.message));
+
   } catch (err) {
     aviso("Não foi possível carregar o Firebase: " + err.message);
   }
 }
 
-renderChips();
-renderLista();
-validarForm();
 conectar();
 </script>
 </body>
