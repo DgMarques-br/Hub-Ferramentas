@@ -184,38 +184,84 @@ async function executarAutomacao() {
       if(resRegras.ok) regrasExternas = await resRegras.text();
     } catch(err) { console.warn("Aviso: TXT não encontrado."); }
 
-    const queryLimpa = titulo.replace(/para PC|Iluminado|Preto|Branco|Com Fio/gi, '').trim();
-    const queryFinal = `${queryLimpa} especificações`;
+    // ---------- BUSCA CONFIÁVEL ----------
+    const DOMINIOS_RUINS = ['pinterest.com','youtube.com','facebook.com','instagram.com','tiktok.com','reddit.com','quora.com','olx.com.br'];
+    const LOJAS = ['kabum.com.br','pichau.com.br','terabyteshop.com.br','mercadolivre.com.br','amazon.com.br','magazineluiza.com.br','fastshop.com.br','casasbahia.com.br','carrefour.com.br','americanas.com.br','techpowerup.com','notebookcheck.net','gsmarena.com','rtings.com'];
+    const STOP = new Set(['para','com','sem','placa','mae','gamer','gaming','preto','branco','iluminado','fio','kit','conjunto','mouse','teclado','headset','fone','cabo','fonte','memoria','monitor']);
+    const norm = t => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    const queryLimpa = titulo.replace(/para PC|Iluminado|Preto|Branco|Com Fio/gi, '').replace(/\s+/g, ' ').trim();
+    const ean = (instrucoes.match(/\b\d{13}\b/) || [])[0];
+    const palavras = norm(queryLimpa).split(/[^a-z0-9]+/).filter(w => w.length >= 4 && !STOP.has(w));
+    const comDigito = norm(queryLimpa).split(/[^a-z0-9]+/).filter(w => w.length >= 3 && /\d/.test(w));
+    const tokensModelo = [...new Set(comDigito.length ? comDigito : palavras)];
+
+    const buscar = async (query, profundidade) => {
+      const body = { api_key: tavilyKey, query, search_depth: profundidade, max_results: 6, include_answer: false, include_raw_content: true, exclude_domains: DOMINIOS_RUINS };
+      if (profundidade === 'advanced') body.chunks_per_source = 3;
+      const r = await fetch('https://api.tavily.com/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.detail?.error || d.message || 'Erro Tavily');
+      return d.results || [];
+    };
 
     btn.textContent = "🔍 A pesquisar na web...";
-    const tavilyRes = await fetch('https://api.tavily.com/search', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        api_key: tavilyKey, 
-        query: queryFinal, 
-        search_depth: "advanced",
-        include_answer: true, 
-        max_results: 4 
-      })
+    const consultas = [
+      buscar(`${queryLimpa} ficha técnica especificações`, 'advanced'),
+      buscar(`${queryLimpa} dimensões peso altura largura comprimento embalagem`, 'advanced')
+    ];
+    if (ean) consultas.push(buscar(ean, 'basic'));
+    const resp = await Promise.allSettled(consultas);
+    const ok = resp.filter(r => r.status === 'fulfilled');
+    if (!ok.length) throw resp[0].reason;
+
+    const extrairMedidas = txt => {
+      const re = /(altura|largura|profundidade|comprimento|dimens[õo]es|medidas|peso|height|width|depth|length|weight|dimensions)/i;
+      const vistos = new Set(); const out = [];
+      (txt || '').split(/\n|(?<=[.;|])\s+/).forEach(l => {
+        l = l.replace(/\s+/g, ' ').trim();
+        if (l.length < 4 || l.length > 220 || !re.test(l) || !/\d/.test(l) || vistos.has(l)) return;
+        vistos.add(l); out.push(l);
+      });
+      return out.slice(0, 8);
+    };
+
+    const mapa = new Map();
+    ok.flatMap(r => r.value).forEach(r => {
+      if (!r.url) return;
+      const k = r.url.split('#')[0]; const ant = mapa.get(k);
+      if (!ant) mapa.set(k, r);
+      else mapa.set(k, { ...((r.score || 0) > (ant.score || 0) ? r : ant), raw_content: r.raw_content || ant.raw_content });
     });
 
-    const tavilyData = await tavilyRes.json();
-    if (!tavilyRes.ok) throw new Error(tavilyData.message || "Erro Tavily");
+    const analisados = [...mapa.values()].map(r => {
+      let host = ''; try { host = new URL(r.url).hostname.replace(/^www\./, ''); } catch (e) {}
+      const labels = host.split('.').filter(l => !['com', 'br', 'net', 'org', 'co'].includes(l));
+      const oficial = labels.some(l => l.length >= 4 && palavras.includes(l));
+      const loja = LOJAS.some(d => host === d || host.endsWith('.' + d));
+      const texto = norm(`${r.title} ${r.url} ${r.content} ${(r.raw_content || '').slice(0, 3000)}`);
+      const match = tokensModelo.length ? tokensModelo.filter(t => texto.includes(t)).length / tokensModelo.length : 1;
+      const trechos = extrairMedidas(r.raw_content || r.content);
+      const rank = (r.score || 0) + (oficial ? 0.35 : 0) + (loja ? 0.15 : 0) + (trechos.length ? 0.1 : 0);
+      return { ...r, host, oficial, loja, match, trechos, rank };
+    });
 
-    let contextoWeb = tavilyData.answer ? `Resumo da Web: ${tavilyData.answer}\n\n` : "";
-    const linksUteis = [];
+    let validos = analisados.filter(r => r.match >= 0.6);
+    const semMatch = validos.length === 0;
+    if (semMatch) validos = analisados;
+    const top = validos.sort((a, b) => b.rank - a.rank).slice(0, 5);
 
-    if (tavilyData.results) {
-      tavilyData.results.forEach(res => {
-        contextoWeb += `- Fonte: ${res.title}\nConteúdo: ${res.content}\n\n`;
-        if (res.url) linksUteis.push({ title: res.title || res.url, url: res.url });
-      });
-    }
-
-    if (contextoWeb.length > 3500) {
-      contextoWeb = contextoWeb.substring(0, 3500) + "\n\n[... TEXTO CORTADO PARA NÃO EXCEDER LIMITE DA IA ...]";
-    }
+    let contextoWeb = "";
+    const linksUteis = top.map(r => ({ title: r.title || r.url, url: r.url, host: r.host, oficial: r.oficial, loja: r.loja, medidas: r.trechos.length > 0 }));
+    top.forEach((r, i) => {
+      const tipo = r.oficial ? 'SITE OFICIAL DO FABRICANTE' : r.loja ? 'LOJA CONHECIDA' : 'OUTRO SITE';
+      contextoWeb += `[FONTE ${i + 1} | ${tipo} | ${r.host}]\nTítulo: ${r.title}\nConteúdo: ${(r.content || '').slice(0, 1500)}\n`;
+      if (r.trechos.length) contextoWeb += `Trechos com medidas/peso:\n- ${r.trechos.join('\n- ')}\n`;
+      contextoWeb += '\n';
+    });
+    if (contextoWeb.length > 9000) contextoWeb = contextoWeb.substring(0, 9000) + "\n\n[... TEXTO CORTADO ...]";
+    if (!top.length) contextoWeb = "(nenhuma fonte encontrada)";
+    if (semMatch && top.length) showToast("⚠️ Nenhuma fonte citou o modelo exato. Confira os dados.");
 
     btn.textContent = "✨ A formatar com Groq...";
     const promptGroq = `
@@ -230,10 +276,10 @@ ${regrasExternas}
 INSTRUÇÕES CRÍTICAS DE DESIGN E AGRUPAMENTO:
 1. Agrupe todos os itens da mesma secção dentro da mesma tag span, saltando linha apenas com a tag <br>. Não abra e feche spans a cada linha!
 2. NUNCA OMita a secção ITENS INCLUSOS.
-3. DIMENSÕES E FORMATO: Para hardwares, o 'Formato' (ex: ATX) DEVE ser listado na secção ESPECIFICAÇÕES. Na secção DIMENSÕES, procure as medidas em cm e o peso em Kg.
+3. DIMENSÕES E FORMATO: Para hardwares, o 'Formato' (ex: ATX) DEVE ser listado na secção ESPECIFICAÇÕES. Na secção DIMENSÕES, use os 'Trechos com medidas/peso' das fontes (em cm e Kg; converta mm para cm e g para Kg). Se a fonte distinguir medidas do produto e da embalagem, siga as REGRAS DE NEGÓCIO acima; se elas não disserem nada, use as do produto.
 4. EAN, Anatel e NAC: Para EAN e Anatel, só o rótulo é negrito. Para o NAC, TODO o texto e números são negrito (<strong>NAC000000</strong>). Não adicione quebras de linha extras antes do NAC.
-5. FONTES DE PESQUISA: Priorize o site oficial do fabricante ou marketplaces confiáveis.
-6. ESCUDO ANTI-ALUCINAÇÃO: Se a pesquisa trazer informações bizarras de produtos diferentes (ex: carro ao invés de placa), ignore a web.
+5. FONTES DE PESQUISA: cada fonte vem marcada (SITE OFICIAL, LOJA CONHECIDA ou OUTRO SITE). Em caso de valores diferentes, prevaleça SITE OFICIAL, depois LOJA CONHECIDA. Só use OUTRO SITE se for coerente com as demais.
+6. ESCUDO ANTI-ALUCINAÇÃO: se uma fonte tratar de OUTRO produto ou modelo, ignore ESSA fonte. NUNCA invente valores: se Altura, Largura, Comprimento, Peso ou qualquer especificação não aparecer em nenhuma fonte, escreva VERIFICAR no lugar do valor (sem a unidade).
 
 MOLDE OBRIGATÓRIO DE SAÍDA (HTML):
 Siga EXATAMENTE esta estrutura:
@@ -302,11 +348,12 @@ ${contextoWeb}
         linksUteis.forEach(item => {
           const li = document.createElement('li');
           const a = document.createElement('a'); a.href = item.url; a.target = "_blank"; a.textContent = item.title;
-          li.appendChild(a); sourcesList.appendChild(li);
+          const tag = document.createElement('span'); tag.textContent = ' — ' + item.host + (item.oficial ? ' · 🏭 oficial' : item.loja ? ' · 🛒 loja' : '') + (item.medidas ? ' · 📏 medidas' : '');
+          li.appendChild(a); li.appendChild(tag); sourcesList.appendChild(li);
         });
         sourcesBox.style.display = 'block';
       }
-      showToast("Descrição gerada com sucesso!");
+      showToast(/VERIFICAR/.test(htmlGerado) ? "Gerado — há campos VERIFICAR (dado não encontrado)." : "Descrição gerada com sucesso!");
     }
   } catch (err) {
     alert("Erro no processo: " + err.message);
