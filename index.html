@@ -6,53 +6,24 @@
 <title>Hub · Ferramentas Internas</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
 <style>
-  /* Variáveis originais do projeto Catálogo SAP */
+  /* Variáveis originais do projeto */
   :root{
-    --bg: #EEF0EF;
-    --paper: #FFFFFF;
-    --ink: #17211D;
-    --ink-soft: #576159;
-    --line: #DADFDA;
-    --line-soft: #E7EAE6;
-    --teal: #1F6F5C;
-    --teal-dark: #164F42;
-    --teal-wash: #E4F0EC;
-    --amber: #B9762D;
-    --amber-wash: #F7ECDE;
-    --plum: #5B4B8A;
-    --plum-wash: #ECE8F5;
-    --red: #D93025;
-    --radius: 10px;
+    --bg: #EEF0EF; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
+    --line: #DADFDA; --line-soft: #E7EAE6; --teal: #1F6F5C; --teal-dark: #164F42;
+    --teal-wash: #E4F0EC; --amber: #B9762D; --amber-wash: #F7ECDE;
+    --plum: #5B4B8A; --plum-wash: #ECE8F5; --red: #D93025; --radius: 10px;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
   }
   :root[data-theme="dark"]{
-    --bg: #11201B;
-    --paper: #16231E;
-    --ink: #E8EEEC;
-    --ink-soft: #92A49C;
-    --line: #233830;
-    --line-soft: #1D2D27;
-    --teal: #3FB492;
-    --teal-dark: #7FDDBE;
-    --teal-wash: #1B3830;
-    --amber: #E3A95D;
-    --amber-wash: #39301A;
-    --plum: #C2B0EC;
-    --plum-wash: #2B2440;
-    --red: #F28B82;
+    --bg: #11201B; --paper: #16231E; --ink: #E8EEEC; --ink-soft: #92A49C;
+    --line: #233830; --line-soft: #1D2D27; --teal: #3FB492; --teal-dark: #7FDDBE;
+    --teal-wash: #1B3830; --amber: #E3A95D; --amber-wash: #39301A;
+    --plum: #C2B0EC; --plum-wash: #2B2440; --red: #F28B82;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
-  body{
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    transition: background .15s ease, color .15s ease;
-  }
+  html,body{ margin:0; padding:0; background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; transition: background .15s ease, color .15s ease; }
 
   /* ---------- Header e Ações ---------- */
   header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
@@ -131,6 +102,7 @@
   .sug-tag.t-plum{ background: var(--plum-wash); color: var(--plum); }
   .sug-tag.t-amber{ background: var(--amber-wash); color: var(--amber); }
   .sug-date{ font-size: 11.5px; color: var(--ink-soft); }
+  .sug-date b { color: var(--ink); }
   .sug-content{ font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
   .sug-actions{ display: flex; gap: 14px; margin-top: 8px; }
   .sug-link{ background: none; border: none; padding: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; font-family: var(--sans); }
@@ -138,6 +110,11 @@
   .sug-link.danger:hover{ color: var(--red); }
   .sug-edit-row{ display: flex; gap: 8px; margin-top: 8px; }
   .sug-empty{ text-align: center; color: var(--ink-soft); font-size: 14px; padding: 24px 0; }
+  
+  .sug-admin-reply { margin-top: 12px; padding: 12px; background: var(--teal-wash); border-left: 4px solid var(--teal); border-radius: 4px; }
+  .sug-admin-reply-label { display: block; font-size: 11px; font-weight: 700; color: var(--teal-dark); text-transform: uppercase; margin-bottom: 4px; }
+  .sug-admin-reply-text { font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
+  :root[data-theme="dark"] .sug-admin-reply-text { color: var(--ink); }
 
   /* ---------- Main Grid ---------- */
   main{ max-width: 1180px; margin: 40px auto; padding: 0 24px 60px; }
@@ -358,7 +335,7 @@ const FIREBASE_CONFIG = {
   measurementId: "G-9WDCR689P5"
 };
 
-// ⚠️ COLOQUE AQUI O E-MAIL DO ADMINISTRADOR (QUE PODE MARCAR COMO CONCLUÍDO)
+// ⚠️ COLOQUE AQUI O E-MAIL DO ADMINISTRADOR (QUE PODE RESPONDER E CONCLUIR)
 const ADMIN_EMAIL = "diogo.moreira2777@gmail.com"; 
 
 const COLECAO = "sugestoes";
@@ -382,7 +359,10 @@ let db = null, fb = null, authInstance = null, authProvider = null;
 let currentUser = null;
 let itens = [];
 let tagForm = null;
+
+// Controle de Edição e Resposta
 let editId = null, editDraft = "";
+let replyId = null, replyDraft = "";
 
 // ---------- Abrir / fechar ----------
 const overlay = $("sugOverlay");
@@ -437,13 +417,17 @@ $("sugEnviar").addEventListener("click", async () => {
   if (!db || !tagForm || texto.length < 3) return;
   $("sugEnviar").disabled = true;
   try {
+    // Definindo o nome do usuário a ser exibido
+    const nomeExibicao = currentUser.displayName || currentUser.email.split('@')[0];
+
     await fb.addDoc(fb.collection(db, COLECAO), {
       texto, 
       tag: tagForm, 
       concluida: false, 
       criadoEm: fb.serverTimestamp(),
-      autorId: currentUser.uid,          // Salva o ID do usuário
-      autorEmail: currentUser.email      // Salva o e-mail do usuário
+      autorId: currentUser.uid,          
+      autorEmail: currentUser.email,
+      autorNome: nomeExibicao // Salvando o nome
     });
     $("sugTexto").value = "";
     tagForm = null;
@@ -488,16 +472,30 @@ function renderLista(){
     return;
   }
 
-  // Verifica se o usuário atual é o admin
   const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
 
   $("sugLista").innerHTML = lista.map(i => {
     const t = tagInfo(i.tag);
     const isOwner = currentUser && i.autorId === currentUser.uid;
     const canEditOrDelete = isOwner || isAdmin;
+    
+    // Nome do autor para exibição
+    const nomeAutor = i.autorNome || (i.autorEmail ? i.autorEmail.split('@')[0] : 'Usuário Oculto');
 
     const editando = editId === i.id;
+    const respondendo = replyId === i.id;
     let corpo = '';
+    
+    // Se há uma resposta do Admin gravada e não estamos editando/respondendo
+    let respostaHtml = '';
+    if (i.respostaAdmin && i.respostaAdmin.trim() !== "") {
+      respostaHtml = `
+        <div class="sug-admin-reply">
+          <span class="sug-admin-reply-label">Resposta do Admin:</span>
+          <div class="sug-admin-reply-text">${esc(i.respostaAdmin)}</div>
+        </div>
+      `;
+    }
 
     if (editando) {
       corpo = `
@@ -506,14 +504,31 @@ function renderLista(){
            <button class="sug-btn" data-act="salvar" data-id="${i.id}" type="button">Salvar</button>
            <button class="sug-btn ghost" data-act="cancelar" type="button">Cancelar</button>
          </div>`;
-    } else {
-      corpo = `<div class="sug-content">${esc(i.texto)}</div>`;
-      if (canEditOrDelete) {
-        corpo += `
-         <div class="sug-actions">
-           <button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>
-           <button class="sug-link danger" data-act="excluir" data-id="${i.id}" type="button">Excluir</button>
+    } else if (respondendo) {
+      // Área para o Admin digitar a resposta
+      corpo = `
+         <textarea class="sug-text" id="sugReplyText" maxlength="${MAX_CHARS}" placeholder="Digite a resposta do administrador...">${esc(replyDraft)}</textarea>
+         <div class="sug-edit-row">
+           <button class="sug-btn" data-act="salvar-resposta" data-id="${i.id}" type="button">Enviar Resposta</button>
+           <button class="sug-btn ghost" data-act="cancelar-resposta" type="button">Cancelar</button>
          </div>`;
+    } else {
+      corpo = `<div class="sug-content">${esc(i.texto)}</div>${respostaHtml}`;
+      
+      let botoes = '';
+      if (canEditOrDelete) {
+        botoes += `<button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>`;
+      }
+      if (isAdmin) {
+        // Botão de responder exclusivo do Admin
+        botoes += `<button class="sug-link" data-act="responder" data-id="${i.id}" type="button" style="color: var(--teal);">Responder</button>`;
+      }
+      if (canEditOrDelete) {
+        botoes += `<button class="sug-link danger" data-act="excluir" data-id="${i.id}" type="button">Excluir</button>`;
+      }
+
+      if(botoes !== '') {
+        corpo += `<div class="sug-actions">${botoes}</div>`;
       }
     }
 
@@ -523,7 +538,7 @@ function renderLista(){
         <div class="sug-body">
           <div class="sug-meta">
             <span class="sug-tag t-${t.c}">${esc(t.label)}</span>
-            <span class="sug-date">${fmtData(i.criadoEm)}${i.editadoEm ? ' · editada' : ''}</span>
+            <span class="sug-date">Por <b>${esc(nomeAutor)}</b> · ${fmtData(i.criadoEm)}${i.editadoEm ? ' (editada)' : ''}</span>
           </div>
           ${corpo}
         </div>
@@ -531,8 +546,10 @@ function renderLista(){
   }).join("");
 }
 
+// Captura texto sendo digitado nos campos (edição ou resposta)
 $("sugLista").addEventListener("input", (e) => {
   if (e.target.id === "sugEditText") editDraft = e.target.value;
+  if (e.target.id === "sugReplyText") replyDraft = e.target.value;
 });
 
 $("sugLista").addEventListener("click", async (e) => {
@@ -545,17 +562,38 @@ $("sugLista").addEventListener("click", async (e) => {
   try {
     if (act === "toggle") {
       await fb.updateDoc(ref, { concluida: el.checked });
+      
     } else if (act === "editar") {
       editId = id; editDraft = item ? item.texto : "";
+      replyId = null; // Fecha a resposta se estiver aberta
       renderLista();
       const ta = $("sugEditText"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+      
     } else if (act === "cancelar") {
       editId = null; editDraft = ""; renderLista();
+      
     } else if (act === "salvar") {
       const texto = editDraft.trim();
       if (texto.length < 3) { aviso("A sugestão precisa ter pelo menos 3 caracteres."); return; }
       await fb.updateDoc(ref, { texto, editadoEm: fb.serverTimestamp() });
       editId = null; editDraft = ""; aviso("");
+
+    // Ações de Resposta (Exclusivas do Admin)
+    } else if (act === "responder") {
+      replyId = id; replyDraft = item.respostaAdmin || "";
+      editId = null; // Fecha a edição se estiver aberta
+      renderLista();
+      const ta = $("sugReplyText"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+
+    } else if (act === "cancelar-resposta") {
+      replyId = null; replyDraft = ""; renderLista();
+
+    } else if (act === "salvar-resposta") {
+      const resposta = replyDraft.trim();
+      await fb.updateDoc(ref, { respostaAdmin: resposta, respondidoEm: fb.serverTimestamp() });
+      replyId = null; replyDraft = ""; aviso("");
+
+    // Ação de Exclusão
     } else if (act === "excluir") {
       if (!confirm("Excluir esta sugestão? Isso não pode ser desfeito.")) return;
       await fb.deleteDoc(ref);
@@ -588,7 +626,8 @@ async function conectar(){
       if (user) {
         $("btnLogin").style.display = "none";
         $("userBadge").style.display = "flex";
-        $("userEmailTxt").textContent = user.email;
+        // Pega o primeiro nome se houver displayName, senão usa o inicio do email
+        $("userEmailTxt").textContent = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
       } else {
         $("btnLogin").style.display = "inline-flex";
         $("userBadge").style.display = "none";
