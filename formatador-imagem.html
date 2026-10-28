@@ -1,11 +1,11 @@
+
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formatador de Imagens</title>
+<title>Formatador Lote</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
     --bg: #EEF0EF;
@@ -67,19 +67,14 @@
   .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
   .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
 
-  main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
+  main { max-width: 1200px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
   
-  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
   
-  /* Efeito visual ao arrastar arquivo sobre a tela */
-  body.drag-active .card {
-    border: 2px dashed var(--teal);
-    background: var(--teal-wash);
-  }
-
+  /* Área de Upload / Drag & Drop */
   .drop-zone {
     width: 100%;
-    max-width: 400px;
+    max-width: 500px;
     height: 300px;
     margin: 0 auto 24px;
     border: 2px dashed var(--ink-soft);
@@ -95,127 +90,211 @@
     overflow: hidden;
   }
   
-  .drop-zone:hover, .drop-zone.dragover { border-color: var(--teal); background: var(--teal-wash); }
-  .drop-zone-text { font-size: 14px; font-weight: 600; color: var(--ink-soft); margin-bottom: 12px; pointer-events: none; }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: var(--teal);
+    background: var(--teal-wash);
+  }
+  
+  .drop-zone-text { font-size: 14px; font-weight: 600; color: var(--ink-soft); margin-bottom: 12px; pointer-events: none; text-align: center;}
   .btn-upload { padding: 10px 20px; font-size: 14px; background-color: var(--ink-soft); color: #fff; border: none; border-radius: 6px; font-weight: bold; pointer-events: none; }
   #fileInput { display: none; }
 
+  /* Pré-visualização do resultado */
   .preview-container { display: none; margin-top: 20px; }
-  .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
+  .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;}
   
   .preview-layout {
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 32px;
   }
-  @media (min-width: 768px) {
+
+  @media (min-width: 900px) {
     .preview-layout { flex-direction: row; align-items: stretch; justify-content: center; text-align: left; }
   }
 
-  .editor-area { display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 380px; }
+  /* Grid de Imagens */
+  .images-grid-container {
+    flex-grow: 1;
+    max-width: 100%;
+  }
 
+  .images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 16px;
+    justify-items: center;
+  }
+
+  /* Container xadrez para evidenciar transparência/bordas */
   .image-wrapper {
     width: 100%;
-    max-width: 380px;
-    aspect-ratio: 1/1;
+    aspect-ratio: 1 / 1;
+    max-width: 250px;
     border: 1px solid var(--line);
-    border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     background-image: repeating-linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), repeating-linear-gradient(45deg, #ccc 25%, #fff 25%, #fff 75%, #ccc 75%, #ccc);
     background-position: 0 0, 10px 10px;
     background-size: 20px 20px;
     flex-shrink: 0;
-    overflow: hidden;
-  }
-  .preview-image { width: 100%; height: 100%; object-fit: contain; }
-
-  .filmstrip {
-    display: flex;
-    gap: 12px;
-    width: 100%;
-    overflow-x: auto;
-    padding: 6px 4px 10px;
-    justify-content: flex-start;
-  }
-  
-  .filmstrip::-webkit-scrollbar { height: 6px; }
-  .filmstrip::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
-  .filmstrip::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
-
-  .thumb-wrap {
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-    border: 2px solid var(--line);
-    border-radius: 6px;
-    cursor: pointer;
     position: relative;
-    background: var(--paper);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.2s;
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s;
   }
-  .thumb-wrap:hover { border-color: var(--teal-dark); }
-  .thumb-wrap.active { border-color: var(--teal); box-shadow: 0 0 0 2px var(--teal-wash); }
   
-  .thumb-img { max-width: 100%; max-height: 100%; border-radius: 4px; object-fit: contain; pointer-events: none; }
+  .image-wrapper:active {
+      cursor: grabbing;
+  }
+
+  .image-wrapper:hover {
+     transform: scale(1.02);
+  }
+
+  .image-wrapper.selected {
+      border: 3px solid var(--teal);
+  }
+
+  .image-wrapper.dragging {
+      opacity: 0.5;
+      transform: scale(0.95);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+
+  .image-wrapper.drag-over {
+      border: 3px dashed var(--teal);
+  }
+
+  .preview-image { width: 100%; height: 100%; object-fit: contain; pointer-events: none;} /* Impede arrastar a tag img nativa */
   
-  .thumb-delete {
-    position: absolute; top: -6px; right: -6px; background: var(--red); color: white; border: none;
-    border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold;
-    display: none; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+  .image-number {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: var(--teal);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 2;
   }
-  .thumb-wrap:hover .thumb-delete { display: flex; }
-
-  .thumb-add {
-    background: var(--bg); border: 2px dashed var(--ink-soft);
-    color: var(--ink-soft); font-size: 24px; font-weight: normal;
-    transition: all 0.2s ease;
+  
+  .btn-remove-image {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
   }
-  .thumb-add:hover, .thumb-add.dragover { background: var(--teal-wash); border-color: var(--teal); color: var(--teal); transform: scale(1.05); }
+  
+  .image-wrapper:hover .btn-remove-image {
+      display: flex;
+  }
 
+  /* Botão Adicionar Mais no Grid */
+  .add-more-card {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      max-width: 250px;
+      border: 2px dashed var(--line);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      cursor: pointer;
+      transition: all 0.2s;
+      color: var(--ink-soft);
+  }
+  
+  .add-more-card:hover {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: var(--teal-wash);
+  }
+
+  .add-more-card span {
+      font-size: 32px;
+      margin-bottom: 8px;
+  }
+
+  /* Painel de Ajustes */
   .ajustes-panel {
-    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
-    padding: 24px; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 20px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    align-self: flex-start;
+    position: sticky;
+    top: 20px;
   }
 
   .ajuste-grupo { display: flex; flex-direction: column; gap: 6px; }
   .ajuste-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
   .ajuste-valor { color: var(--teal); font-family: var(--mono); }
 
-  .input-text { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font-size: 13.5px; font-family: var(--sans); outline: none; }
+  /* Inputs Customizados */
+  .input-text {
+    width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line);
+    background: var(--paper); color: var(--ink); font-size: 13.5px; font-family: var(--sans); outline: none;
+  }
   .input-text:focus { border-color: var(--teal); }
 
+  /* Color Picker */
   .color-picker-wrap { display: flex; align-items: center; gap: 12px; }
   .input-color { width: 36px; height: 36px; padding: 0; border: none; border-radius: 6px; cursor: pointer; background: transparent; }
   .input-color::-webkit-color-swatch-wrapper { padding: 0; }
   .input-color::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 6px; }
 
+  /* Custom Range Slider */
   input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
   input[type=range]:focus { outline: none; }
   input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--line); border-radius: 99px; }
   input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--teal); cursor: pointer; -webkit-appearance: none; margin-top: -5px; border: 2px solid var(--paper); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
   input[type=range]:focus::-webkit-slider-runnable-track { background: var(--line-soft); }
+  input[type=range]:disabled::-webkit-slider-thumb { background: var(--ink-soft); cursor: not-allowed;}
+  input[type=range]:disabled::-webkit-slider-runnable-track { cursor: not-allowed;}
 
   .divider { height: 1px; background: var(--line); margin: 4px 0; }
-  
-  .acoes-ajuste { display: flex; justify-content: space-between; align-items: center; }
-  .btn-acao-texto { background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0; }
-  .btn-resetar { color: var(--ink-soft); }
-  .btn-resetar:hover { color: var(--red); }
-  .btn-aplicar-todas { color: var(--teal); }
-  .btn-aplicar-todas:hover { color: var(--teal-dark); }
+
+  .btn-resetar-ajustes { background: none; border: none; color: var(--ink-soft); font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: underline; align-self: flex-start; padding: 0; }
+  .btn-resetar-ajustes:hover { color: var(--red); }
+  .btn-resetar-ajustes:disabled { opacity: 0.5; cursor: not-allowed;}
 
   .actions { display: flex; gap: 12px; justify-content: center; margin-top: 32px; }
   .btn-primary { padding: 12px 24px; font-size: 14.5px; background-color: var(--teal); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
   .btn-primary:hover { opacity: 0.9; }
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
   .btn-secondary:hover { background: var(--line-soft); }
+  .btn-danger { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--red); border: 1.5px solid var(--red-wash); border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+  .btn-danger:hover { background: var(--red-wash); border-color: var(--red); }
 
   footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
+  
+  .aviso-selecao { font-size: 12px; color: var(--amber); margin-bottom: 10px; font-weight: 600;}
 </style>
 </head>
 <body>
@@ -225,8 +304,8 @@
     <div>
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
       <p class="brand-eyebrow">Mídia</p>
-      <h1>Formatador de Imagem</h1>
-      <p class="subtitle">Enquadramento e cor em lote. Edite cada página individualmente.</p>
+      <h1>Formatador de Imagem (Lote Flexível)</h1>
+      <p class="subtitle">Adicione até 10 imagens, arraste para reordenar, ajuste cores e fundos.</p>
     </div>
     <div>
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
@@ -237,58 +316,66 @@
 <main>
   <div class="card">
     
-    <!-- Zona de Drop -->
+    <!-- Zona de Drop Inicial (só aparece se não tiver imagens) -->
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="drop-zone-text">coloque aqui até 15 imagens<br>desejadas</div>
-      <button class="btn-upload">pesquisar no PC</button>
+      <div class="drop-zone-text">Coloque até 10 imagens aqui<br>ou clique para selecionar</div>
+      <button class="btn-upload">Pesquisar no PC</button>
+      <input type="file" id="fileInput" accept="image/*" multiple max="10">
     </div>
-    <input type="file" id="fileInput" accept="image/*" multiple>
 
     <!-- Área de Resultado e Edição -->
     <div class="preview-container" id="previewContainer">
+      <div class="preview-title">
+          <span>Resultados (1200 x 1200px)</span>
+          <span id="contadorImagens" style="font-size: 14px; font-weight: normal; color: var(--ink-soft);">0 / 10 imagens</span>
+      </div>
+      
       <div class="preview-layout">
         
-        <!-- Lado Esquerdo: Imagem Maior e Carrossel -->
-        <div class="editor-area">
-          <div class="preview-title" style="width:100%;">
-            <span id="lblPaginaAtual">Página 1</span>
-            <span style="font-size: 12px; color: var(--ink-soft); font-weight: normal;">(1200 x 1200px)</span>
-          </div>
-
-          <div class="image-wrapper">
-            <img id="resultImage" class="preview-image" src="" alt="Pré-visualização">
-          </div>
-
-          <!-- Filmstrip (Miniaturas) -->
-          <div class="filmstrip" id="filmstripContainer"></div>
+        <!-- Grid de Imagens -->
+        <div class="images-grid-container">
+            <div class="images-grid" id="imagesGrid">
+                <!-- Imagens injetadas via JS -->
+                
+                <!-- Botão Add Fica Fixo no Fim -->
+                <div class="add-more-card" id="btnAddMore" onclick="document.getElementById('fileInputAdd').click()">
+                    <span>+</span>
+                    <strong>Adicionar Imagem</strong>
+                </div>
+            </div>
+            <input type="file" id="fileInputAdd" accept="image/*" multiple style="display:none;">
         </div>
         
-        <!-- Lado Direito: Painel de Ajustes -->
+        <!-- Painel de Ajustes -->
         <div class="ajustes-panel">
           
+          <div class="aviso-selecao" id="avisoSelecao">Selecione uma imagem no grid para ajustar cor/fundo individualmente.</div>
+
+          <!-- Nome do Arquivo Base -->
           <div class="ajuste-grupo" style="margin-bottom: 4px;">
-            <label class="ajuste-header" for="inpNomeArquivo">Nome do Produto (para o arquivo ZIP)</label>
+            <label class="ajuste-header" for="inpNomeArquivo">Nome Base (Final)</label>
             <input type="text" id="inpNomeArquivo" class="input-text" placeholder="Ex: JBL_Quantum">
+            <span style="font-size: 11px; color: var(--ink-soft);">Será salvo como NomeBase_1.jpg, NomeBase_2.jpg...</span>
           </div>
 
           <div class="divider"></div>
 
-          <!-- Cor de Fundo -->
+          <!-- Cor de Fundo (Individual) -->
           <div class="ajuste-grupo">
-            <label class="ajuste-header">Fundo da Página Atual</label>
+            <label class="ajuste-header">Preenchimento da Selecionada</label>
             <div class="color-picker-wrap">
-              <input type="color" id="inpCorFundo" class="input-color" value="#FFFFFF">
-              <span style="font-size: 12px; color: var(--ink-soft); line-height: 1.3;">Selecione a cor para preencher as bordas.</span>
+              <input type="color" id="inpCorFundo" class="input-color" value="#FFFFFF" title="Escolha a cor para combinar com a imagem" disabled>
+              <span style="font-size: 12px; color: var(--ink-soft); line-height: 1.3;">Aplica apenas na imagem selecionada.</span>
             </div>
           </div>
 
-          <!-- Sliders -->
+          <!-- Sliders (Individual) -->
           <div class="ajuste-grupo">
             <div class="ajuste-header">
-              <label for="inpBrilho">Brilho</label>
+              <label for="inpBrilho">Brilho (Selecionada)</label>
               <span class="ajuste-valor" id="valBrilho">100%</span>
             </div>
-            <input type="range" id="inpBrilho" min="0" max="200" value="100">
+            <input type="range" id="inpBrilho" min="0" max="200" value="100" disabled>
           </div>
 
           <div class="ajuste-grupo">
@@ -296,7 +383,7 @@
               <label for="inpContraste">Contraste</label>
               <span class="ajuste-valor" id="valContraste">100%</span>
             </div>
-            <input type="range" id="inpContraste" min="0" max="200" value="100">
+            <input type="range" id="inpContraste" min="0" max="200" value="100" disabled>
           </div>
 
           <div class="ajuste-grupo">
@@ -304,20 +391,16 @@
               <label for="inpSaturacao">Saturação</label>
               <span class="ajuste-valor" id="valSaturacao">100%</span>
             </div>
-            <input type="range" id="inpSaturacao" min="0" max="200" value="100">
+            <input type="range" id="inpSaturacao" min="0" max="200" value="100" disabled>
           </div>
 
-          <div class="acoes-ajuste">
-            <button class="btn-acao-texto btn-resetar" onclick="resetarFiltrosPagina()">Resetar esta página</button>
-            <button class="btn-acao-texto btn-aplicar-todas" onclick="aplicarConfigATodas()" title="Aplica as cores e filtros atuais em todas as imagens">Aplicar a todas</button>
-          </div>
-
+          <button class="btn-resetar-ajustes" id="btnResetarAjustes" onclick="resetarFiltros()" disabled>Resetar Ajustes da Selecionada</button>
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-primary" id="btnDownload">Baixar Imagens (ZIP)</button>
-        <button class="btn-secondary" onclick="limparTudo()">Começar do Zero</button>
+        <button class="btn-primary" id="btnDownloadAll">Baixar Todas (ZIP)</button>
+        <button class="btn-danger" onclick="limparTudo()">Limpar Tudo</button>
       </div>
     </div>
 
@@ -325,6 +408,9 @@
 </main>
 
 <footer>Processamento local no navegador. Nenhuma inteligência artificial ou envio de dados externo.</footer>
+
+<!-- Importando JSZip via CDN para empacotar as imagens -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <script>
 // --- GESTÃO DE TEMA ---
@@ -341,14 +427,15 @@ themeToggleBtn.addEventListener('click', () => {
   localStorage.setItem('sapCatalogTheme', next);
 });
 
-// --- VARIÁVEIS ---
+// --- VARIÁVEIS GLOBAIS ---
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
+const fileInputAdd = document.getElementById('fileInputAdd');
 const previewContainer = document.getElementById('previewContainer');
-const resultImage = document.getElementById('resultImage');
-const filmstripContainer = document.getElementById('filmstripContainer');
-const btnDownload = document.getElementById('btnDownload');
-const lblPaginaAtual = document.getElementById('lblPaginaAtual');
+const imagesGrid = document.getElementById('imagesGrid');
+const btnAddMore = document.getElementById('btnAddMore');
+const btnDownloadAll = document.getElementById('btnDownloadAll');
+const contadorImagens = document.getElementById('contadorImagens');
 
 const inpNomeArquivo = document.getElementById('inpNomeArquivo');
 const inpCorFundo = document.getElementById('inpCorFundo');
@@ -358,301 +445,410 @@ const inpSaturacao = document.getElementById('inpSaturacao');
 const valBrilho = document.getElementById('valBrilho');
 const valContraste = document.getElementById('valContraste');
 const valSaturacao = document.getElementById('valSaturacao');
+const btnResetarAjustes = document.getElementById('btnResetarAjustes');
+const avisoSelecao = document.getElementById('avisoSelecao');
 
-let paginas = [];
-let paginaAtualIndex = 0;
-const LIMITE_IMAGENS = 15; // Atualizado para 15 imagens
+const MAX_IMAGES = 10;
+let imagensArray = []; 
+// Objeto padrão da imagem: { idText, nomeOriginal, imgObject, brilho, contraste, saturacao, corFundo, dataUrlFinal }
+let indiceSelecionado = -1; // Refere-se à posição atual no array
 
-// --- DRAG & DROP NA TELA TODA (GLOBAL) ---
-['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  window.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
-});
+// --- EVENTOS DE ARQUIVO ---
+fileInput.addEventListener('change', function() { processarArquivos(this.files); this.value = ""; });
+fileInputAdd.addEventListener('change', function() { processarArquivos(this.files); this.value = ""; });
 
-window.addEventListener('dragover', () => {
-  document.body.classList.add('drag-active');
-});
+// Eventos Drag & Drop Inicial
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, preventDefaults, false));
+function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
 
-['dragleave', 'drop'].forEach(eventName => {
-  window.addEventListener(eventName, (e) => {
-    // Só remove a classe quando sai da janela ou faz o drop
-    if (e.type === 'drop' || (e.clientX === 0 && e.clientY === 0)) {
-      document.body.classList.remove('drag-active');
+['dragenter', 'dragover'].forEach(ev => dropZone.addEventListener(ev, () => dropZone.classList.add('dragover'), false));
+['dragleave', 'drop'].forEach(ev => dropZone.addEventListener(ev, () => dropZone.classList.remove('dragover'), false));
+
+dropZone.addEventListener('drop', (e) => processarArquivos(e.dataTransfer.files));
+
+// Eventos Drag & Drop no Grid (para adicionar arquivos arrastando pra qualquer lugar do grid)
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(ev => imagesGrid.addEventListener(ev, preventDefaults, false));
+imagesGrid.addEventListener('drop', (e) => {
+    // Só processa arquivos se não for um drag interno (reordenação)
+    if(e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        processarArquivos(e.dataTransfer.files);
     }
-  });
 });
 
-window.addEventListener('drop', (e) => {
-  document.body.classList.remove('drag-active');
-  if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-    processarArquivos(e.dataTransfer.files);
-  }
-});
 
-fileInput.addEventListener('change', function() {
-  if (this.files && this.files.length > 0) {
-    processarArquivos(this.files);
-    this.value = '';
-  }
-});
-
-// --- PROCESSAMENTO DOS ARQUIVOS ---
-function processarArquivos(files) {
-  let arquivosArray = Array.from(files).filter(f => f.type.match('image.*'));
+// --- PROCESSAMENTO ---
+async function processarArquivos(files) {
+  if (!files || files.length === 0) return;
   
-  if (arquivosArray.length === 0) return;
-
-  let espacoLivre = LIMITE_IMAGENS - paginas.length;
-  if (arquivosArray.length > espacoLivre) {
-    alert(`Você só pode adicionar mais ${espacoLivre} imagem(ns). O limite é de 15 imagens por lote.`);
-    arquivosArray = arquivosArray.slice(0, espacoLivre);
+  let arquivosNovos = Array.from(files).filter(f => f.type.match('image.*'));
+  
+  if (arquivosNovos.length === 0) {
+      alert("Nenhuma imagem válida encontrada.");
+      return;
   }
-  if(arquivosArray.length === 0) return;
-
-  if(inpNomeArquivo.value.trim() === "" && paginas.length === 0) {
-    inpNomeArquivo.value = arquivosArray[0].name.split('.')[0];
+  
+  let espacoLivre = MAX_IMAGES - imagensArray.length;
+  if (espacoLivre <= 0) {
+      alert(`O limite de ${MAX_IMAGES} imagens já foi atingido.`);
+      return;
+  }
+  
+  if (arquivosNovos.length > espacoLivre) {
+      alert(`Você tentou adicionar ${arquivosNovos.length} imagens, mas só há espaço para mais ${espacoLivre}. As excedentes foram ignoradas.`);
+      arquivosNovos = arquivosNovos.slice(0, espacoLivre);
   }
 
-  let indexInicialNovas = paginas.length;
-  let carregadas = 0;
+  if(imagensArray.length === 0 && inpNomeArquivo.value.trim() === "") {
+    inpNomeArquivo.value = arquivosNovos[0].name.split('.')[0];
+  }
 
-  arquivosArray.forEach((file) => {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        
-        paginas.push({
-          id: Date.now() + Math.random(),
-          imgObjeto: img,
-          bg: "#FFFFFF",
-          brilho: 100,
-          contraste: 100,
-          saturacao: 100
-        });
+  // Transição de UI se for o primeiro arquivo
+  if (imagensArray.length === 0) {
+      dropZone.style.display = 'none';
+      previewContainer.style.display = 'block';
+  }
+  
+  let startIndex = imagensArray.length;
 
-        carregadas++;
+  let promises = arquivosNovos.map((file, idx) => {
+      return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              const img = new Image();
+              img.onload = function() {
+                  const imgData = {
+                      idText: 'img_' + Date.now() + '_' + idx, // ID único real
+                      nomeOriginal: file.name,
+                      imgObject: img,
+                      brilho: 100,
+                      contraste: 100,
+                      saturacao: 100,
+                      corFundo: "#FFFFFF",
+                      dataUrlFinal: ""
+                  };
+                  imagensArray.push(imgData);
+                  resolve();
+              }
+              img.src = e.target.result;
+          }
+          reader.readAsDataURL(file);
+      });
+  });
+
+  await Promise.all(promises);
+  renderizarGrid();
+  
+  // Seleciona a primeira das recém adicionadas se não houver seleção
+  if(indiceSelecionado === -1 && imagensArray.length > 0) {
+      selecionarImagem(startIndex);
+  }
+}
+
+// --- RENDERIZAÇÃO DO GRID ---
+function renderizarGrid() {
+    // Preserva o botão Add
+    imagesGrid.innerHTML = '';
+    
+    imagensArray.forEach((imgData, index) => {
+        imgData.dataUrlFinal = desenharCanvasInterno(imgData);
         
-        if(carregadas === arquivosArray.length) {
-          dropZone.style.display = 'none';
-          previewContainer.style.display = 'block';
-          
-          renderizarFilmstrip();
-          selecionarPagina(indexInicialNovas);
+        const wrapper = document.createElement('div');
+        wrapper.className = `image-wrapper ${indiceSelecionado === index ? 'selected' : ''}`;
+        wrapper.id = `wrap_${imgData.idText}`;
+        wrapper.dataset.index = index;
+        wrapper.draggable = true;
+        
+        // Evento de clique para selecionar
+        wrapper.onclick = (e) => {
+            if(e.target.classList.contains('btn-remove-image')) return; // Evita selecionar ao remover
+            selecionarImagem(parseInt(wrapper.dataset.index));
+        };
+        
+        // Drag and Drop (Reordenação)
+        wrapper.addEventListener('dragstart', handleDragStart);
+        wrapper.addEventListener('dragover', handleDragOver);
+        wrapper.addEventListener('dragleave', handleDragLeave);
+        wrapper.addEventListener('drop', handleDrop);
+        wrapper.addEventListener('dragend', handleDragEnd);
+
+        wrapper.innerHTML = `
+            <div class="image-number">${index + 1}</div>
+            <button class="btn-remove-image" onclick="removerImagem(${index})" title="Remover imagem">✕</button>
+            <img class="preview-image" src="${imgData.dataUrlFinal}" alt="Preview ${index + 1}">
+        `;
+        imagesGrid.appendChild(wrapper);
+    });
+    
+    imagesGrid.appendChild(btnAddMore);
+    
+    contadorImagens.textContent = `${imagensArray.length} / ${MAX_IMAGES} imagens`;
+    
+    if(imagensArray.length >= MAX_IMAGES) {
+        btnAddMore.style.display = 'none';
+    } else {
+        btnAddMore.style.display = 'flex';
+    }
+}
+
+// --- DRAG & DROP REORDENAÇÃO ---
+let draggedIndex = -1;
+
+function handleDragStart(e) {
+    draggedIndex = parseInt(this.dataset.index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', draggedIndex); // Dummy data
+    setTimeout(() => this.classList.add('dragging'), 0);
+}
+
+function handleDragOver(e) {
+    if (e.preventDefault) e.preventDefault(); // Necessário para permitir o drop
+    e.dataTransfer.dropEffect = 'move';
+    if(parseInt(this.dataset.index) !== draggedIndex) {
+        this.classList.add('drag-over');
+    }
+    return false;
+}
+
+function handleDragLeave(e) {
+    this.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+    if (e.stopPropagation) e.stopPropagation(); 
+    this.classList.remove('drag-over');
+    
+    let targetIndex = parseInt(this.dataset.index);
+    if (draggedIndex === targetIndex || draggedIndex === -1) return false;
+    
+    // Reordena o Array
+    const draggedItem = imagensArray[draggedIndex];
+    imagensArray.splice(draggedIndex, 1);
+    imagensArray.splice(targetIndex, 0, draggedItem);
+    
+    // Atualiza o índice selecionado se ele mudou de lugar
+    if (indiceSelecionado === draggedIndex) {
+        indiceSelecionado = targetIndex;
+    } else if (indiceSelecionado !== -1) {
+        // Se a seleção não foi a que moveu, ajusta se foi afetada pelo shift
+        if (draggedIndex < indiceSelecionado && targetIndex >= indiceSelecionado) {
+            indiceSelecionado--;
+        } else if (draggedIndex > indiceSelecionado && targetIndex <= indiceSelecionado) {
+            indiceSelecionado++;
         }
-      }
-      img.src = e.target.result;
     }
-    reader.readAsDataURL(file);
-  });
-}
-
-// --- NAVEGAÇÃO E UI ---
-function renderizarFilmstrip() {
-  filmstripContainer.innerHTML = '';
-
-  paginas.forEach((pagina, index) => {
-    const thumbWrap = document.createElement('div');
-    thumbWrap.className = `thumb-wrap ${index === paginaAtualIndex ? 'active' : ''}`;
-    thumbWrap.onclick = () => selecionarPagina(index);
     
-    const img = document.createElement('img');
-    img.src = pagina.imgObjeto.src;
-    img.className = 'thumb-img';
+    renderizarGrid();
+    return false;
+}
+
+function handleDragEnd(e) {
+    this.classList.remove('dragging');
+    document.querySelectorAll('.image-wrapper').forEach(el => el.classList.remove('drag-over'));
+    draggedIndex = -1;
+}
+
+// --- REMOÇÃO ---
+function removerImagem(index) {
+    imagensArray.splice(index, 1);
     
-    const btnDel = document.createElement('button');
-    btnDel.className = 'thumb-delete';
-    btnDel.innerHTML = '✕';
-    btnDel.title = "Remover imagem";
-    btnDel.onclick = (e) => {
-      e.stopPropagation();
-      removerPagina(index);
-    };
-
-    thumbWrap.appendChild(img);
-    thumbWrap.appendChild(btnDel);
-    filmstripContainer.appendChild(thumbWrap);
-  });
-
-  // Botão de Adicionar (+)
-  if (paginas.length < LIMITE_IMAGENS) {
-    const addWrap = document.createElement('div');
-    addWrap.className = 'thumb-wrap thumb-add';
-    addWrap.innerHTML = '+';
-    addWrap.title = "Clique ou arraste imagens para qualquer lugar da tela";
-    addWrap.onclick = () => fileInput.click();
-    filmstripContainer.appendChild(addWrap);
-  }
-}
-
-function selecionarPagina(index) {
-  if (paginas.length === 0) return;
-  
-  paginaAtualIndex = index;
-  lblPaginaAtual.textContent = `Página ${index + 1} de ${paginas.length}`;
-  
-  const cfg = paginas[index];
-  inpCorFundo.value = cfg.bg;
-  inpBrilho.value = cfg.brilho;
-  inpContraste.value = cfg.contraste;
-  inpSaturacao.value = cfg.saturacao;
-  
-  atualizarTextosSliders();
-  renderizarFilmstrip();
-  gerarPreviewNoCanvas();
-}
-
-function removerPagina(index) {
-  paginas.splice(index, 1);
-  if (paginas.length === 0) {
-    limparTudo();
-  } else {
-    if (paginaAtualIndex >= paginas.length) {
-      paginaAtualIndex = paginas.length - 1;
+    if (imagensArray.length === 0) {
+        limparTudo();
+        return;
     }
-    selecionarPagina(paginaAtualIndex);
-  }
+
+    if (indiceSelecionado === index) {
+        indiceSelecionado = -1;
+        desabilitarControles();
+    } else if (indiceSelecionado > index) {
+        indiceSelecionado--;
+    }
+    
+    renderizarGrid();
+    if(indiceSelecionado !== -1) selecionarImagem(indiceSelecionado); // re-highlight
 }
 
-// --- DESENHO NO CANVAS DA PRÉVIA ---
-function gerarPreviewNoCanvas() {
-  if (paginas.length === 0) return;
-  
-  const cfg = paginas[paginaAtualIndex];
+function limparTudo() {
+    fileInput.value = "";
+    fileInputAdd.value = "";
+    imagensArray = [];
+    indiceSelecionado = -1;
+    imagesGrid.innerHTML = '';
+    desabilitarControles();
+    previewContainer.style.display = 'none';
+    dropZone.style.display = 'flex';
+}
+
+// --- DESENHO NO CANVAS ---
+function desenharCanvasInterno(imgData) {
+  const TAMANHO_ALVO = 1200;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  const TAMANHO_ALVO = 1200;
   
   canvas.width = TAMANHO_ALVO;
   canvas.height = TAMANHO_ALVO;
   
-  ctx.fillStyle = cfg.bg;
+  // Fundo
+  ctx.fillStyle = imgData.corFundo;
   ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
   
-  ctx.filter = `brightness(${cfg.brilho}%) contrast(${cfg.contraste}%) saturate(${cfg.saturacao}%)`;
+  // Filtros na imagem original
+  ctx.filter = `brightness(${imgData.brilho}%) contrast(${imgData.contraste}%) saturate(${imgData.saturacao}%)`;
   
-  const ratioOriginal = cfg.imgObjeto.width / cfg.imgObjeto.height;
+  // Proporção
+  const ratioOriginal = imgData.imgObject.width / imgData.imgObject.height;
   let drawWidth, drawHeight;
-  if (cfg.imgObjeto.width > cfg.imgObjeto.height) {
-    drawWidth = TAMANHO_ALVO; drawHeight = TAMANHO_ALVO / ratioOriginal;
+  
+  if (imgData.imgObject.width > imgData.imgObject.height) {
+    drawWidth = TAMANHO_ALVO;
+    drawHeight = TAMANHO_ALVO / ratioOriginal;
   } else {
-    drawHeight = TAMANHO_ALVO; drawWidth = TAMANHO_ALVO * ratioOriginal;
+    drawHeight = TAMANHO_ALVO;
+    drawWidth = TAMANHO_ALVO * ratioOriginal;
   }
   
   const x = (TAMANHO_ALVO - drawWidth) / 2;
   const y = (TAMANHO_ALVO - drawHeight) / 2;
   
-  ctx.drawImage(cfg.imgObjeto, x, y, drawWidth, drawHeight);
-  resultImage.src = canvas.toDataURL('image/jpeg', 0.95);
+  ctx.drawImage(imgData.imgObject, x, y, drawWidth, drawHeight);
+  ctx.filter = 'none';
+  
+  return canvas.toDataURL('image/jpeg', 0.95);
 }
 
-// --- EVENTOS DE EDIÇÃO EM TEMPO REAL ---
-function atualizarTextosSliders() {
+function atualizarPreviewAtual() {
+    if (indiceSelecionado < 0 || indiceSelecionado >= imagensArray.length) return;
+    
+    let imgData = imagensArray[indiceSelecionado];
+    
+    imgData.brilho = inpBrilho.value;
+    imgData.contraste = inpContraste.value;
+    imgData.saturacao = inpSaturacao.value;
+    imgData.corFundo = inpCorFundo.value;
+    
+    imgData.dataUrlFinal = desenharCanvasInterno(imgData);
+    
+    // Atualiza a src da imagem na grid diretamente
+    const wrapper = document.getElementById(`wrap_${imgData.idText}`);
+    if(wrapper) {
+        wrapper.querySelector('.preview-image').src = imgData.dataUrlFinal;
+    }
+}
+
+// --- CONTROLE DE SELEÇÃO E INPUTS ---
+function selecionarImagem(index) {
+    if (index < 0 || index >= imagensArray.length) return;
+
+    // Remove seleção antiga visualmente
+    if (indiceSelecionado >= 0 && imagensArray[indiceSelecionado]) {
+        const oldWrap = document.getElementById(`wrap_${imagensArray[indiceSelecionado].idText}`);
+        if(oldWrap) oldWrap.classList.remove('selected');
+    }
+    
+    indiceSelecionado = index;
+    const newWrap = document.getElementById(`wrap_${imagensArray[index].idText}`);
+    if(newWrap) newWrap.classList.add('selected');
+    
+    let imgData = imagensArray[index];
+    
+    inpBrilho.value = imgData.brilho;
+    inpContraste.value = imgData.contraste;
+    inpSaturacao.value = imgData.saturacao;
+    inpCorFundo.value = imgData.corFundo;
+    
+    atualizarValoresTextuais();
+    habilitarControles(index);
+}
+
+function desabilitarControles() {
+    inpBrilho.disabled = true;
+    inpContraste.disabled = true;
+    inpSaturacao.disabled = true;
+    inpCorFundo.disabled = true;
+    btnResetarAjustes.disabled = true;
+    avisoSelecao.textContent = 'Selecione uma imagem no grid para ajustar cor/fundo individualmente.';
+    avisoSelecao.style.color = 'var(--amber)';
+}
+
+function habilitarControles(index) {
+    inpBrilho.disabled = false;
+    inpContraste.disabled = false;
+    inpSaturacao.disabled = false;
+    inpCorFundo.disabled = false;
+    btnResetarAjustes.disabled = false;
+    avisoSelecao.textContent = `Ajustando Imagem ${index + 1}`;
+    avisoSelecao.style.color = 'var(--teal)';
+}
+
+function atualizarValoresTextuais() {
   valBrilho.textContent = `${inpBrilho.value}%`;
   valContraste.textContent = `${inpContraste.value}%`;
   valSaturacao.textContent = `${inpSaturacao.value}%`;
 }
 
-function salvarAlteracaoAtual() {
-  if(paginas.length === 0) return;
-  paginas[paginaAtualIndex].bg = inpCorFundo.value;
-  paginas[paginaAtualIndex].brilho = inpBrilho.value;
-  paginas[paginaAtualIndex].contraste = inpContraste.value;
-  paginas[paginaAtualIndex].saturacao = inpSaturacao.value;
-  
-  atualizarTextosSliders();
-  gerarPreviewNoCanvas();
-}
-
-[inpBrilho, inpContraste, inpSaturacao, inpCorFundo].forEach(input => {
-  input.addEventListener('input', salvarAlteracaoAtual);
+// Ouvintes dos Sliders
+[inpBrilho, inpContraste, inpSaturacao].forEach(input => {
+  input.addEventListener('input', () => {
+    atualizarValoresTextuais();
+    atualizarPreviewAtual();
+  });
 });
 
-function resetarFiltrosPagina() {
+inpCorFundo.addEventListener('input', atualizarPreviewAtual);
+
+function resetarFiltros() {
+  if (indiceSelecionado < 0) return;
   inpBrilho.value = 100;
   inpContraste.value = 100;
   inpSaturacao.value = 100;
-  salvarAlteracaoAtual(); 
+  inpCorFundo.value = "#FFFFFF";
+  atualizarValoresTextuais();
+  atualizarPreviewAtual();
 }
 
-function aplicarConfigATodas() {
-  if(paginas.length === 0) return;
-  const cfgAtual = paginas[paginaAtualIndex];
+// --- AÇÕES FINAIS (ZIP) ---
+btnDownloadAll.addEventListener('click', async () => {
+  if (imagensArray.length === 0) return;
   
-  paginas.forEach(p => {
-    p.bg = cfgAtual.bg;
-    p.brilho = cfgAtual.brilho;
-    p.contraste = cfgAtual.contraste;
-    p.saturacao = cfgAtual.saturacao;
-  });
-  alert("As configurações atuais foram aplicadas a todas as páginas!");
-}
-
-function limparTudo() {
-  paginas = [];
-  paginaAtualIndex = 0;
-  fileInput.value = "";
-  inpNomeArquivo.value = "";
-  previewContainer.style.display = 'none';
-  dropZone.style.display = 'flex';
-}
-
-// --- GERAÇÃO DO ZIP ---
-btnDownload.addEventListener('click', () => {
-  if (paginas.length === 0) return;
-
-  btnDownload.textContent = "Compactando...";
-  btnDownload.disabled = true;
+  let nomeBase = inpNomeArquivo.value.trim() || "Lote_Imagens";
   
-  let nomeBase = inpNomeArquivo.value.trim() || "Produto";
-  
-  const zip = new JSZip();
-  const TAMANHO_ALVO = 1200;
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  canvas.width = TAMANHO_ALVO;
-  canvas.height = TAMANHO_ALVO;
-
-  for(let i = 0; i < paginas.length; i++) {
-      let cfg = paginas[i];
-
-      ctx.fillStyle = cfg.bg;
-      ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
-      
-      ctx.filter = `brightness(${cfg.brilho}%) contrast(${cfg.contraste}%) saturate(${cfg.saturacao}%)`;
-      
-      const ratioOriginal = cfg.imgObjeto.width / cfg.imgObjeto.height;
-      let drawWidth, drawHeight;
-      if (cfg.imgObjeto.width > cfg.imgObjeto.height) {
-        drawWidth = TAMANHO_ALVO; drawHeight = TAMANHO_ALVO / ratioOriginal;
-      } else {
-        drawHeight = TAMANHO_ALVO; drawWidth = TAMANHO_ALVO * ratioOriginal;
-      }
-      
-      const x = (TAMANHO_ALVO - drawWidth) / 2;
-      const y = (TAMANHO_ALVO - drawHeight) / 2;
-      
-      ctx.drawImage(cfg.imgObjeto, x, y, drawWidth, drawHeight);
-      ctx.filter = 'none';
-
-      let dataUrl = canvas.toDataURL('image/jpeg', 0.95);
-      let base64Data = dataUrl.split(',')[1];
-      
-      let nomeArquivoFinal = `${i + 1}.jpg`;
-      
-      zip.file(nomeArquivoFinal, base64Data, {base64: true});
+  if (imagensArray.length === 1) {
+      const a = document.createElement('a');
+      a.href = imagensArray[0].dataUrlFinal;
+      a.download = `${nomeBase}_1.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
   }
 
-  zip.generateAsync({type:"blob"}).then(function(conteudoZip) {
+  btnDownloadAll.textContent = "Gerando ZIP...";
+  btnDownloadAll.disabled = true;
+
+  try {
+      const zip = new JSZip();
+      
+      imagensArray.forEach((img, index) => {
+          const base64Data = img.dataUrlFinal.split(',')[1];
+          zip.file(`${nomeBase}_${index + 1}.jpg`, base64Data, {base64: true});
+      });
+      
+      const content = await zip.generateAsync({type:"blob"});
+      
       const a = document.createElement('a');
-      a.href = URL.createObjectURL(conteudoZip);
+      a.href = URL.createObjectURL(content);
       a.download = `${nomeBase}.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       
-      btnDownload.textContent = "Baixar Imagens (ZIP)";
-      btnDownload.disabled = false;
-  });
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  } catch (error) {
+      alert("Erro ao gerar o arquivo ZIP.");
+      console.error(error);
+  } finally {
+      btnDownloadAll.textContent = "Baixar Todas (ZIP)";
+      btnDownloadAll.disabled = false;
+  }
 });
 </script>
 </body>
