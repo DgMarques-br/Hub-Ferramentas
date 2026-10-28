@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formatador</title>
+<title>Formatador de Imagens</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
   :root{
     --bg: #EEF0EF;
@@ -66,11 +67,10 @@
   .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
   .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
 
-  main { max-width: 900px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
+  main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
   
   .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
   
-  /* Área de Upload / Drag & Drop */
   .drop-zone {
     width: 100%;
     max-width: 400px;
@@ -89,18 +89,13 @@
     overflow: hidden;
   }
   
-  .drop-zone:hover, .drop-zone.dragover {
-    border-color: var(--teal);
-    background: var(--teal-wash);
-  }
-  
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--teal); background: var(--teal-wash); }
   .drop-zone-text { font-size: 14px; font-weight: 600; color: var(--ink-soft); margin-bottom: 12px; pointer-events: none; }
   .btn-upload { padding: 10px 20px; font-size: 14px; background-color: var(--ink-soft); color: #fff; border: none; border-radius: 6px; font-weight: bold; pointer-events: none; }
   #fileInput { display: none; }
 
-  /* Pré-visualização do resultado */
   .preview-container { display: none; margin-top: 20px; }
-  .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 24px; }
+  .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
   
   .preview-layout {
     display: flex;
@@ -108,57 +103,89 @@
     align-items: center;
     gap: 32px;
   }
-
-  @media (min-width: 650px) {
+  @media (min-width: 768px) {
     .preview-layout { flex-direction: row; align-items: stretch; justify-content: center; text-align: left; }
   }
 
-  /* Container xadrez para evidenciar transparência/bordas */
+  .editor-area { display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 380px; }
+
   .image-wrapper {
-    width: 320px;
-    height: 320px;
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 1/1;
     border: 1px solid var(--line);
+    border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     background-image: repeating-linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), repeating-linear-gradient(45deg, #ccc 25%, #fff 25%, #fff 75%, #ccc 75%, #ccc);
     background-position: 0 0, 10px 10px;
     background-size: 20px 20px;
     flex-shrink: 0;
+    overflow: hidden;
   }
-
   .preview-image { width: 100%; height: 100%; object-fit: contain; }
 
-  /* Painel de Ajustes */
-  .ajustes-panel {
-    background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    padding: 24px;
-    width: 100%;
-    max-width: 320px;
+  .filmstrip {
     display: flex;
-    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    justify-content: flex-start;
+  }
+  
+  .filmstrip::-webkit-scrollbar { height: 6px; }
+  .filmstrip::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
+  .filmstrip::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+
+  .thumb-wrap {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
+    border: 2px solid var(--line);
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    background: var(--paper);
+    display: flex;
     justify-content: center;
-    gap: 20px;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  .thumb-wrap:hover { border-color: var(--teal-dark); }
+  .thumb-wrap.active { border-color: var(--teal); box-shadow: 0 0 0 2px var(--teal-wash); }
+  
+  .thumb-img { max-width: 100%; max-height: 100%; border-radius: 4px; object-fit: contain; pointer-events: none; }
+  
+  .thumb-delete {
+    position: absolute; top: -6px; right: -6px; background: var(--red); color: white; border: none;
+    border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold;
+    display: none; align-items: center; justify-content: center; cursor: pointer; padding: 0;
+  }
+  .thumb-wrap:hover .thumb-delete { display: flex; }
+
+  .thumb-add {
+    background: var(--bg); border: 2px dashed var(--ink-soft);
+    color: var(--ink-soft); font-size: 24px; font-weight: normal;
+  }
+  .thumb-add:hover { background: var(--teal-wash); border-color: var(--teal); color: var(--teal); }
+
+  .ajustes-panel {
+    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+    padding: 24px; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 20px;
   }
 
   .ajuste-grupo { display: flex; flex-direction: column; gap: 6px; }
   .ajuste-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
   .ajuste-valor { color: var(--teal); font-family: var(--mono); }
 
-  /* Inputs Customizados */
-  .input-text {
-    width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line);
-    background: var(--paper); color: var(--ink); font-size: 13.5px; font-family: var(--sans); outline: none;
-  }
+  .input-text { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font-size: 13.5px; font-family: var(--sans); outline: none; }
   .input-text:focus { border-color: var(--teal); }
 
-  /* Color Picker */
   .color-picker-wrap { display: flex; align-items: center; gap: 12px; }
   .input-color { width: 36px; height: 36px; padding: 0; border: none; border-radius: 6px; cursor: pointer; background: transparent; }
   .input-color::-webkit-color-swatch-wrapper { padding: 0; }
   .input-color::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 6px; }
 
-  /* Custom Range Slider */
   input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
   input[type=range]:focus { outline: none; }
   input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--line); border-radius: 99px; }
@@ -166,13 +193,18 @@
   input[type=range]:focus::-webkit-slider-runnable-track { background: var(--line-soft); }
 
   .divider { height: 1px; background: var(--line); margin: 4px 0; }
-
-  .btn-resetar-ajustes { background: none; border: none; color: var(--ink-soft); font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: underline; align-self: flex-start; padding: 0; }
-  .btn-resetar-ajustes:hover { color: var(--red); }
+  
+  .acoes-ajuste { display: flex; justify-content: space-between; align-items: center; }
+  .btn-acao-texto { background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0; }
+  .btn-resetar { color: var(--ink-soft); }
+  .btn-resetar:hover { color: var(--red); }
+  .btn-aplicar-todas { color: var(--teal); }
+  .btn-aplicar-todas:hover { color: var(--teal-dark); }
 
   .actions { display: flex; gap: 12px; justify-content: center; margin-top: 32px; }
   .btn-primary { padding: 12px 24px; font-size: 14.5px; background-color: var(--teal); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
   .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
   .btn-secondary:hover { background: var(--line-soft); }
 
@@ -187,7 +219,7 @@
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
       <p class="brand-eyebrow">Mídia</p>
       <h1>Formatador de Imagem</h1>
-      <p class="subtitle">Enquadramento automático, estúdio de cor e correspondência de fundos.</p>
+      <p class="subtitle">Enquadramento e cor em lote. Edite cada página individualmente.</p>
     </div>
     <div>
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
@@ -200,28 +232,35 @@
     
     <!-- Zona de Drop -->
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="drop-zone-text">coloque aqui a imagem<br>desejada</div>
-      <button class="btn-upload">pesquisar em Pc</button>
-      <input type="file" id="fileInput" accept="image/*">
+      <div class="drop-zone-text">coloque aqui até 10 imagens<br>desejadas</div>
+      <button class="btn-upload">pesquisar no PC</button>
     </div>
+    <input type="file" id="fileInput" accept="image/*" multiple>
 
     <!-- Área de Resultado e Edição -->
     <div class="preview-container" id="previewContainer">
-      <div class="preview-title">Resultado Final (1200 x 1200px)</div>
-      
       <div class="preview-layout">
         
-        <!-- Imagem -->
-        <div class="image-wrapper">
-          <img id="resultImage" class="preview-image" src="" alt="Pré-visualização">
+        <!-- Lado Esquerdo: Imagem Maior e Carrossel -->
+        <div class="editor-area">
+          <div class="preview-title" style="width:100%;">
+            <span id="lblPaginaAtual">Página 1</span>
+            <span style="font-size: 12px; color: var(--ink-soft); font-weight: normal;">(1200 x 1200px)</span>
+          </div>
+
+          <div class="image-wrapper">
+            <img id="resultImage" class="preview-image" src="" alt="Pré-visualização">
+          </div>
+
+          <!-- Filmstrip (Miniaturas) -->
+          <div class="filmstrip" id="filmstripContainer"></div>
         </div>
         
-        <!-- Painel de Ajustes -->
+        <!-- Lado Direito: Painel de Ajustes -->
         <div class="ajustes-panel">
           
-          <!-- Nome do Arquivo -->
           <div class="ajuste-grupo" style="margin-bottom: 4px;">
-            <label class="ajuste-header" for="inpNomeArquivo">Nome do Arquivo Final</label>
+            <label class="ajuste-header" for="inpNomeArquivo">Nome do Produto (para o arquivo ZIP)</label>
             <input type="text" id="inpNomeArquivo" class="input-text" placeholder="Ex: JBL_Quantum">
           </div>
 
@@ -229,17 +268,17 @@
 
           <!-- Cor de Fundo -->
           <div class="ajuste-grupo">
-            <label class="ajuste-header">Preenchimento (Bordas)</label>
+            <label class="ajuste-header">Fundo da Página Atual</label>
             <div class="color-picker-wrap">
-              <input type="color" id="inpCorFundo" class="input-color" value="#FFFFFF" title="Escolha a cor para combinar com a imagem">
-              <span style="font-size: 12px; color: var(--ink-soft); line-height: 1.3;">Altere para disfarçar o recorte de imagens cinzas/coloridas.</span>
+              <input type="color" id="inpCorFundo" class="input-color" value="#FFFFFF">
+              <span style="font-size: 12px; color: var(--ink-soft); line-height: 1.3;">Selecione a cor para preencher as bordas.</span>
             </div>
           </div>
 
           <!-- Sliders -->
           <div class="ajuste-grupo">
             <div class="ajuste-header">
-              <label for="inpBrilho">Brilho da Imagem</label>
+              <label for="inpBrilho">Brilho</label>
               <span class="ajuste-valor" id="valBrilho">100%</span>
             </div>
             <input type="range" id="inpBrilho" min="0" max="200" value="100">
@@ -261,13 +300,17 @@
             <input type="range" id="inpSaturacao" min="0" max="200" value="100">
           </div>
 
-          <button class="btn-resetar-ajustes" onclick="resetarFiltros()">Resetar Ajustes de Cor</button>
+          <div class="acoes-ajuste">
+            <button class="btn-acao-texto btn-resetar" onclick="resetarFiltrosPagina()">Resetar esta página</button>
+            <button class="btn-acao-texto btn-aplicar-todas" onclick="aplicarConfigATodas()" title="Aplica as cores e filtros atuais em todas as imagens">Aplicar a todas</button>
+          </div>
+
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-primary" id="btnDownload">Baixar Imagem</button>
-        <button class="btn-secondary" onclick="formatarOutra()">Formatar Outra</button>
+        <button class="btn-primary" id="btnDownload">Baixar Imagens (ZIP)</button>
+        <button class="btn-secondary" onclick="limparTudo()">Começar do Zero</button>
       </div>
     </div>
 
@@ -296,11 +339,12 @@ const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const previewContainer = document.getElementById('previewContainer');
 const resultImage = document.getElementById('resultImage');
+const filmstripContainer = document.getElementById('filmstripContainer');
 const btnDownload = document.getElementById('btnDownload');
+const lblPaginaAtual = document.getElementById('lblPaginaAtual');
 
 const inpNomeArquivo = document.getElementById('inpNomeArquivo');
 const inpCorFundo = document.getElementById('inpCorFundo');
-
 const inpBrilho = document.getElementById('inpBrilho');
 const inpContraste = document.getElementById('inpContraste');
 const inpSaturacao = document.getElementById('inpSaturacao');
@@ -308,15 +352,14 @@ const valBrilho = document.getElementById('valBrilho');
 const valContraste = document.getElementById('valContraste');
 const valSaturacao = document.getElementById('valSaturacao');
 
-let imagemOriginalObjeto = null; 
-let imagemFinalDataUrl = '';
+let paginas = [];
+let paginaAtualIndex = 0;
+const LIMITE_IMAGENS = 10;
 
 // --- EVENTOS DRAG & DROP ---
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  dropZone.addEventListener(eventName, preventDefaults, false);
+  dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
 });
-function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
-
 ['dragenter', 'dragover'].forEach(eventName => {
   dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
 });
@@ -325,138 +368,275 @@ function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
 });
 
 dropZone.addEventListener('drop', (e) => {
-  let dt = e.dataTransfer;
-  let files = dt.files;
-  if(files.length > 0) processarArquivo(files[0]);
+  if(e.dataTransfer.files.length > 0) processarArquivos(e.dataTransfer.files);
 });
 
 fileInput.addEventListener('change', function() {
-  if (this.files && this.files[0]) processarArquivo(this.files[0]);
+  if (this.files && this.files.length > 0) {
+    processarArquivos(this.files);
+    this.value = '';
+  }
 });
 
-// --- PROCESSAMENTO DA IMAGEM ---
-function processarArquivo(file) {
-  if (!file.type.match('image.*')) {
-    alert("Por favor, selecione um arquivo de imagem válido.");
-    return;
-  }
+// --- PROCESSAMENTO DOS ARQUIVOS ---
+function processarArquivos(files) {
+  let arquivosArray = Array.from(files).filter(f => f.type.match('image.*'));
   
-  // Puxa o nome do arquivo se o campo estiver vazio
-  if(inpNomeArquivo.value.trim() === "") {
-    inpNomeArquivo.value = file.name.split('.')[0];
+  if (arquivosArray.length === 0) return;
+
+  let espacoLivre = LIMITE_IMAGENS - paginas.length;
+  if (arquivosArray.length > espacoLivre) {
+    alert(`Você só pode adicionar mais ${espacoLivre} imagem(ns). As excedentes serão ignoradas.`);
+    arquivosArray = arquivosArray.slice(0, espacoLivre);
+  }
+  if(arquivosArray.length === 0) return;
+
+  if(inpNomeArquivo.value.trim() === "" && paginas.length === 0) {
+    inpNomeArquivo.value = arquivosArray[0].name.split('.')[0];
   }
 
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const img = new Image();
-    img.onload = function() {
-      imagemOriginalObjeto = img;
-      resetarFiltrosInputs();
-      inpCorFundo.value = "#FFFFFF"; // Volta pro branco por padrão ao carregar nova foto
-      gerarImagemFinal(); 
-      
-      dropZone.style.display = 'none';
-      previewContainer.style.display = 'block';
+  let indexInicialNovas = paginas.length;
+  let carregadas = 0;
+
+  arquivosArray.forEach((file) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        
+        paginas.push({
+          id: Date.now() + Math.random(),
+          imgObjeto: img,
+          bg: "#FFFFFF",
+          brilho: 100,
+          contraste: 100,
+          saturacao: 100
+        });
+
+        carregadas++;
+        
+        if(carregadas === arquivosArray.length) {
+          dropZone.style.display = 'none';
+          previewContainer.style.display = 'block';
+          
+          renderizarFilmstrip();
+          selecionarPagina(indexInicialNovas);
+        }
+      }
+      img.src = e.target.result;
     }
-    img.src = e.target.result;
-  }
-  reader.readAsDataURL(file);
+    reader.readAsDataURL(file);
+  });
 }
 
-// --- DESENHO NO CANVAS ---
-function gerarImagemFinal() {
-  if (!imagemOriginalObjeto) return;
+// --- NAVEGAÇÃO E UI ---
+function renderizarFilmstrip() {
+  filmstripContainer.innerHTML = '';
 
-  const TAMANHO_ALVO = 1200;
+  paginas.forEach((pagina, index) => {
+    const thumbWrap = document.createElement('div');
+    thumbWrap.className = `thumb-wrap ${index === paginaAtualIndex ? 'active' : ''}`;
+    thumbWrap.onclick = () => selecionarPagina(index);
+    
+    const img = document.createElement('img');
+    img.src = pagina.imgObjeto.src;
+    img.className = 'thumb-img';
+    
+    const btnDel = document.createElement('button');
+    btnDel.className = 'thumb-delete';
+    btnDel.innerHTML = '✕';
+    btnDel.title = "Remover imagem";
+    btnDel.onclick = (e) => {
+      e.stopPropagation();
+      removerPagina(index);
+    };
+
+    thumbWrap.appendChild(img);
+    thumbWrap.appendChild(btnDel);
+    filmstripContainer.appendChild(thumbWrap);
+  });
+
+  if (paginas.length < LIMITE_IMAGENS) {
+    const addWrap = document.createElement('div');
+    addWrap.className = 'thumb-wrap thumb-add';
+    addWrap.innerHTML = '+';
+    addWrap.title = "Adicionar mais imagens";
+    addWrap.onclick = () => fileInput.click();
+    filmstripContainer.appendChild(addWrap);
+  }
+}
+
+function selecionarPagina(index) {
+  if (paginas.length === 0) return;
+  
+  paginaAtualIndex = index;
+  lblPaginaAtual.textContent = `Página ${index + 1} de ${paginas.length}`;
+  
+  const cfg = paginas[index];
+  inpCorFundo.value = cfg.bg;
+  inpBrilho.value = cfg.brilho;
+  inpContraste.value = cfg.contraste;
+  inpSaturacao.value = cfg.saturacao;
+  
+  atualizarTextosSliders();
+  renderizarFilmstrip();
+  gerarPreviewNoCanvas();
+}
+
+function removerPagina(index) {
+  paginas.splice(index, 1);
+  if (paginas.length === 0) {
+    limparTudo();
+  } else {
+    if (paginaAtualIndex >= paginas.length) {
+      paginaAtualIndex = paginas.length - 1;
+    }
+    selecionarPagina(paginaAtualIndex);
+  }
+}
+
+// --- DESENHO NO CANVAS DA PRÉVIA ---
+function gerarPreviewNoCanvas() {
+  if (paginas.length === 0) return;
+  
+  const cfg = paginas[paginaAtualIndex];
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
+  const TAMANHO_ALVO = 1200;
   
   canvas.width = TAMANHO_ALVO;
   canvas.height = TAMANHO_ALVO;
   
-  // 1. Pinta o fundo com a cor selecionada pelo usuário
-  ctx.fillStyle = inpCorFundo.value;
+  ctx.fillStyle = cfg.bg;
   ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
   
-  // 2. Aplica os filtros (Brilho, Contraste, Saturação) APENAS na imagem
-  ctx.filter = `brightness(${inpBrilho.value}%) contrast(${inpContraste.value}%) saturate(${inpSaturacao.value}%)`;
+  ctx.filter = `brightness(${cfg.brilho}%) contrast(${cfg.contraste}%) saturate(${cfg.saturacao}%)`;
   
-  // 3. Centraliza mantendo proporção
-  const ratioOriginal = imagemOriginalObjeto.width / imagemOriginalObjeto.height;
+  const ratioOriginal = cfg.imgObjeto.width / cfg.imgObjeto.height;
   let drawWidth, drawHeight;
-  
-  if (imagemOriginalObjeto.width > imagemOriginalObjeto.height) {
-    drawWidth = TAMANHO_ALVO;
-    drawHeight = TAMANHO_ALVO / ratioOriginal;
+  if (cfg.imgObjeto.width > cfg.imgObjeto.height) {
+    drawWidth = TAMANHO_ALVO; drawHeight = TAMANHO_ALVO / ratioOriginal;
   } else {
-    drawHeight = TAMANHO_ALVO;
-    drawWidth = TAMANHO_ALVO * ratioOriginal;
+    drawHeight = TAMANHO_ALVO; drawWidth = TAMANHO_ALVO * ratioOriginal;
   }
   
   const x = (TAMANHO_ALVO - drawWidth) / 2;
   const y = (TAMANHO_ALVO - drawHeight) / 2;
   
-  // 4. Desenha a imagem filtrada por cima do fundo
-  ctx.drawImage(imagemOriginalObjeto, x, y, drawWidth, drawHeight);
-  
-  // 5. Salva para exibição e download
-  ctx.filter = 'none';
-  imagemFinalDataUrl = canvas.toDataURL('image/jpeg', 0.95);
-  resultImage.src = imagemFinalDataUrl;
+  ctx.drawImage(cfg.imgObjeto, x, y, drawWidth, drawHeight);
+  resultImage.src = canvas.toDataURL('image/jpeg', 0.95);
 }
 
-// --- EVENTOS EM TEMPO REAL ---
-function atualizarValoresTextuais() {
+// --- EVENTOS DE EDIÇÃO EM TEMPO REAL ---
+function atualizarTextosSliders() {
   valBrilho.textContent = `${inpBrilho.value}%`;
   valContraste.textContent = `${inpContraste.value}%`;
   valSaturacao.textContent = `${inpSaturacao.value}%`;
 }
 
-// Atualiza ao mexer nos Sliders
-[inpBrilho, inpContraste, inpSaturacao].forEach(input => {
-  input.addEventListener('input', () => {
-    atualizarValoresTextuais();
-    gerarImagemFinal();
-  });
+function salvarAlteracaoAtual() {
+  if(paginas.length === 0) return;
+  paginas[paginaAtualIndex].bg = inpCorFundo.value;
+  paginas[paginaAtualIndex].brilho = inpBrilho.value;
+  paginas[paginaAtualIndex].contraste = inpContraste.value;
+  paginas[paginaAtualIndex].saturacao = inpSaturacao.value;
+  
+  atualizarTextosSliders();
+  gerarPreviewNoCanvas();
+}
+
+[inpBrilho, inpContraste, inpSaturacao, inpCorFundo].forEach(input => {
+  input.addEventListener('input', salvarAlteracaoAtual);
 });
 
-// Atualiza ao mexer na Cor do Fundo
-inpCorFundo.addEventListener('input', gerarImagemFinal);
-
-function resetarFiltrosInputs() {
+function resetarFiltrosPagina() {
   inpBrilho.value = 100;
   inpContraste.value = 100;
   inpSaturacao.value = 100;
-  atualizarValoresTextuais();
+  salvarAlteracaoAtual(); 
 }
 
-function resetarFiltros() {
-  resetarFiltrosInputs();
-  gerarImagemFinal(); 
+function aplicarConfigATodas() {
+  if(paginas.length === 0) return;
+  const cfgAtual = paginas[paginaAtualIndex];
+  
+  paginas.forEach(p => {
+    p.bg = cfgAtual.bg;
+    p.brilho = cfgAtual.brilho;
+    p.contraste = cfgAtual.contraste;
+    p.saturacao = cfgAtual.saturacao;
+  });
+  alert("As configurações atuais foram aplicadas a todas as páginas!");
 }
 
-// --- AÇÕES FINAIS ---
-btnDownload.addEventListener('click', () => {
-  if (!imagemFinalDataUrl) return;
-  
-  let nomeBase = inpNomeArquivo.value.trim() || "Imagem";
-  
-  const a = document.createElement('a');
-  a.href = imagemFinalDataUrl;
-  a.download = `${nomeBase}.jpg`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-});
-
-// Mantém o nome preenchido para não ter que digitar novamente em lotes
-function formatarOutra() {
+function limparTudo() {
+  paginas = [];
+  paginaAtualIndex = 0;
   fileInput.value = "";
-  imagemFinalDataUrl = '';
-  imagemOriginalObjeto = null;
+  inpNomeArquivo.value = "";
   previewContainer.style.display = 'none';
   dropZone.style.display = 'flex';
 }
+
+// --- GERAÇÃO DO ZIP ---
+btnDownload.addEventListener('click', () => {
+  if (paginas.length === 0) return;
+
+  btnDownload.textContent = "Compactando...";
+  btnDownload.disabled = true;
+  
+  let nomeBase = inpNomeArquivo.value.trim() || "Produto";
+  
+  const zip = new JSZip();
+  const TAMANHO_ALVO = 1200;
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width = TAMANHO_ALVO;
+  canvas.height = TAMANHO_ALVO;
+
+  for(let i = 0; i < paginas.length; i++) {
+      let cfg = paginas[i];
+
+      ctx.fillStyle = cfg.bg;
+      ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
+      
+      ctx.filter = `brightness(${cfg.brilho}%) contrast(${cfg.contraste}%) saturate(${cfg.saturacao}%)`;
+      
+      const ratioOriginal = cfg.imgObjeto.width / cfg.imgObjeto.height;
+      let drawWidth, drawHeight;
+      if (cfg.imgObjeto.width > cfg.imgObjeto.height) {
+        drawWidth = TAMANHO_ALVO; drawHeight = TAMANHO_ALVO / ratioOriginal;
+      } else {
+        drawHeight = TAMANHO_ALVO; drawWidth = TAMANHO_ALVO * ratioOriginal;
+      }
+      
+      const x = (TAMANHO_ALVO - drawWidth) / 2;
+      const y = (TAMANHO_ALVO - drawHeight) / 2;
+      
+      ctx.drawImage(cfg.imgObjeto, x, y, drawWidth, drawHeight);
+      ctx.filter = 'none';
+
+      let dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      let base64Data = dataUrl.split(',')[1];
+      
+      // Nome simples numérico dentro do arquivo ZIP (1.jpg, 2.jpg, 3.jpg...)
+      let nomeArquivoFinal = `${i + 1}.jpg`;
+      
+      zip.file(nomeArquivoFinal, base64Data, {base64: true});
+  }
+
+  zip.generateAsync({type:"blob"}).then(function(conteudoZip) {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(conteudoZip);
+      a.download = `${nomeBase}.zip`; // Nome da pasta zipada principal
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      
+      btnDownload.textContent = "Baixar Imagens (ZIP)";
+      btnDownload.disabled = false;
+  });
+});
 </script>
 </body>
 </html>
