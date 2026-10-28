@@ -69,8 +69,14 @@
 
   main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
   
-  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
   
+  /* Efeito visual ao arrastar arquivo sobre a tela */
+  body.drag-active .card {
+    border: 2px dashed var(--teal);
+    background: var(--teal-wash);
+  }
+
   .drop-zone {
     width: 100%;
     max-width: 400px;
@@ -129,7 +135,7 @@
     gap: 12px;
     width: 100%;
     overflow-x: auto;
-    padding-bottom: 8px;
+    padding: 6px 4px 10px;
     justify-content: flex-start;
   }
   
@@ -166,8 +172,9 @@
   .thumb-add {
     background: var(--bg); border: 2px dashed var(--ink-soft);
     color: var(--ink-soft); font-size: 24px; font-weight: normal;
+    transition: all 0.2s ease;
   }
-  .thumb-add:hover { background: var(--teal-wash); border-color: var(--teal); color: var(--teal); }
+  .thumb-add:hover, .thumb-add.dragover { background: var(--teal-wash); border-color: var(--teal); color: var(--teal); transform: scale(1.05); }
 
   .ajustes-panel {
     background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
@@ -232,7 +239,7 @@
     
     <!-- Zona de Drop -->
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="drop-zone-text">coloque aqui até 10 imagens<br>desejadas</div>
+      <div class="drop-zone-text">coloque aqui até 15 imagens<br>desejadas</div>
       <button class="btn-upload">pesquisar no PC</button>
     </div>
     <input type="file" id="fileInput" accept="image/*" multiple>
@@ -354,21 +361,31 @@ const valSaturacao = document.getElementById('valSaturacao');
 
 let paginas = [];
 let paginaAtualIndex = 0;
-const LIMITE_IMAGENS = 10;
+const LIMITE_IMAGENS = 15; // Atualizado para 15 imagens
 
-// --- EVENTOS DRAG & DROP ---
+// --- DRAG & DROP NA TELA TODA (GLOBAL) ---
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-  dropZone.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
-});
-['dragenter', 'dragover'].forEach(eventName => {
-  dropZone.addEventListener(eventName, () => dropZone.classList.add('dragover'), false);
-});
-['dragleave', 'drop'].forEach(eventName => {
-  dropZone.addEventListener(eventName, () => dropZone.classList.remove('dragover'), false);
+  window.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
 });
 
-dropZone.addEventListener('drop', (e) => {
-  if(e.dataTransfer.files.length > 0) processarArquivos(e.dataTransfer.files);
+window.addEventListener('dragover', () => {
+  document.body.classList.add('drag-active');
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+  window.addEventListener(eventName, (e) => {
+    // Só remove a classe quando sai da janela ou faz o drop
+    if (e.type === 'drop' || (e.clientX === 0 && e.clientY === 0)) {
+      document.body.classList.remove('drag-active');
+    }
+  });
+});
+
+window.addEventListener('drop', (e) => {
+  document.body.classList.remove('drag-active');
+  if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+    processarArquivos(e.dataTransfer.files);
+  }
 });
 
 fileInput.addEventListener('change', function() {
@@ -386,7 +403,7 @@ function processarArquivos(files) {
 
   let espacoLivre = LIMITE_IMAGENS - paginas.length;
   if (arquivosArray.length > espacoLivre) {
-    alert(`Você só pode adicionar mais ${espacoLivre} imagem(ns). As excedentes serão ignoradas.`);
+    alert(`Você só pode adicionar mais ${espacoLivre} imagem(ns). O limite é de 15 imagens por lote.`);
     arquivosArray = arquivosArray.slice(0, espacoLivre);
   }
   if(arquivosArray.length === 0) return;
@@ -456,11 +473,12 @@ function renderizarFilmstrip() {
     filmstripContainer.appendChild(thumbWrap);
   });
 
+  // Botão de Adicionar (+)
   if (paginas.length < LIMITE_IMAGENS) {
     const addWrap = document.createElement('div');
     addWrap.className = 'thumb-wrap thumb-add';
     addWrap.innerHTML = '+';
-    addWrap.title = "Adicionar mais imagens";
+    addWrap.title = "Clique ou arraste imagens para qualquer lugar da tela";
     addWrap.onclick = () => fileInput.click();
     filmstripContainer.appendChild(addWrap);
   }
@@ -619,7 +637,6 @@ btnDownload.addEventListener('click', () => {
       let dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       let base64Data = dataUrl.split(',')[1];
       
-      // Nome simples numérico dentro do arquivo ZIP (1.jpg, 2.jpg, 3.jpg...)
       let nomeArquivoFinal = `${i + 1}.jpg`;
       
       zip.file(nomeArquivoFinal, base64Data, {base64: true});
@@ -628,7 +645,7 @@ btnDownload.addEventListener('click', () => {
   zip.generateAsync({type:"blob"}).then(function(conteudoZip) {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(conteudoZip);
-      a.download = `${nomeBase}.zip`; // Nome da pasta zipada principal
+      a.download = `${nomeBase}.zip`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
