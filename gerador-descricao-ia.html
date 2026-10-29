@@ -87,6 +87,12 @@
         <label>Chave API Tavily</label>
         <input type="password" id="apiKeyTavily" placeholder="tvly-...">
       </div>
+      <div class="form-group" style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px;">
+        <label style="color: var(--plum);">Histórico Recente (Local)</label>
+        <ul id="logAtividades" style="margin: 0; padding-left: 20px; font-size: 12.5px; color: var(--ink-soft); max-height: 100px; overflow-y: auto;">
+          <li>Nenhum registo recente.</li>
+        </ul>
+      </div>
       <div class="form-group">
         <label>Nome do Produto / Modelo</label>
         <input type="text" id="tituloInput" placeholder="Ex: Placa Mãe Gigabyte Z790 Aero G AX">
@@ -354,6 +360,8 @@ ${contextoWeb}
         sourcesBox.style.display = 'block';
       }
       showToast(/VERIFICAR/.test(htmlGerado) ? "Gerado — há campos VERIFICAR (dado não encontrado)." : "Descrição gerada com sucesso!");
+    
+      atualizarHistorico(titulo);
     }
   } catch (err) {
     alert("Erro no processo: " + err.message);
@@ -449,6 +457,26 @@ function exportarParaWord() {
   document.body.removeChild(downloadLink);
   showToast('Ficheiro Word exportado com espaçamento perfeito!');
 }
+
+// --- HISTÓRICO LOCAL ---
+function atualizarHistorico(novoTitulo) {
+  let logs = JSON.parse(localStorage.getItem('iaLogs') || '[]');
+  
+  if (novoTitulo) {
+    const dataHora = new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
+    logs.unshift(`[${dataHora}] ${novoTitulo}`);
+    if (logs.length > 5) logs.pop(); // Guarda só os últimos 5
+    localStorage.setItem('iaLogs', JSON.stringify(logs));
+  }
+  
+  const lista = document.getElementById('logAtividades');
+  if (logs.length > 0) {
+    lista.innerHTML = logs.map(l => `<li>${l}</li>`).join('');
+  }
+}
+
+// Carregar ao iniciar
+atualizarHistorico(null);
 </script>
 </body>
 </html>

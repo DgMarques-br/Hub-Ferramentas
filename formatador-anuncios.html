@@ -577,6 +577,9 @@ function limparCampos() {
   document.getElementById('avisoValidacao').style.display = 'none';
   condicaoAtual = 'novo';
   document.querySelectorAll('#condicaoSeg .seg-btn')[0].click();
+  
+  // Limpa o rascunho guardado na memória
+  localStorage.removeItem('formatadorDraft');
 }
 
 function showToast(msg) {
@@ -619,6 +622,40 @@ function copiarRenderizado() {
     showToast('Texto simples copiado!');
   }
 }
+
+// --- LÓGICA DE AUTOSAVE ---
+const formInputs = ['tituloOrig', 'descOrig', 'specsOrig', 'itensOrig', 'garantiaOrig', 'eanOrig', 'anatelOrig', 'nacOrig'];
+
+function saveDraft() {
+  const draft = {};
+  formInputs.forEach(id => draft[id] = document.getElementById(id).value);
+  // Guardar também o estado do botão "Condição"
+  draft['condicao'] = condicaoAtual;
+  localStorage.setItem('formatadorDraft', JSON.stringify(draft));
+}
+
+function loadDraft() {
+  const saved = localStorage.getItem('formatadorDraft');
+  if (saved) {
+    const draft = JSON.parse(saved);
+    formInputs.forEach(id => {
+      if(draft[id] !== undefined) document.getElementById(id).value = draft[id];
+    });
+    // Restaurar botão de condição
+    if(draft['condicao'] && draft['condicao'] !== condicaoAtual) {
+       document.querySelector(`[data-val="${draft['condicao']}"]`).click();
+    }
+  }
+}
+
+// Aciona o save a cada tecla digitada
+formInputs.forEach(id => {
+  document.getElementById(id).addEventListener('input', saveDraft);
+});
+document.getElementById('condicaoSeg').addEventListener('click', saveDraft);
+
+// Carrega ao abrir a página
+window.addEventListener('DOMContentLoaded', loadDraft);
 </script>
 </body>
 </html>

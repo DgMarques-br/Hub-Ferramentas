@@ -187,6 +187,22 @@
   </div>
 </header>
 
+<!-- MURAL DE AVISOS -->
+<div id="muralWrapper" style="max-width: 1180px; margin: 20px auto 0; padding: 0 24px; display: none;">
+  <div style="background: var(--teal-wash); border: 1px solid var(--teal); border-radius: 8px; padding: 16px; position: relative;">
+    <h3 style="margin: 0 0 8px; font-size: 14px; color: var(--teal-dark); text-transform: uppercase;">Mural de Avisos</h3>
+    <div id="muralConteudo" style="font-size: 14px; color: var(--ink); line-height: 1.4;">(Carregando...)</div>
+    <div id="muralEdicao" style="display: none; margin-top: 10px;">
+      <textarea id="muralTextoInput" style="width: 100%; min-height: 60px; padding: 8px; border-radius: 4px; border: 1px solid var(--teal); font-family: var(--sans); font-size: 14px;"></textarea>
+      <div style="margin-top: 8px; display: flex; gap: 8px;">
+        <button id="btnSalvarMural" style="background: var(--teal); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Salvar Aviso</button>
+        <button id="btnCancelarMural" style="background: transparent; color: var(--teal); border: 1px solid var(--teal); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Cancelar</button>
+      </div>
+    </div>
+    <button id="btnEditarMural" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 12px; color: var(--teal); cursor: pointer; font-weight: bold; display: none; text-decoration: underline;">Editar</button>
+  </div>
+</div>
+
 <main>
   <div class="hub-grid">
     <a href="catalogo-busca-sap.html" class="card-link">
@@ -335,7 +351,6 @@ const FIREBASE_CONFIG = {
   measurementId: "G-9WDCR689P5"
 };
 
-// ⚠️ COLOQUE AQUI O E-MAIL DO ADMINISTRADOR (QUE PODE RESPONDER E CONCLUIR)
 const ADMIN_EMAIL = "diogo.moreira2777@gmail.com"; 
 
 const COLECAO = "sugestoes";
@@ -417,7 +432,6 @@ $("sugEnviar").addEventListener("click", async () => {
   if (!db || !tagForm || texto.length < 3) return;
   $("sugEnviar").disabled = true;
   try {
-    // Definindo o nome do usuário a ser exibido
     const nomeExibicao = currentUser.displayName || currentUser.email.split('@')[0];
 
     await fb.addDoc(fb.collection(db, COLECAO), {
@@ -427,7 +441,7 @@ $("sugEnviar").addEventListener("click", async () => {
       criadoEm: fb.serverTimestamp(),
       autorId: currentUser.uid,          
       autorEmail: currentUser.email,
-      autorNome: nomeExibicao // Salvando o nome
+      autorNome: nomeExibicao
     });
     $("sugTexto").value = "";
     tagForm = null;
@@ -479,14 +493,12 @@ function renderLista(){
     const isOwner = currentUser && i.autorId === currentUser.uid;
     const canEditOrDelete = isOwner || isAdmin;
     
-    // Nome do autor para exibição
     const nomeAutor = i.autorNome || (i.autorEmail ? i.autorEmail.split('@')[0] : 'Usuário Oculto');
 
     const editando = editId === i.id;
     const respondendo = replyId === i.id;
     let corpo = '';
     
-    // Se há uma resposta do Admin gravada e não estamos editando/respondendo
     let respostaHtml = '';
     if (i.respostaAdmin && i.respostaAdmin.trim() !== "") {
       respostaHtml = `
@@ -505,7 +517,6 @@ function renderLista(){
            <button class="sug-btn ghost" data-act="cancelar" type="button">Cancelar</button>
          </div>`;
     } else if (respondendo) {
-      // Área para o Admin digitar a resposta
       corpo = `
          <textarea class="sug-text" id="sugReplyText" maxlength="${MAX_CHARS}" placeholder="Digite a resposta do administrador...">${esc(replyDraft)}</textarea>
          <div class="sug-edit-row">
@@ -520,7 +531,6 @@ function renderLista(){
         botoes += `<button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>`;
       }
       if (isAdmin) {
-        // Botão de responder exclusivo do Admin
         botoes += `<button class="sug-link" data-act="responder" data-id="${i.id}" type="button" style="color: var(--teal);">Responder</button>`;
       }
       if (canEditOrDelete) {
@@ -546,7 +556,6 @@ function renderLista(){
   }).join("");
 }
 
-// Captura texto sendo digitado nos campos (edição ou resposta)
 $("sugLista").addEventListener("input", (e) => {
   if (e.target.id === "sugEditText") editDraft = e.target.value;
   if (e.target.id === "sugReplyText") replyDraft = e.target.value;
@@ -565,7 +574,7 @@ $("sugLista").addEventListener("click", async (e) => {
       
     } else if (act === "editar") {
       editId = id; editDraft = item ? item.texto : "";
-      replyId = null; // Fecha a resposta se estiver aberta
+      replyId = null;
       renderLista();
       const ta = $("sugEditText"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
       
@@ -578,10 +587,9 @@ $("sugLista").addEventListener("click", async (e) => {
       await fb.updateDoc(ref, { texto, editadoEm: fb.serverTimestamp() });
       editId = null; editDraft = ""; aviso("");
 
-    // Ações de Resposta (Exclusivas do Admin)
     } else if (act === "responder") {
       replyId = id; replyDraft = item.respostaAdmin || "";
-      editId = null; // Fecha a edição se estiver aberta
+      editId = null;
       renderLista();
       const ta = $("sugReplyText"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
 
@@ -593,7 +601,6 @@ $("sugLista").addEventListener("click", async (e) => {
       await fb.updateDoc(ref, { respostaAdmin: resposta, respondidoEm: fb.serverTimestamp() });
       replyId = null; replyDraft = ""; aviso("");
 
-    // Ação de Exclusão
     } else if (act === "excluir") {
       if (!confirm("Excluir esta sugestão? Isso não pode ser desfeito.")) return;
       await fb.deleteDoc(ref);
@@ -604,7 +611,6 @@ $("sugLista").addEventListener("click", async (e) => {
   }
 });
 
-// ---------- Firebase Inicialização e Autenticação ----------
 async function conectar(){
   try {
     const [appModule, storeModule, authModule] = await Promise.all([
@@ -619,14 +625,12 @@ async function conectar(){
     authInstance = authModule.getAuth(app);
     authProvider = new authModule.GoogleAuthProvider();
 
-    // Observador de Sessão (Login/Logout)
     authModule.onAuthStateChanged(authInstance, (user) => {
       currentUser = user;
       
       if (user) {
         $("btnLogin").style.display = "none";
         $("userBadge").style.display = "flex";
-        // Pega o primeiro nome se houver displayName, senão usa o inicio do email
         $("userEmailTxt").textContent = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
       } else {
         $("btnLogin").style.display = "inline-flex";
@@ -634,31 +638,72 @@ async function conectar(){
         $("userEmailTxt").textContent = "";
       }
       
+      // MOSTRAR/ESCONDER BOTÃO DO MURAL CONSOANTE ADMIN
+      const btnEditarMural = document.getElementById("btnEditarMural");
+      if (btnEditarMural) {
+        btnEditarMural.style.display = (user && user.email === ADMIN_EMAIL) ? "block" : "none";
+      }
+      
       renderChips();
       validarForm();
       renderLista();
     });
 
-    // Botões de Autenticação
     $("btnLogin").addEventListener("click", async () => {
-      try {
-        await authModule.signInWithPopup(authInstance, authProvider);
-      } catch (err) {
-        alert("Erro ao fazer login: " + err.message);
-      }
+      try { await authModule.signInWithPopup(authInstance, authProvider); } 
+      catch (err) { alert("Erro ao fazer login: " + err.message); }
     });
 
     $("btnLogout").addEventListener("click", () => {
       authModule.signOut(authInstance);
     });
 
-    // Carregar sugestões
     const q = storeModule.query(storeModule.collection(db, COLECAO), storeModule.orderBy("criadoEm", "desc"));
     storeModule.onSnapshot(q, (snap) => {
       itens = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
       aviso("");
       renderLista();
     }, (err) => aviso("Não foi possível ler as sugestões: " + err.message));
+
+    // LÓGICA DO MURAL (dentro do conectar, após db estar pronto)
+    const DOC_MURAL_ID = "aviso_geral"; 
+    const refMural = fb.doc(db, "configuracoes", DOC_MURAL_ID);
+
+    fb.onSnapshot(refMural, (docSnap) => {
+      document.getElementById("muralWrapper").style.display = "block";
+      if (docSnap.exists()) {
+        const dados = docSnap.data();
+        document.getElementById("muralConteudo").innerHTML = esc(dados.texto || "").replace(/\n/g, "<br>");
+        document.getElementById("muralTextoInput").value = dados.texto || "";
+      } else {
+        document.getElementById("muralConteudo").textContent = "Nenhum aviso no momento.";
+      }
+    });
+
+    document.getElementById("btnEditarMural").addEventListener("click", () => {
+      document.getElementById("muralConteudo").style.display = "none";
+      document.getElementById("btnEditarMural").style.display = "none";
+      document.getElementById("muralEdicao").style.display = "block";
+    });
+
+    document.getElementById("btnCancelarMural").addEventListener("click", () => {
+      document.getElementById("muralConteudo").style.display = "block";
+      // Repõe o botão se for admin
+      if (currentUser && currentUser.email === ADMIN_EMAIL) {
+        document.getElementById("btnEditarMural").style.display = "block";
+      }
+      document.getElementById("muralEdicao").style.display = "none";
+    });
+
+    document.getElementById("btnSalvarMural").addEventListener("click", async () => {
+      const novoTexto = document.getElementById("muralTextoInput").value.trim();
+      try {
+        await fb.setDoc(refMural, { texto: novoTexto, atualizadoEm: fb.serverTimestamp() }, { merge: true });
+        document.getElementById("btnCancelarMural").click();
+      } catch (err) {
+        alert("Erro ao salvar aviso. Sem permissão.");
+      }
+    });
 
   } catch (err) {
     aviso("Não foi possível carregar o Firebase: " + err.message);
