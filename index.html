@@ -46,9 +46,10 @@
   .btn-logout { background: var(--red); color: white; border: none; padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
   .btn-logout:hover { opacity: 0.8; }
 
-  .btn-panel { background: var(--plum); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s ease; }
+.btn-panel { background: var(--plum); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s ease; }
   .btn-panel:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-
+  :root[data-theme="dark"] .btn-panel { color: #11201B; }
+  
   /* Botão do Mural e Sugestões */
   .btn-mural { background: var(--amber); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all .2s ease; }
   .btn-mural:hover { opacity: .95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
