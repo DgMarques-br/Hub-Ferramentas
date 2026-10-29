@@ -50,108 +50,293 @@
     background: var(--bg);
     color: var(--ink);
     font-family: var(--sans);
-    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     -webkit-font-smoothing: antialiased;
     transition: background .15s ease, color .15s ease;
   }
 
-  /* ---------- Header ---------- */
-  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
-  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-  .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; transition: color 0.15s ease; }
+  /* ---------- Header compacto ---------- */
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); flex: 0 0 auto; }
+  .top-inner{ max-width: 1400px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .top-left{ display: flex; align-items: center; gap: 18px; min-width: 0; }
+  .nav-back { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; white-space: nowrap; transition: color 0.15s ease; }
   .nav-back:hover { color: var(--amber); }
-  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 600; margin: 0 0 6px; }
-  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ink); }
-  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 520px; }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 600; margin: 0 0 2px; }
+  h1{ font-family: var(--serif); font-size: 22px; line-height: 1.1; margin: 0; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 12.5px; }
+  .title-block{ border-left: 1px solid var(--line); padding-left: 18px; }
 
-  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 6px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
   .theme-toggle:hover{ border-color: var(--amber); color: var(--ink); }
 
-  /* ---------- Layout Grid ---------- */
-  main { max-width: 1180px; margin: 0 auto; padding: 32px 24px 60px; }
-  .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
-  @media (max-width: 850px){ .split-view { grid-template-columns: 1fr; } }
+  /* ---------- Layout Grid (ocupa a tela toda) ---------- */
+  main { flex: 1 1 auto; min-height: 0; width: 100%; max-width: 1400px; margin: 0 auto; padding: 14px 24px 6px; }
+  .split-view { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; height: 100%; }
+
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 
   /* ---------- Formulário ---------- */
-  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 13.5px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
-  .form-group .hint { font-size: 12px; color: var(--ink-soft); margin-top: 4px; display: block; }
-  
-  .input-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .form-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto minmax(60px, 1fr) auto minmax(60px, 0.8fr); gap: 10px 14px; }
+  .span-2 { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .field.grow textarea { flex: 1 1 auto; min-height: 0; }
+  .field label, .lbl { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
+  .lbl .opt { font-weight: 400; color: var(--ink-soft); font-size: 11.5px; }
+  .hint { font-size: 11px; color: var(--ink-soft); margin-top: 3px; line-height: 1.3; display: block; }
 
   input[type="text"], textarea {
-    width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--line);
-    background: var(--bg); font-size: 14.5px; font-family: var(--sans); color: var(--ink);
+    width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: var(--bg); font-size: 13.5px; font-family: var(--sans); color: var(--ink);
     outline: none; transition: border-color .15s ease, background .15s ease;
   }
   input[type="text"]:focus, textarea:focus { border-color: var(--amber); background: var(--paper); }
-  textarea { resize: vertical; min-height: 100px; }
-  textarea.large { min-height: 140px; }
+  input:disabled { cursor: not-allowed; }
+  textarea { resize: none; }
+
+  .row-cond { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
 
   /* Segmented Control */
-  .segmented { display: flex; gap: 6px; background: var(--bg); padding: 4px; border-radius: 999px; border: 1px solid var(--line); width: fit-content; }
-  .seg-btn { border: none; background: transparent; padding: 8px 18px; border-radius: 999px; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all .15s ease; }
+  .segmented { display: flex; gap: 4px; background: var(--bg); padding: 3px; border-radius: 999px; border: 1px solid var(--line); width: fit-content; }
+  .seg-btn { border: none; background: transparent; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all .15s ease; }
   .seg-btn.active { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
   .seg-btn.active[data-val="novo"] { color: var(--teal-dark); }
   .seg-btn.active[data-val="recondicionado"] { color: var(--amber); }
 
-  /* Bloco Dinâmico de Dimensões */
-  .dims-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .btn-add-dim { background: var(--red); color: white; border: none; font-size: 12px; font-weight: bold; padding: 4px 10px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
+  /* Dimensões */
+  .dims-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+  .dims-header .lbl { margin-bottom: 0; }
+  .btn-add-dim { background: var(--red); color: white; border: none; font-size: 11.5px; font-weight: bold; padding: 2px 9px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
   .btn-add-dim:hover { opacity: 0.9; }
-  
-  .dim-bloco { background: var(--bg); border: 1px solid var(--line); padding: 14px; border-radius: 8px; margin-bottom: 12px; position: relative; }
-  .dim-bloco-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-  .dim-bloco-titulo { font-size: 12.5px; font-weight: 700; color: var(--amber); text-transform: uppercase; }
-  .btn-remover-bloco { background: transparent; border: none; color: var(--red); font-size: 12px; font-weight: bold; cursor: pointer; padding: 0; }
+  #containerDims { max-height: 112px; overflow-y: auto; }
+  .dim-bloco { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: end; margin-bottom: 6px; }
+  .dim-bloco .dim-nome-wrap, .dim-bloco .btn-remover-bloco { display: none; }
+  #containerDims.multi .dim-bloco { grid-template-columns: 1.4fr repeat(4, 1fr) auto; }
+  #containerDims.multi .dim-nome-wrap { display: block; }
+  #containerDims.multi .btn-remover-bloco { display: block; }
+  .dim-bloco label { font-size: 11px; font-weight: 600; color: var(--ink-soft); display: block; margin-bottom: 2px; }
+  .dim-bloco input { padding: 6px 9px; font-size: 13px; }
+  .btn-remover-bloco { background: transparent; border: none; color: var(--red); font-size: 12px; font-weight: bold; cursor: pointer; padding: 0 2px 8px; }
   .btn-remover-bloco:hover { text-decoration: underline; }
 
+  /* Identificação */
+  .ident-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .ident-grid input:last-child { grid-column: 1 / -1; }
+
   /* Botões de Ação */
-  .actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line-soft); }
-  .btn-primary { flex: 1; padding: 12px 24px; font-size: 14.5px; background-color: var(--amber); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; text-align: center; }
+  .actions { display: flex; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft); flex: 0 0 auto; }
+  .btn-primary { flex: 1; padding: 9px 20px; font-size: 14px; background-color: var(--amber); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; text-align: center; }
   .btn-primary:hover { opacity: 0.9; }
-  .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+  .btn-secondary { padding: 9px 18px; font-size: 13.5px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
   .btn-secondary:hover { background: var(--line-soft); }
 
   /* ---------- Resultados ---------- */
-  .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
-  .tab-btn { background: none; border: none; padding: 0 0 10px 0; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 10px; flex: 0 0 auto; }
+  .tab-btn { background: none; border: none; padding: 0 0 8px 0; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
   .tab-btn:hover { color: var(--ink); }
   .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
 
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
-  
-  #htmlOutput { font-family: var(--mono); font-size: 13px; line-height: 1.5; color: var(--ink-soft); background: var(--bg); height: 600px; }
-  
+  .tab-content { display: none; flex: 1 1 auto; min-height: 0; }
+  .tab-content.active { display: flex; flex-direction: column; }
+
+  #htmlOutput { flex: 1 1 auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); background: var(--bg); height: 100%; }
+
   .preview-box {
-    border: 1.5px solid var(--line); border-radius: 8px; padding: 20px; background: var(--paper);
-    min-height: 600px; font-family: Arial, sans-serif;
+    flex: 1 1 auto; min-height: 0; overflow-y: auto;
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 14px; background: var(--paper);
+    font-family: Arial, sans-serif;
   }
-  
-  .aviso-validacao { display: none; margin-top: 16px; padding: 12px 16px; border-radius: 8px; background: var(--amber-wash); border: 1px solid var(--amber); color: var(--amber); font-size: 13.5px; font-weight: 600; }
+
+  .aviso-validacao { display: none; margin-top: 8px; padding: 7px 12px; border-radius: 8px; background: var(--amber-wash); border: 1px solid var(--amber); color: var(--amber); font-size: 12.5px; font-weight: 600; flex: 0 0 auto; }
 
   /* Toast Notification */
   .toast{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #17211D; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; z-index: 100; }
   .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
+  footer{ flex: 0 0 auto; text-align: center; padding: 4px 24px 8px; color: var(--ink-soft); font-size: 11px; }
+
+  /* =========================================================
+     VISUAL REFINADO (camada de estilo por cima do layout)
+     ========================================================= */
+  body{
+    background:
+      radial-gradient(900px 420px at 8% -8%, color-mix(in srgb, var(--amber) 16%, transparent), transparent 60%),
+      radial-gradient(800px 420px at 100% 0%, color-mix(in srgb, var(--teal) 14%, transparent), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+  ::-webkit-scrollbar{ width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb{ background: var(--line); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover{ background: var(--ink-soft); }
+
+  /* Header */
+  header.top{
+    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    position: relative;
+  }
+  header.top::after{
+    content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
+    background: linear-gradient(90deg, var(--amber), var(--teal) 55%, transparent);
+    opacity:.85;
+  }
+  .nav-back{
+    padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line);
+    background: var(--bg); font-size: 12.5px;
+  }
+  .nav-back:hover{ border-color: var(--amber); transform: translateX(-2px); }
+  .title-block{ border-left: none; padding-left: 0; display: flex; align-items: center; gap: 12px; }
+  .title-block::before{
+    content:"</>"; display:grid; place-items:center; width:38px; height:38px; flex:0 0 auto;
+    border-radius: 11px; color:#fff; font-family: var(--mono); font-weight: 700; font-size: 13px;
+    background: linear-gradient(135deg, var(--amber), #D9923E);
+    box-shadow: 0 6px 14px color-mix(in srgb, var(--amber) 38%, transparent);
+  }
+  .brand-eyebrow{ margin: 0 0 1px; }
+  h1{ font-size: 21px; }
+  .subtitle{
+    padding: 5px 12px; border-radius: 999px; background: var(--teal-wash);
+    color: var(--teal-dark); font-size: 12px; font-weight: 500; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; min-width: 0;
+  }
+  .theme-toggle{ box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+  .theme-toggle:hover{ transform: translateY(-1px); }
+
+  /* Cards */
+  .card{
+    border-radius: 16px; padding: 16px 18px; position: relative; overflow: hidden;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 30px -12px rgba(23,33,29,.18), 0 2px 6px rgba(23,33,29,.04);
+  }
+  .card::before{
+    content:""; position:absolute; left:0; top:0; right:0; height:3px;
+    background: linear-gradient(90deg, var(--amber), color-mix(in srgb, var(--amber) 20%, transparent));
+  }
+  .split-view > .card:last-child::before{
+    background: linear-gradient(90deg, var(--teal), color-mix(in srgb, var(--teal) 20%, transparent));
+  }
+  :root[data-theme="dark"] .card{ box-shadow: 0 10px 30px -12px rgba(0,0,0,.55); }
+
+  /* Labels */
+  .field label, .lbl{
+    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 5px; display: flex; align-items: center; gap: 6px;
+  }
+  .field > label::before, .lbl::before{
+    content:""; width: 6px; height: 6px; border-radius: 2px; background: var(--amber); flex: 0 0 auto;
+  }
+  .lbl .opt{ text-transform: none; letter-spacing: 0; font-weight: 400; }
+  .dim-bloco label{ text-transform: none; letter-spacing: 0; font-size: 11px; }
+  .dim-bloco label::before{ display:none; }
+  .hint{ font-size: 10.5px; opacity: .9; }
+
+  /* Inputs */
+  input[type="text"], textarea{
+    border-radius: 10px; border: 1.5px solid var(--line);
+    background: color-mix(in srgb, var(--bg) 70%, var(--paper));
+    padding: 8px 11px;
+  }
+  input[type="text"]::placeholder, textarea::placeholder{ color: color-mix(in srgb, var(--ink-soft) 65%, transparent); }
+  input[type="text"]:hover, textarea:hover{ border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); }
+  input[type="text"]:focus, textarea:focus{
+    border-color: var(--amber); background: var(--paper);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 18%, transparent);
+  }
+  input:disabled{ opacity: .6; }
+
+  /* Condição */
+  .segmented{ padding: 3px; background: var(--bg); border-radius: 12px; border: 1.5px solid var(--line); }
+  .seg-btn{ border-radius: 9px; padding: 6px 16px; font-size: 12.5px; }
+  .seg-btn:hover:not(.active){ color: var(--ink); }
+  .seg-btn.active[data-val="novo"]{ background: var(--teal-wash); color: var(--teal-dark); box-shadow: inset 0 0 0 1.5px var(--teal); }
+  .seg-btn.active[data-val="recondicionado"]{ background: var(--amber-wash); color: var(--amber); box-shadow: inset 0 0 0 1.5px var(--amber); }
+  .seg-btn.active[data-val="novo"]::before{ content:"● "; font-size: 9px; vertical-align: 1px; }
+  .seg-btn.active[data-val="recondicionado"]::before{ content:"● "; font-size: 9px; vertical-align: 1px; }
+
+  /* Dimensões em painel */
+  #containerDims{
+    background: color-mix(in srgb, var(--bg) 60%, var(--paper));
+    border: 1.5px dashed var(--line); border-radius: 12px; padding: 8px 10px 4px;
+  }
+  .btn-add-dim{
+    border-radius: 999px; padding: 2px 11px; font-size: 11px;
+    background: linear-gradient(135deg, var(--red), #E8584E);
+    box-shadow: 0 3px 8px color-mix(in srgb, var(--red) 32%, transparent);
+  }
+  .btn-add-dim:hover{ transform: translateY(-1px); opacity: 1; }
+  .dim-bloco input{ background: var(--paper); }
+
+  /* Botões */
+  .actions{ border-top: 1px dashed var(--line); gap: 10px; }
+  .btn-primary{
+    border-radius: 11px; padding: 10px 20px; letter-spacing: .01em;
+    background: linear-gradient(135deg, var(--amber), #D9923E);
+    box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--amber) 60%, transparent);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+  }
+  .btn-primary:hover{ opacity: 1; transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 12px 22px -6px color-mix(in srgb, var(--amber) 65%, transparent); }
+  .btn-primary:active{ transform: translateY(0); }
+  .btn-secondary{ border-radius: 11px; padding: 10px 18px; background: var(--bg); }
+  .btn-secondary:hover{ background: var(--paper); border-color: var(--amber); transform: translateY(-1px); }
+
+  /* Abas em pílula */
+  .tabs{
+    display: inline-flex; width: fit-content; gap: 4px; padding: 3px; border: 1.5px solid var(--line);
+    border-radius: 12px; background: var(--bg); margin-bottom: 12px;
+  }
+  .tab-btn{ padding: 6px 14px; border: none; border-radius: 9px; font-size: 12.5px; }
+  .tab-btn.active{ background: var(--teal-wash); color: var(--teal-dark); box-shadow: inset 0 0 0 1.5px var(--teal); border-bottom-color: transparent; }
+
+  /* Saída de código estilo editor */
+  #htmlOutput{
+    background: #0F1B17; color: #BFE8D8; border-color: #1F3A30; border-radius: 12px;
+    padding: 14px 16px; font-size: 12.5px; line-height: 1.6;
+  }
+  #htmlOutput::placeholder{ color: #5E8274; }
+  #htmlOutput:focus{ box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 22%, transparent); border-color: var(--teal); background: #0F1B17; }
+  .preview-box{
+    border-radius: 12px; padding: 18px 20px; background: #fff; color: #17211D;
+    border: 1.5px solid var(--line); box-shadow: inset 0 1px 3px rgba(0,0,0,.04);
+    line-height: 1.55;
+  }
+
+  .aviso-validacao{ border-radius: 10px; }
+  .toast{ border-radius: 12px; background: var(--ink); color: var(--paper); box-shadow: 0 10px 24px rgba(0,0,0,.25); }
+  footer{ opacity: .8; }
+
+  @media (max-width: 900px){
+    .subtitle{ display: none; }
+    .title-block::before{ width: 34px; height: 34px; }
+  }
+
+  /* Telas estreitas: volta ao fluxo normal (não cabe lado a lado) */
+  @media (max-width: 900px){
+    body{ height: auto; overflow: auto; }
+    main{ padding-bottom: 24px; }
+    .split-view{ grid-template-columns: 1fr; height: auto; }
+    .form-grid{ grid-template-columns: 1fr; grid-template-rows: none; }
+    .field.grow textarea{ min-height: 100px; }
+    #htmlOutput, .preview-box{ min-height: 360px; }
+    .subtitle{ display: none; }
+  }
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="top-inner">
-    <div>
+    <div class="top-left">
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
-      <p class="brand-eyebrow">Operacional</p>
-      <h1>Formatador de Anúncios</h1>
+      <div class="title-block">
+        <p class="brand-eyebrow">Operacional</p>
+        <h1>Formatador de Anúncios</h1>
+      </div>
       <p class="subtitle">Padronização automática de descrições HTML para plataformas ERP, Linx, Tiktok e Magalu.</p>
     </div>
-    <div>
-      <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
-    </div>
+    <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
   </div>
 </header>
 
@@ -159,115 +344,107 @@
   <div class="split-view">
     <!-- COLUNA 1: ENTRADA DE DADOS -->
     <div class="card">
-      
-      <!-- 1. Título -->
-      <div class="form-group">
-        <label>Título do Produto</label>
-        <input type="text" id="tituloOrig" placeholder="Ex: PLACA MÃE ASUS PRIME A520M-E AM4 MATX DDR4">
-      </div>
+      <div class="form-grid">
 
-      <!-- 2. Condição do Produto -->
-      <div class="form-group">
-        <label>Condição do Produto</label>
-        <div class="segmented" id="condicaoSeg">
-          <button type="button" class="seg-btn active" data-val="novo">Novo</button>
-          <button type="button" class="seg-btn" data-val="recondicionado">Recondicionado</button>
+        <!-- 1. Título -->
+        <div class="field span-2">
+          <label>Título do Produto</label>
+          <input type="text" id="tituloOrig" placeholder="Ex: PLACA MÃE ASUS PRIME A520M-E AM4 MATX DDR4">
         </div>
-      </div>
 
-      <!-- 3. Descrição -->
-      <div class="form-group">
-        <label>Descrição</label>
-        <textarea id="descOrig" class="large" placeholder="Cole o texto descritivo e comercial do produto..."></textarea>
-      </div>
-
-      <!-- 4. Especificações -->
-      <div class="form-group">
-        <label>Especificações</label>
-        <textarea id="specsOrig" class="large" placeholder="Marca: Asus&#10;Modelo: Prime A520M-E&#10;Chipset: AMD A520..."></textarea>
-        <span class="hint">Adicione os dados técnicos. O formato "Chave: Valor" aplicará negrito automaticamente na chave.</span>
-      </div>
-
-      <!-- 5. Dimensões Dinâmicas -->
-      <div class="form-group">
-        <div class="dims-header">
-          <label style="margin-bottom:0;">Dimensões e Peso (Opcional)</label>
-          <button type="button" class="btn-add-dim" onclick="adicionarBlocoDimensao()">1+</button>
-        </div>
-        <span class="hint" style="margin-bottom: 12px;">Deixe em branco se não houver dimensões. Ou clique em 1+ para kits.</span>
-        
-        <!-- Contendor dos Blocos de Dimensão -->
-        <div id="containerDims">
-          <!-- Bloco Inicial Padrão (Item único) -->
-          <div class="dim-bloco" data-index="0">
-            <div class="dim-bloco-topo" style="display:none;">
-              <span class="dim-bloco-titulo">Item 1</span>
-              <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
+        <!-- 2. Condição + 7. Garantia -->
+        <div class="field span-2">
+          <div class="row-cond">
+            <div>
+              <span class="lbl">Condição do Produto</span>
+              <div class="segmented" id="condicaoSeg">
+                <button type="button" class="seg-btn active" data-val="novo">Novo</button>
+                <button type="button" class="seg-btn" data-val="recondicionado">Recondicionado</button>
+              </div>
             </div>
-            <div class="form-group" style="margin-bottom: 10px; display:none;">
-              <label style="font-size: 12px;">Nome do Item (Opcional p/ Kits)</label>
-              <input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse, Base...">
-            </div>
-            <div class="input-grid">
-              <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
-              <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
-              <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
-              <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
+            <div id="garantiaWrap">
+              <label for="garantiaOrig">Garantia (Meses/Dias)</label>
+              <input type="text" id="garantiaOrig" placeholder="Ex: 1 ano" value="1 ano" title="Ignorado automaticamente para produtos recondicionados.">
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- 6. Itens Inclusos -->
-      <div class="form-group">
-        <label>Itens Inclusos</label>
-        <textarea id="itensOrig" placeholder="1 Placa-mãe&#10;2 Cabos SATA&#10;Manual do usuário..."></textarea>
-        <span class="hint">Um item por linha. Marcadores (-, *, •) são removidos automaticamente.</span>
-      </div>
-
-      <!-- 7. Garantia -->
-      <div class="form-group" id="garantiaWrap">
-        <label>Garantia (Meses/Dias)</label>
-        <input type="text" id="garantiaOrig" placeholder="Ex: 1 ano" value="1 ano">
-        <span class="hint">Ignorado automaticamente para produtos recondicionados.</span>
-      </div>
-
-      <!-- 8. Identificação (EAN, Anatel e NAC) -->
-      <div class="form-group">
-        <label>Identificação (EAN, Anatel e NAC)</label>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-          <input type="text" id="eanOrig" placeholder="Código EAN">
-          <input type="text" id="anatelOrig" placeholder="Homologação Anatel">
+        <!-- 3. Descrição -->
+        <div class="field grow">
+          <label for="descOrig">Descrição</label>
+          <textarea id="descOrig" placeholder="Cole o texto descritivo e comercial do produto..."></textarea>
         </div>
-        <input type="text" id="nacOrig" placeholder="Número NAC (Ex: 013738)">
-        <span class="hint">O prefixo "NAC" é adicionado automaticamente na formatação.</span>
+
+        <!-- 4. Especificações -->
+        <div class="field grow">
+          <label for="specsOrig">Especificações</label>
+          <textarea id="specsOrig" placeholder="Marca: Asus&#10;Modelo: Prime A520M-E&#10;Chipset: AMD A520..."></textarea>
+          <span class="hint">Formato "Chave: Valor" aplica negrito na chave.</span>
+        </div>
+
+        <!-- 5. Dimensões Dinâmicas -->
+        <div class="field span-2">
+          <div class="dims-header">
+            <span class="lbl">Dimensões e Peso <span class="opt">(opcional · use 1+ para kits)</span></span>
+            <button type="button" class="btn-add-dim" onclick="adicionarBlocoDimensao()">1+</button>
+          </div>
+          <div id="containerDims">
+            <div class="dim-bloco" data-index="0">
+              <div class="dim-nome-wrap"><label>Nome do Item</label><input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse..."></div>
+              <div><label>Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
+              <div><label>Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
+              <div><label>Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
+              <div><label>Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
+              <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Itens Inclusos -->
+        <div class="field grow">
+          <label for="itensOrig">Itens Inclusos</label>
+          <textarea id="itensOrig" placeholder="1 Placa-mãe&#10;2 Cabos SATA&#10;Manual do usuário..."></textarea>
+          <span class="hint">Um item por linha. Marcadores (-, *, •) são removidos.</span>
+        </div>
+
+        <!-- 8. Identificação (EAN, Anatel e NAC) -->
+        <div class="field">
+          <label>Identificação (EAN, Anatel e NAC)</label>
+          <div class="ident-grid">
+            <input type="text" id="eanOrig" placeholder="Código EAN">
+            <input type="text" id="anatelOrig" placeholder="Homologação Anatel">
+            <input type="text" id="nacOrig" placeholder="Número NAC (Ex: 013738)">
+          </div>
+          <span class="hint">O prefixo "NAC" é adicionado automaticamente.</span>
+        </div>
+
       </div>
+
+      <div class="aviso-validacao" id="avisoValidacao"></div>
 
       <div class="actions">
         <button type="button" class="btn-primary" onclick="processarHTML()">Formatar Descrição</button>
         <button type="button" class="btn-secondary" onclick="limparCampos()">Limpar</button>
       </div>
-      
-      <div class="aviso-validacao" id="avisoValidacao"></div>
     </div>
 
     <!-- COLUNA 2: RESULTADOS -->
-    <div class="card" style="display: flex; flex-direction: column;">
+    <div class="card">
       <div class="tabs">
         <button class="tab-btn active" onclick="switchTab('html')">&lt;/&gt; Código HTML</button>
         <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização Real</button>
       </div>
 
-      <div id="tab-html" class="tab-content active" style="flex-grow: 1;">
+      <div id="tab-html" class="tab-content active">
         <textarea id="htmlOutput" readonly placeholder="O HTML formatado aparecerá aqui..."></textarea>
       </div>
-      <div id="tab-preview" class="tab-content" style="flex-grow: 1;">
+      <div id="tab-preview" class="tab-content">
         <div class="preview-box" id="previewOutput">
           <span style="color: var(--ink-soft); font-size: 14px;">Nenhuma pré-visualização disponível.</span>
         </div>
       </div>
 
-      <div class="actions" style="margin-top: auto;">
+      <div class="actions">
         <button type="button" class="btn-primary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
         <button type="button" class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto s/ HTML</button>
       </div>
@@ -303,7 +480,7 @@ document.getElementById('condicaoSeg').addEventListener('click', (e) => {
   document.querySelectorAll('#condicaoSeg .seg-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   condicaoAtual = btn.getAttribute('data-val');
-  
+
   const garWrap = document.getElementById('garantiaWrap');
   if(condicaoAtual === 'recondicionado') {
     garWrap.style.opacity = '0.5';
@@ -317,7 +494,7 @@ document.getElementById('condicaoSeg').addEventListener('click', (e) => {
 function switchTab(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-  
+
   if(tab === 'html') {
     document.querySelectorAll('.tab-btn')[0].classList.add('active');
     document.getElementById('tab-html').classList.add('active');
@@ -328,72 +505,47 @@ function switchTab(tab) {
 }
 
 // --- GESTÃO DE BLOCOS DINÂMICOS DE DIMENSÕES ---
+function blocoDimensaoHTML() {
+  return `
+    <div class="dim-nome-wrap"><label>Nome do Item</label><input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse..."></div>
+    <div><label>Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
+    <div><label>Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
+    <div><label>Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
+    <div><label>Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
+    <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
+  `;
+}
+
 function adicionarBlocoDimensao() {
   const container = document.getElementById('containerDims');
-  const blocos = container.querySelectorAll('.dim-bloco');
-  const novoIndice = blocos.length + 1;
-
+  const novoIndice = container.querySelectorAll('.dim-bloco').length + 1;
   const div = document.createElement('div');
   div.className = 'dim-bloco';
   div.setAttribute('data-index', novoIndice);
-  div.innerHTML = `
-    <div class="dim-bloco-topo">
-      <span class="dim-bloco-titulo">Item ${novoIndice}</span>
-      <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
-    </div>
-    <div class="form-group" style="margin-bottom: 10px;">
-      <label style="font-size: 12px;">Nome do Item</label>
-      <input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse, Receptor...">
-    </div>
-    <div class="input-grid">
-      <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
-      <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
-      <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
-      <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
-    </div>
-  `;
+  div.innerHTML = blocoDimensaoHTML();
   container.appendChild(div);
   atualizarVisibilidadeBlocosDims();
+  div.querySelector('.dim-nome').focus();
 }
 
 function removerBlocoDimensao(btn) {
-  const bloco = btn.closest('.dim-bloco');
-  bloco.remove();
-  
-  const container = document.getElementById('containerDims');
-  const blocos = container.querySelectorAll('.dim-bloco');
-  blocos.forEach((b, idx) => {
-    b.setAttribute('data-index', idx + 1);
-    const titulo = b.querySelector('.dim-bloco-titulo');
-    if(titulo) titulo.textContent = `Item ${idx + 1}`;
-  });
-
+  btn.closest('.dim-bloco').remove();
   atualizarVisibilidadeBlocosDims();
 }
 
 function atualizarVisibilidadeBlocosDims() {
   const container = document.getElementById('containerDims');
   const blocos = container.querySelectorAll('.dim-bloco');
-  
-  blocos.forEach((b) => {
-    const topo = b.querySelector('.dim-bloco-topo');
-    const inputNome = b.querySelector('.dim-nome').closest('.form-group');
-    
-    if (blocos.length === 1) {
-      if(topo) topo.style.display = 'none';
-      if(inputNome) inputNome.style.display = 'none';
-    } else {
-      if(topo) topo.style.display = 'flex';
-      if(inputNome) inputNome.style.display = 'block';
-    }
-  });
+  blocos.forEach((b, idx) => b.setAttribute('data-index', idx + 1));
+  // Modo kit (vários itens): mostra nome do item e botão remover
+  container.classList.toggle('multi', blocos.length > 1);
 }
 
 // --- LÓGICA DE FORMATAÇÃO ---
 function formatarTituloCase(texto) {
   const excecoes = ['e', 'de', 'da', 'do', 'das', 'dos', 'a', 'o', 'em', 'para', 'com'];
   const pular = ['USB', 'HDMI', 'SSD', 'NVME', 'DDR4', 'DDR5', 'WIFI', 'WI-FI', 'PC', 'MATX', 'ATX', 'AM4', 'AM5', 'RGB', 'LED'];
-  
+
   return texto.toLowerCase().split(' ').map((palavra, index) => {
     if (pular.includes(palavra.toUpperCase())) return palavra.toUpperCase();
     if (index !== 0 && excecoes.includes(palavra)) return palavra;
@@ -428,7 +580,7 @@ function processarHTML() {
   // 2. Processar Blocos de Texto
   let blocoDescricao = descInput.split('\n').map(l => l.trim()).filter(l => l !== '');
   let blocoSpecs = specsInput.split('\n').map(l => l.trim()).filter(l => l !== '');
-  
+
   let blocoItens = itensInput.split('\n')
     .map(l => l.replace(/^[-*•]\s*/, '').trim())
     .filter(l => l !== '');
@@ -436,7 +588,7 @@ function processarHTML() {
   // 3. Processar Dimensões Dinâmicas
   const blocosDimsDOM = document.querySelectorAll('.dim-bloco');
   let dadosDimensoes = [];
-  
+
   blocosDimsDOM.forEach(bloco => {
     let nomeItem = bloco.querySelector('.dim-nome').value.trim();
     let altura = bloco.querySelector('.dim-altura').value.trim();
@@ -457,7 +609,7 @@ function processarHTML() {
 
   // --- MONTAGEM DO HTML ---
   let html = `<span style="font-size:14px;"><strong>${tituloFormatado}</strong></span><br><br>\n`;
-  
+
   // Bloco Descrição
   html += `<span style="font-size:12px;">\n`;
   if(blocoDescricao.length > 0) {
@@ -490,12 +642,12 @@ function processarHTML() {
   if(dadosDimensoes.length > 0) {
     html += `<span style="font-size:12px;"><strong>DIMENSÕES E PESO</strong></span><br>\n`;
     html += `<span style="font-size:12px;">\n`;
-    
+
     const multiplos = dadosDimensoes.length > 1 || dadosDimensoes[0].nome !== "";
-    
+
     dadosDimensoes.forEach(d => {
       let prefixo = multiplos && d.nome ? `<strong>${d.nome}</strong> - ` : "";
-      
+
       if(d.altura) html += `${prefixo}<strong>Altura:</strong> ${d.altura}<br>\n`;
       if(d.largura) html += `${prefixo}<strong>Largura:</strong> ${d.largura}<br>\n`;
       if(d.comprimento) html += `${prefixo}<strong>Comprimento:</strong> ${d.comprimento}<br>\n`;
@@ -528,10 +680,10 @@ function processarHTML() {
     html += `Produto novo na caixa, lacrado com NF e garantia do fabricante de ${gar}.<br>\n`;
     html += `Em caso de dúvidas sobre informações técnicas, utilização, limitações e manuseio do produto, verifique o manual do fabricante.<br>\n`;
   }
-  
+
   // Identificação (EAN, Anatel e NAC)
   if (eanInput || anatelInput || nacInput) {
-    html += `<br>\n`; 
+    html += `<br>\n`;
     if (eanInput) html += `<strong>EAN:</strong> ${eanInput}<br>\n`;
     if (anatelInput) html += `<strong>ANATEL:</strong> ${anatelInput}<br>\n`;
     if (nacInput) html += `<strong>NAC${nacInput}</strong><br>\n`;
@@ -549,24 +701,11 @@ function limparCampos() {
   document.getElementById('tituloOrig').value = '';
   document.getElementById('descOrig').value = '';
   document.getElementById('specsOrig').value = '';
-  document.getElementById('containerDims').innerHTML = `
-    <div class="dim-bloco" data-index="0">
-      <div class="dim-bloco-topo" style="display:none;">
-        <span class="dim-bloco-titulo">Item 1</span>
-        <button type="button" class="btn-remover-bloco" onclick="removerBlocoDimensao(this)">Remover</button>
-      </div>
-      <div class="form-group" style="margin-bottom: 10px; display:none;">
-        <label style="font-size: 12px;">Nome do Item (Opcional p/ Kits)</label>
-        <input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse, Base...">
-      </div>
-      <div class="input-grid">
-        <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
-        <div style="margin-bottom:8px;"><label style="font-size:11px; margin-bottom:2px;">Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
-        <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
-        <div style="margin-bottom:0;"><label style="font-size:11px; margin-bottom:2px;">Peso</label><input type="text" class="dim-peso" placeholder="Ex: 0,85"></div>
-      </div>
-    </div>
-  `;
+
+  const container = document.getElementById('containerDims');
+  container.innerHTML = '<div class="dim-bloco" data-index="0">' + blocoDimensaoHTML() + '</div>';
+  atualizarVisibilidadeBlocosDims();
+
   document.getElementById('itensOrig').value = '';
   document.getElementById('garantiaOrig').value = '1 ano';
   document.getElementById('eanOrig').value = '';
@@ -577,7 +716,7 @@ function limparCampos() {
   document.getElementById('avisoValidacao').style.display = 'none';
   condicaoAtual = 'novo';
   document.querySelectorAll('#condicaoSeg .seg-btn')[0].click();
-  
+
   // Limpa o rascunho guardado na memória
   localStorage.removeItem('formatadorDraft');
 }
@@ -607,7 +746,7 @@ function copiarRenderizado() {
     showToast('Nenhum conteúdo para copiar.');
     return;
   }
-  
+
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(prev.innerText).then(() => {
       showToast('Texto simples copiado!');

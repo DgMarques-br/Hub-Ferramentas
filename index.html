@@ -15,6 +15,7 @@
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --ease: cubic-bezier(.22,.8,.3,1);
   }
   :root[data-theme="dark"]{
     --bg: #11201B; --paper: #16231E; --ink: #E8EEEC; --ink-soft: #92A49C;
@@ -23,68 +24,144 @@
     --plum: #C2B0EC; --plum-wash: #2B2440; --red: #F28B82;
   }
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; transition: background .15s ease, color .15s ease; }
+  html,body{ margin:0; padding:0; background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  body{ display: flex; flex-direction: column; }
 
-  /* ---------- Header e Ações ---------- */
+  /* Transição suave ao trocar de tema */
+  body, .top, .topbar, .hero, .card, .btn-sm, .qa-btn, .sug-modal, .footer-bar, .count-pill, .tag, .card-icon{
+    transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease, transform .25s var(--ease);
+  }
+
+  /* ---------- Animações ---------- */
+  @keyframes fadeUp   { from{ opacity:0; transform: translateY(16px); } to{ opacity:1; transform: none; } }
+  @keyframes fadeDown { from{ opacity:0; transform: translateY(-10px); } to{ opacity:1; transform: none; } }
+  @keyframes fadeIn   { from{ opacity:0; } to{ opacity:1; } }
+  @keyframes popIn    { from{ opacity:0; transform: translateY(14px) scale(.97); } to{ opacity:1; transform: none; } }
+  @keyframes growBar  { from{ transform: scaleY(0); } to{ transform: scaleY(1); } }
+  @keyframes pulseDot { 0%,100%{ box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 45%, transparent); } 50%{ box-shadow: 0 0 0 5px transparent; } }
+  @keyframes countPop { 0%{ transform: scale(.4); opacity:0; } 70%{ transform: scale(1.18); } 100%{ transform: scale(1); opacity:1; } }
+
+  .a-down { animation: fadeDown .5s var(--ease) both; }
+  .a-up   { animation: fadeUp .6s var(--ease) both; animation-delay: calc(var(--d, 0) * 1ms); }
+
+  /* ---------- Barra superior ---------- */
   header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
-  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 38px 24px 32px; display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-dark); font-weight: 600; margin: 0 0 8px; }
-  h1{ font-family: var(--serif); font-size: 38px; line-height: 1.1; margin: 0 0 10px; letter-spacing: -0.01em; color: var(--ink); }
-  .subtitle{ margin:0; color: var(--ink-soft); font-size: 15.5px; max-width: 520px; line-height: 1.5; }
+  .topbar{ border-bottom: 1px solid var(--line); }
+  .topbar-inner{ max-width: 1180px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand{ display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .brand-logo{ width: 30px; height: 30px; border-radius: 8px; background: var(--amber-wash); color: var(--amber); display: grid; place-items: center; flex: 0 0 auto; transition: transform .35s var(--ease); }
+  .brand-logo:hover{ transform: rotate(-8deg) scale(1.08); }
+  .brand-logo svg{ width: 17px; height: 17px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 700; margin: 0; white-space: nowrap; }
+  .brand-sep{ width: 1px; height: 16px; background: var(--line); }
+  .brand-sub{ font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
 
-  .header-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; }
-  .actions-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
+  .topbar-actions{ display: flex; align-items: center; gap: 8px; }
+  .btn-sm{ display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
+  .btn-sm svg{ width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .btn-sm:hover{ border-color: var(--teal); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.06); }
+  .btn-sm:active{ transform: translateY(0); }
 
-  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: all .15s ease; }
-  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
-
-  /* Login Styles */
-  .btn-login { background: var(--paper); color: var(--ink); border: 1.5px solid var(--line); padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease; font-family: var(--sans); }
-  .btn-login:hover { border-color: var(--plum); color: var(--plum); }
-  .user-badge { display: none; align-items: center; gap: 10px; background: var(--paper); border: 1.5px solid var(--line); padding: 4px 6px 4px 14px; border-radius: 999px; }
+  /* Login / usuário */
+  .user-badge { display: none; align-items: center; gap: 10px; background: var(--paper); border: 1px solid var(--line); padding: 3px 4px 3px 12px; border-radius: 8px; animation: fadeIn .3s ease; }
   .user-email { font-size: 12.5px; font-weight: 600; color: var(--ink); }
-  .btn-logout { background: var(--red); color: white; border: none; padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  .btn-logout { background: var(--red); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+  :root[data-theme="dark"] .btn-logout{ color: #11201B; }
   .btn-logout:hover { opacity: 0.8; }
 
-.btn-panel { background: var(--plum); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s ease; }
-  .btn-panel:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-  :root[data-theme="dark"] .btn-panel { color: #11201B; }
-  
-  /* Botão do Mural e Sugestões */
-  .btn-mural { background: var(--amber); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all .2s ease; }
-  .btn-mural:hover { opacity: .95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-  :root[data-theme="dark"] .btn-mural { color: #11201B; }
-  .btn-mural .count { font-size: 12px; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 99px; display: none; }
+  /* ---------- Hero ---------- */
+  .hero-inner{ max-width: 1180px; margin: 0 auto; padding: 38px 24px 34px; display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
+  h1{ font-family: var(--serif); font-size: 40px; line-height: 1.08; margin: 0 0 12px; letter-spacing: -0.015em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 520px; line-height: 1.55; }
 
-  .btn-suggest{ background: var(--teal); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all .2s ease; }
-  .btn-suggest:hover{ opacity: .95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
-  :root[data-theme="dark"] .btn-suggest{ color: #11201B; }
-  .btn-suggest .count{ font-size: 12px; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 99px; display: none; }
+  .quick{ display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .quick-label{ font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
+  .quick-row{ display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .qa-btn{ display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; text-decoration: none; white-space: nowrap; }
+  .qa-btn svg{ width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--ease); }
+  .qa-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px -6px rgba(0,0,0,.14); border-color: var(--teal); }
+  .qa-btn:hover svg{ transform: scale(1.15); }
+  .qa-btn:active{ transform: translateY(0); }
+  .qa-btn.highlight{ background: var(--amber-wash); border-color: var(--amber); color: var(--amber); }
+  .qa-btn.highlight:hover{ box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--amber) 55%, transparent); }
 
-  /* Modais Gerais */
+  .qa-badge, .count{ display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 7px; border-radius: 99px; font-size: 11px; font-weight: 700; background: color-mix(in srgb, currentColor 14%, transparent); color: inherit; }
+  .count.pop{ animation: countPop .4s var(--ease); }
+  #validBadge.running{ animation: pulseDot 1.8s ease-in-out infinite; }
+
+  /* ---------- Main ---------- */
+  main{ flex: 1 0 auto; width: 100%; max-width: 1180px; margin: 0 auto; padding: 34px 24px 48px; }
+
+  .section-head{ display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
+  .section-head .bar{ width: 3px; height: 14px; background: var(--amber); border-radius: 2px; transform-origin: top; animation: growBar .5s var(--ease) .35s both; }
+  .section-head .label{ font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--ink); }
+  .count-pill{ font-family: var(--mono); font-size: 10px; font-weight: 700; background: var(--teal-wash); color: var(--teal-dark); padding: 2px 7px; border-radius: 5px; }
+  .section-head .hint{ margin-left: auto; font-size: 12.5px; color: var(--ink-soft); }
+
+  .hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .card-link { text-decoration: none; color: inherit; display: block; }
+
+  .tool{ --acc: var(--teal); --acc-wash: var(--teal-wash); --acc-dark: var(--teal-dark); }
+  .tool[data-accent="amber"]{ --acc: var(--amber); --acc-wash: var(--amber-wash); --acc-dark: var(--amber); }
+  .tool[data-accent="plum"]{ --acc: var(--plum); --acc-wash: var(--plum-wash); --acc-dark: var(--plum); }
+
+  .card { position: relative; overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 18px; height: 100%; display: flex; flex-direction: column; }
+  .card::before{ content:""; position:absolute; left:0; top:0; height:2px; width:100%; background: var(--acc); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
+  .card-link:hover .card { transform: translateY(-5px); box-shadow: 0 16px 32px -14px rgba(0,0,0,.2); border-color: color-mix(in srgb, var(--acc) 55%, var(--line)); }
+  .card-link:hover .card::before{ transform: scaleX(1); }
+  .card-link:active .card{ transform: translateY(-2px); }
+  .card-link:focus-visible{ outline: none; }
+  .card-link:focus-visible .card{ box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 35%, transparent); }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
+  .card-icon { width: 38px; height: 38px; border-radius: 9px; background: var(--acc-wash); color: var(--acc-dark); display: flex; align-items: center; justify-content: center; transition: transform .35s var(--ease); }
+  .card-link:hover .card-icon{ transform: scale(1.1) rotate(-6deg); }
+  .card-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+
+  .tag { font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 4px; font-weight: 700; background: var(--acc-wash); color: var(--acc-dark); }
+
+  .card-title { font-family: var(--serif); font-size: 21px; font-weight: 600; margin: 0 0 8px; color: var(--ink); letter-spacing: -0.005em; }
+  .card-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 0 0 20px; flex-grow: 1; }
+
+  .card-foot{ display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-soft); padding-top: 13px; }
+  .go{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--acc-dark); }
+  .go svg{ width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--ease); }
+  .card-link:hover .go svg{ transform: translate(3px,-3px); }
+  .code{ font-family: var(--mono); font-size: 10.5px; color: var(--ink-soft); letter-spacing: .04em; }
+
+  /* ---------- Rodapé ---------- */
+  .footer-bar{ border-top: 1px solid var(--line); background: var(--paper); flex: 0 0 auto; }
+  .footer-inner{ max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; font-size: 12px; color: var(--ink-soft); }
+  .footer-brand{ display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 14px; color: var(--ink); }
+  .footer-brand svg{ width: 16px; height: 16px; stroke: var(--teal); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .footer-right{ text-align: right; font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
+
+  /* ---------- Modais ---------- */
   .sug-overlay{ position: fixed; inset: 0; background: rgba(17,32,27,.55); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
-  .sug-overlay.open{ display: flex; }
-  .sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+  .sug-overlay.open{ display: flex; animation: fadeIn .22s ease both; backdrop-filter: blur(3px); }
+  .sug-overlay.open .sug-modal{ animation: popIn .35s var(--ease) both; }
+  .sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: 14px; width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
   .sug-head{ display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); }
-  .sug-head h2{ margin: 0; font-size: 18px; }
+  .sug-head h2{ margin: 0; font-size: 18px; font-family: var(--serif); }
   .sug-head p{ margin: 2px 0 0; font-size: 12.5px; color: var(--ink-soft); }
-  .sug-close{ border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; font-family: var(--sans); }
-  .sug-close:hover{ border-color: var(--teal); color: var(--ink); }
+  .sug-close{ border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; font-family: var(--sans); transition: all .2s var(--ease); }
+  .sug-close:hover{ border-color: var(--teal); color: var(--ink); transform: rotate(90deg); }
   .sug-scroll{ overflow-y: auto; padding: 18px 22px 22px; }
 
   .sug-form{ background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 18px; }
   .sug-label{ font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin: 0 0 8px; display: block; }
   .sug-chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
   .sug-chip{ border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft); padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; transition: all .15s ease; }
-  .sug-chip:hover:not(:disabled){ border-color: var(--teal); color: var(--ink); }
+  .sug-chip:hover:not(:disabled){ border-color: var(--teal); color: var(--ink); transform: translateY(-1px); }
   .sug-chip:disabled{ cursor: not-allowed; opacity: 0.6; }
   .sug-chip.sel{ background: var(--teal-wash); border-color: var(--teal); color: var(--teal-dark); }
-  .sug-text{ width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; }
-  .sug-text:focus{ outline: none; border-color: var(--teal); }
+  .sug-text{ width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; transition: border-color .15s ease, box-shadow .15s ease; }
+  .sug-text:focus{ outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 16%, transparent); }
   .sug-text:disabled{ background: var(--bg); color: var(--ink-soft); cursor: not-allowed; }
   .sug-form-foot{ display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 12px; flex-wrap: wrap; }
   .sug-counter{ font-size: 12px; color: var(--ink-soft); }
-  .sug-btn{ background: var(--teal); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 13.5px; font-family: var(--sans); cursor: pointer; }
+  .sug-btn{ background: var(--teal); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 13.5px; font-family: var(--sans); cursor: pointer; transition: transform .15s ease, opacity .15s ease; }
+  .sug-btn:hover:not(:disabled){ transform: translateY(-1px); opacity: .95; }
   :root[data-theme="dark"] .sug-btn{ color: #11201B; }
   .sug-btn:disabled{ background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
   .sug-btn.ghost{ background: var(--bg); color: var(--ink-soft); border: 1.5px solid var(--line); }
@@ -116,156 +193,214 @@
   .sug-link.danger:hover{ color: var(--red); }
   .sug-edit-row{ display: flex; gap: 8px; margin-top: 8px; }
   .sug-empty{ text-align: center; color: var(--ink-soft); font-size: 14px; padding: 24px 0; }
-  
+
   .sug-admin-reply { margin-top: 12px; padding: 12px; background: var(--teal-wash); border-left: 4px solid var(--teal); border-radius: 4px; }
   .sug-admin-reply-label { display: block; font-size: 11px; font-weight: 700; color: var(--teal-dark); text-transform: uppercase; margin-bottom: 4px; }
   .sug-admin-reply-text { font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
   :root[data-theme="dark"] .sug-admin-reply-text { color: var(--ink); }
 
-  /* ---------- Main Grid ---------- */
-  main{ max-width: 1180px; margin: 40px auto; padding: 0 24px 60px; }
-  .hub-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
-  .card-link { text-decoration: none; color: inherit; display: block; }
-  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; height: 100%; display: flex; flex-direction: column; transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
-  .card-link:hover .card { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); border-color: var(--teal); }
-  
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
-  .card-icon { width: 42px; height: 42px; border-radius: 10px; background: var(--teal-wash); color: var(--teal-dark); display: flex; align-items: center; justify-content: center; }
-  .card-icon svg { width: 22px; height: 22px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  
-  .tag { font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; padding: 4px 8px; border-radius: 5px; font-weight: 700; }
-  .tag.active { background: var(--teal-wash); color: var(--teal-dark); }
-
-  .card-title { font-size: 18px; font-weight: 600; margin: 0 0 8px; color: var(--ink); }
-  .card-desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.5; margin: 0; flex-grow: 1; }
-
-  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
-
+  /* ---------- Responsivo ---------- */
+  @media (max-width: 980px){
+    .hub-grid{ grid-template-columns: repeat(2, 1fr); }
+    .quick{ align-items: flex-start; }
+    .quick-row{ justify-content: flex-start; }
+  }
   @media (max-width: 640px){
     h1{ font-size: 30px; }
-    .top-inner{ flex-direction: column; }
-    .header-actions { align-items: flex-start; margin-top: 10px; }
+    .brand-sep, .brand-sub{ display: none; }
+    .hub-grid{ grid-template-columns: 1fr; }
+    .section-head .hint{ display: none; }
+    .hero-inner{ padding: 28px 24px 24px; }
+    .footer-inner{ grid-template-columns: 1fr; text-align: center; }
+    .footer-brand{ justify-content: center; }
+    .footer-right{ text-align: center; }
+  }
+
+  /* Respeita quem prefere menos movimento */
+  @media (prefers-reduced-motion: reduce){
+    *, *::before, *::after{ animation: none !important; transition: none !important; }
   }
 </style>
 </head>
 <body>
 
 <header class="top">
-  <div class="top-inner">
-    <div>
-      <p class="brand-eyebrow">Hub Operacional</p>
-      <h1>Central de Ferramentas</h1>
-      <p class="subtitle">Acesse rapidamente a todos os sistemas internos para cadastro, formatação, validação, métricas e IA.</p>
-    </div>
-    
-    <div class="header-actions">
-      <!-- Módulo de Login / Tema -->
-      <div class="actions-row">
-        <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
-        
+  <!-- Barra superior -->
+  <div class="topbar a-down">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>
+        </div>
+        <p class="brand-eyebrow">Hub Operacional</p>
+        <span class="brand-sep"></span>
+        <span class="brand-sub">Ferramentas internas</span>
+      </div>
+
+      <div class="topbar-actions">
+        <button class="btn-sm" id="themeToggle" type="button">🌙 Modo escuro</button>
+
         <!-- Botão de Login deslogado -->
-        <button class="btn-login" id="btnLogin">
-          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+        <button class="btn-sm" id="btnLogin" type="button">
+          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
           Login
         </button>
 
         <!-- Selo de Usuário Logado -->
         <div class="user-badge" id="userBadge">
           <span class="user-email" id="userEmailTxt">carregando...</span>
-          <button class="btn-logout" id="btnLogout">Sair</button>
+          <button class="btn-logout" id="btnLogout" type="button">Sair</button>
         </div>
       </div>
-      
-      <div class="actions-row">
-        <a href="painel-validacao.html" class="btn-panel">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-          Painel de Validação
-          <span id="validBadge" style="display:none; font-size:12px; background:rgba(255,255,255,0.22); padding:2px 8px; border-radius:99px;"></span>
-        </a>
+    </div>
+  </div>
 
-        <!-- Botão do Mural de Avisos -->
-        <button class="btn-mural" id="btnMural" type="button">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-          Mural de Avisos
-          <span class="count" id="muralCount"></span>
-        </button>
+  <!-- Hero -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="a-up" style="--d:80">
+        <h1>Central de Ferramentas</h1>
+        <p class="subtitle">Acesse rapidamente a todos os sistemas internos para cadastros, formatação, validação, métricas e IA.</p>
+      </div>
 
-        <button class="btn-suggest" id="btnSuggest" type="button">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-          Caixa de Sugestões
-          <span class="count" id="sugCount"></span>
-        </button>
+      <div class="quick a-up" style="--d:180">
+        <span class="quick-label">Acessos rápidos</span>
+        <div class="quick-row">
+          <a href="painel-validacao.html" class="qa-btn">
+            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+            Painel de Validação
+            <span class="qa-badge" id="validBadge" style="display:none;"></span>
+          </a>
+
+          <!-- Botão do Mural de Avisos -->
+          <button class="qa-btn highlight" id="btnMural" type="button">
+            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            Mural de Avisos
+            <span class="count" id="muralCount" style="display:none;"></span>
+          </button>
+
+          <button class="qa-btn" id="btnSuggest" type="button">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Caixa de Sugestões
+            <span class="count" id="sugCount" style="display:none;"></span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </header>
 
 <main>
+  <div class="section-head a-up" style="--d:260">
+    <span class="bar"></span>
+    <span class="label">Todas as ferramentas</span>
+    <span class="count-pill">06</span>
+    <span class="hint">Selecione uma ferramenta para começar.</span>
+  </div>
+
   <div class="hub-grid">
-    <a href="catalogo-busca-sap.html" class="card-link">
+    <a href="catalogo-busca-sap.html" class="card-link tool a-up" data-accent="teal" style="--d:320">
       <div class="card">
         <div class="card-header">
           <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg></div>
-          <span class="tag active">Operacional</span>
+          <span class="tag">Operacional</span>
         </div>
         <h2 class="card-title">Catálogo SAP</h2>
-        <p class="card-desc">Consulta offline rápida de Hierarquia de Grupos de Item, Marca e Categoria para preenchimento no SAP.</p>
+        <p class="card-desc">Consulta offline rápida de Hierarquia de Grupos de Itens, Marcas e Categorias para preenchimento no SAP.</p>
+        <div class="card-foot">
+          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <span class="code">SAP</span>
+        </div>
       </div>
     </a>
-    <a href="buscador-links.html" class="card-link">
+
+    <a href="buscador-links.html" class="card-link tool a-up" data-accent="teal" style="--d:390">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--plum-wash); color: var(--plum);"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg></div>
-          <span class="tag active">Operacional</span>
+          <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg></div>
+          <span class="tag">Operacional</span>
         </div>
         <h2 class="card-title">Validador de Links</h2>
-        <p class="card-desc">Pesquisa unificada em múltiplas abas de e-commerce e verificação de integridade de URLs.</p>
+        <p class="card-desc">Pesquisa unificada em múltiplos sites de e-commerce e verificação de integridade de URLs.</p>
+        <div class="card-foot">
+          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <span class="code">URL</span>
+        </div>
       </div>
     </a>
-    <a href="formatador-anuncios.html" class="card-link">
+
+    <a href="formatador-anuncios.html" class="card-link tool a-up" data-accent="amber" style="--d:460">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-          <span class="tag active">Operacional</span>
+          <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <span class="tag">Operacional</span>
         </div>
         <h2 class="card-title">Formatador de Anúncios</h2>
         <p class="card-desc">Gerador de descrições HTML com extração de especificações, dimensões e termos de garantia.</p>
+        <div class="card-foot">
+          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <span class="code">HTML</span>
+        </div>
       </div>
     </a>
-    <a href="formatador-imagem.html" class="card-link">
+
+    <a href="formatador-imagem.html" class="card-link tool a-up" data-accent="teal" style="--d:530">
       <div class="card">
         <div class="card-header">
           <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
-          <span class="tag active">Mídia</span>
+          <span class="tag">Mídia</span>
         </div>
-        <h2 class="card-title">Formatador de Imagem</h2>
+        <h2 class="card-title">Formatador de Imagens</h2>
         <p class="card-desc">Enquadramento automático para 1200x1200px sem cortar a imagem, com preenchimento de fundo.</p>
+        <div class="card-foot">
+          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <span class="code">IMG</span>
+        </div>
       </div>
     </a>
-    <a href="Dashboard_Marketplaces.html" class="card-link">
+
+    <a href="Dashboard_Marketplaces.html" class="card-link tool a-up" data-accent="amber" style="--d:600">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--amber-wash); color: var(--amber);"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-          <span class="tag active" style="background: var(--amber-wash); color: var(--amber);">Analytics</span>
+          <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <span class="tag">Analytics</span>
         </div>
         <h2 class="card-title">Dashboard de Métricas</h2>
         <p class="card-desc">Visualização de dados analíticos, acompanhamento de KPIs e métricas de desempenho.</p>
+        <div class="card-foot">
+          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <span class="code">KPIs</span>
+        </div>
       </div>
     </a>
-    <a href="gerador-descricao-ia.html" class="card-link">
+
+    <a href="gerador-descricao-ia.html" class="card-link tool a-up" data-accent="teal" style="--d:670">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon" style="background: var(--plum-wash); color: var(--plum);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
-          <span class="tag active" style="background: var(--plum-wash); color: var(--plum);">IA (Testes finais)</span>
+          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+          <span class="tag">IA (Testes finais)</span>
         </div>
         <h2 class="card-title">Gerador de Descrições IA</h2>
         <p class="card-desc">Criação automática de descrições e especificações técnicas otimizadas.</p>
+        <div class="card-foot">
+          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
+          <span class="code">IA</span>
+        </div>
       </div>
     </a>
   </div>
 </main>
 
-<footer>Interface baseada no padrão visual interno.</footer>
+<footer class="footer-bar">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>
+      Central de Ferramentas
+    </div>
+    <div>Virtualizando você no seu ritmo.</div>
+    <div class="footer-right">Uso interno</div>
+  </div>
+</footer>
 
 <!-- Modal do Mural de Avisos -->
 <div class="sug-overlay" id="muralOverlay" aria-hidden="true">
@@ -362,6 +497,7 @@ Validador.subscribe(({ status, snap }) => {
   const feitos = snap.abas.reduce((s, a) => s + a.concluidos, 0);
   const pct = total ? Math.round((feitos / total) * 100) : 0;
   validBadge.textContent = (status === 'paused' ? '⏸ ' : '⚙️ ') + pct + '%';
+  validBadge.classList.toggle('running', status !== 'paused');
   validBadge.style.display = '';
 });
 Validador.init();
@@ -409,6 +545,15 @@ let tagForm = null;
 let editId = null, editDraft = "";
 let replyId = null, replyDraft = "";
 let muralEditId = null;
+
+// Atualiza um contador com uma pequena animação quando o valor muda
+function setCount(el, n){
+  const novo = String(n);
+  const mudou = el.textContent !== novo;
+  el.textContent = novo;
+  el.style.display = n ? "" : "none";
+  if (n && mudou) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
+}
 
 // ---------- Abrir / fechar Modais ----------
 const overlaySug = $("sugOverlay");
@@ -517,8 +662,7 @@ function renderLista(){
   const abertas = itens.filter(i => !i.concluida).length;
   const concl = itens.length - abertas;
 
-  $("sugCount").textContent = abertas;
-  $("sugCount").style.display = abertas ? "" : "none";
+  setCount($("sugCount"), abertas);
   $("sugResumo").textContent = `${abertas} em aberto · ${concl} concluída${concl === 1 ? '' : 's'}`;
 
   const lista = itens.filter(i =>
@@ -692,9 +836,7 @@ function renderMuralLista(){
   $("muralFormWrap").style.display = isAdmin ? "block" : "none";
   
   // Atualizar contador no botão do cabeçalho
-  const totalAvisos = avisosMural.length;
-  $("muralCount").textContent = totalAvisos;
-  $("muralCount").style.display = totalAvisos ? "" : "none";
+  setCount($("muralCount"), avisosMural.length);
 
   if (!avisosMural.length) {
     $("muralLista").innerHTML = `<li class="sug-empty">Nenhum aviso publicado no momento. 📢</li>`;
