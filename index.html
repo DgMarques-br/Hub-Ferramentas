@@ -49,13 +49,18 @@
   .btn-panel { background: var(--plum); color: #fff; text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all 0.2s ease; }
   .btn-panel:hover { opacity: 0.95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
 
-  /* ---------- Caixa de Sugestões ---------- */
+  /* Botão do Mural e Sugestões */
+  .btn-mural { background: var(--amber); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all .2s ease; }
+  .btn-mural:hover { opacity: .95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
+  :root[data-theme="dark"] .btn-mural { color: #11201B; }
+  .btn-mural .count { font-size: 12px; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 99px; display: none; }
+
   .btn-suggest{ background: var(--teal); color: #fff; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; font-family: var(--sans); cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: all .2s ease; }
   .btn-suggest:hover{ opacity: .95; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.12); }
   :root[data-theme="dark"] .btn-suggest{ color: #11201B; }
   .btn-suggest .count{ font-size: 12px; background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: 99px; display: none; }
-  :root[data-theme="dark"] .btn-suggest .count{ background: rgba(17,32,27,0.18); }
 
+  /* Modais Gerais */
   .sug-overlay{ position: fixed; inset: 0; background: rgba(17,32,27,.55); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
   .sug-overlay.open{ display: flex; }
   .sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
@@ -177,6 +182,13 @@
           <span id="validBadge" style="display:none; font-size:12px; background:rgba(255,255,255,0.22); padding:2px 8px; border-radius:99px;"></span>
         </a>
 
+        <!-- Botão do Mural de Avisos -->
+        <button class="btn-mural" id="btnMural" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+          Mural de Avisos
+          <span class="count" id="muralCount"></span>
+        </button>
+
         <button class="btn-suggest" id="btnSuggest" type="button">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           Caixa de Sugestões
@@ -186,22 +198,6 @@
     </div>
   </div>
 </header>
-
-<!-- MURAL DE AVISOS -->
-<div id="muralWrapper" style="max-width: 1180px; margin: 20px auto 0; padding: 0 24px; display: none;">
-  <div style="background: var(--teal-wash); border: 1px solid var(--teal); border-radius: 8px; padding: 16px; position: relative;">
-    <h3 style="margin: 0 0 8px; font-size: 14px; color: var(--teal-dark); text-transform: uppercase;">Mural de Avisos</h3>
-    <div id="muralConteudo" style="font-size: 14px; color: var(--ink); line-height: 1.4;">(Carregando...)</div>
-    <div id="muralEdicao" style="display: none; margin-top: 10px;">
-      <textarea id="muralTextoInput" style="width: 100%; min-height: 60px; padding: 8px; border-radius: 4px; border: 1px solid var(--teal); font-family: var(--sans); font-size: 14px;"></textarea>
-      <div style="margin-top: 8px; display: flex; gap: 8px;">
-        <button id="btnSalvarMural" style="background: var(--teal); color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Salvar Aviso</button>
-        <button id="btnCancelarMural" style="background: transparent; color: var(--teal); border: 1px solid var(--teal); padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold;">Cancelar</button>
-      </div>
-    </div>
-    <button id="btnEditarMural" style="position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 12px; color: var(--teal); cursor: pointer; font-weight: bold; display: none; text-decoration: underline;">Editar</button>
-  </div>
-</div>
 
 <main>
   <div class="hub-grid">
@@ -269,6 +265,37 @@
 </main>
 
 <footer>Interface baseada no padrão visual interno.</footer>
+
+<!-- Modal do Mural de Avisos -->
+<div class="sug-overlay" id="muralOverlay" aria-hidden="true">
+  <div class="sug-modal" role="dialog" aria-modal="true" aria-labelledby="muralTitulo">
+    <div class="sug-head">
+      <div>
+        <h2 id="muralTitulo">Mural de Avisos</h2>
+        <p>Comunicados oficiais e atualizações para a equipe</p>
+      </div>
+      <button class="sug-close" id="muralClose" type="button" aria-label="Fechar">✕</button>
+    </div>
+    <div class="sug-scroll">
+      <div class="sug-aviso" id="muralAviso"></div>
+
+      <!-- Formulário de criação/edição restrito ao Admin -->
+      <div class="sug-form" id="muralFormWrap" style="display: none;">
+        <span class="sug-label" id="muralFormTituloLabel">Novo Comunicado</span>
+        <textarea class="sug-text" id="muralTexto" maxlength="600" placeholder="Escreva o aviso para a equipe..."></textarea>
+        <div class="sug-form-foot">
+          <span class="sug-counter" id="muralCounter">0 / 600</span>
+          <div style="display: flex; gap: 8px;">
+            <button class="sug-btn ghost" id="muralCancelarEdicao" type="button" style="display:none;">Cancelar</button>
+            <button class="sug-btn" id="muralEnviar" type="button" disabled>Publicar Aviso</button>
+          </div>
+        </div>
+      </div>
+
+      <ul class="sug-list" id="muralLista"></ul>
+    </div>
+  </div>
+</div>
 
 <!-- Modal da Caixa de Sugestões -->
 <div class="sug-overlay" id="sugOverlay" aria-hidden="true">
@@ -354,6 +381,7 @@ const FIREBASE_CONFIG = {
 const ADMIN_EMAIL = "diogo.moreira2777@gmail.com"; 
 
 const COLECAO = "sugestoes";
+const COLECAO_MURAL = "mural_avisos";
 const MAX_CHARS = 500;
 
 const TAGS = [
@@ -373,20 +401,32 @@ const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;',
 let db = null, fb = null, authInstance = null, authProvider = null;
 let currentUser = null;
 let itens = [];
+let avisosMural = [];
 let tagForm = null;
 
-// Controle de Edição e Resposta
+// Controle de Edição de Sugestões e Mural
 let editId = null, editDraft = "";
 let replyId = null, replyDraft = "";
+let muralEditId = null;
 
-// ---------- Abrir / fechar ----------
-const overlay = $("sugOverlay");
-function abrir(){ overlay.classList.add("open"); overlay.setAttribute("aria-hidden","false"); }
-function fechar(){ overlay.classList.remove("open"); overlay.setAttribute("aria-hidden","true"); }
-$("btnSuggest").addEventListener("click", abrir);
-$("sugClose").addEventListener("click", fechar);
-overlay.addEventListener("click", (e) => { if (e.target === overlay) fechar(); });
-document.addEventListener("keydown", (e) => { if (e.key === "Escape") fechar(); });
+// ---------- Abrir / fechar Modais ----------
+const overlaySug = $("sugOverlay");
+function abrirSug(){ overlaySug.classList.add("open"); overlaySug.setAttribute("aria-hidden","false"); }
+function fecharSug(){ overlaySug.classList.remove("open"); overlaySug.setAttribute("aria-hidden","true"); }
+$("btnSuggest").addEventListener("click", abrirSug);
+$("sugClose").addEventListener("click", fecharSug);
+overlaySug.addEventListener("click", (e) => { if (e.target === overlaySug) fecharSug(); });
+
+const overlayMural = $("muralOverlay");
+function abrirMural(){ overlayMural.classList.add("open"); overlayMural.setAttribute("aria-hidden","false"); }
+function fecharMural(){ overlayMural.classList.remove("open"); overlayMural.setAttribute("aria-hidden","true"); }
+$("btnMural").addEventListener("click", abrirMural);
+$("muralClose").addEventListener("click", fecharMural);
+overlayMural.addEventListener("click", (e) => { if (e.target === overlayMural) fecharMural(); });
+
+document.addEventListener("keydown", (e) => { 
+  if (e.key === "Escape") { fecharSug(); fecharMural(); } 
+});
 
 function aviso(msg){
   const el = $("sugAviso");
@@ -394,7 +434,13 @@ function aviso(msg){
   el.style.display = msg ? "block" : "none";
 }
 
-// ---------- Formulário ----------
+function muralAviso(msg){
+  const el = $("muralAviso");
+  el.textContent = msg || "";
+  el.style.display = msg ? "block" : "none";
+}
+
+// ---------- Gestão do Formulário de Sugestões ----------
 function renderChips(){
   $("sugChips").innerHTML = TAGS.map(t =>
     `<button type="button" class="sug-chip ${tagForm === t.id ? 'sel' : ''}" data-tag="${t.id}" ${!currentUser ? 'disabled' : ''}>${esc(t.label)}</button>`
@@ -421,7 +467,7 @@ function validarForm(){
   ta.disabled = false;
   ta.placeholder = "Descreva a melhoria, ideia ou problema...";
   const n = ta.value.trim().length;
-  $("sugCounter").textContent = `${ta.value.length} / ${MAX_CHARS}`;
+  $("sugCounter").textContent = `${ta.value.length} / 500`;
   $("sugEnviar").disabled = !(db && tagForm && n >= 3);
 }
 $("sugTexto").addEventListener("input", validarForm);
@@ -433,7 +479,6 @@ $("sugEnviar").addEventListener("click", async () => {
   $("sugEnviar").disabled = true;
   try {
     const nomeExibicao = currentUser.displayName || currentUser.email.split('@')[0];
-
     await fb.addDoc(fb.collection(db, COLECAO), {
       texto, 
       tag: tagForm, 
@@ -453,12 +498,11 @@ $("sugEnviar").addEventListener("click", async () => {
   validarForm();
 });
 
-// ---------- Filtros ----------
+// ---------- Filtros Sugestões ----------
 $("sugFiltroTag").innerHTML = `<option value="todas">Todas as ferramentas</option>` + TAGS.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
 $("sugFiltroTag").addEventListener("change", renderLista);
 $("sugFiltroStatus").addEventListener("change", renderLista);
 
-// ---------- Lista ----------
 function fmtData(ts){
   try {
     const d = ts && ts.toDate ? ts.toDate() : null;
@@ -492,9 +536,7 @@ function renderLista(){
     const t = tagInfo(i.tag);
     const isOwner = currentUser && i.autorId === currentUser.uid;
     const canEditOrDelete = isOwner || isAdmin;
-    
     const nomeAutor = i.autorNome || (i.autorEmail ? i.autorEmail.split('@')[0] : 'Usuário Oculto');
-
     const editando = editId === i.id;
     const respondendo = replyId === i.id;
     let corpo = '';
@@ -511,35 +553,25 @@ function renderLista(){
 
     if (editando) {
       corpo = `
-         <textarea class="sug-text" id="sugEditText" maxlength="${MAX_CHARS}">${esc(editDraft)}</textarea>
+         <textarea class="sug-text" id="sugEditText" maxlength="500">${esc(editDraft)}</textarea>
          <div class="sug-edit-row">
            <button class="sug-btn" data-act="salvar" data-id="${i.id}" type="button">Salvar</button>
            <button class="sug-btn ghost" data-act="cancelar" type="button">Cancelar</button>
          </div>`;
     } else if (respondendo) {
       corpo = `
-         <textarea class="sug-text" id="sugReplyText" maxlength="${MAX_CHARS}" placeholder="Digite a resposta do administrador...">${esc(replyDraft)}</textarea>
+         <textarea class="sug-text" id="sugReplyText" maxlength="500" placeholder="Digite a resposta do administrador...">${esc(replyDraft)}</textarea>
          <div class="sug-edit-row">
            <button class="sug-btn" data-act="salvar-resposta" data-id="${i.id}" type="button">Enviar Resposta</button>
            <button class="sug-btn ghost" data-act="cancelar-resposta" type="button">Cancelar</button>
          </div>`;
     } else {
       corpo = `<div class="sug-content">${esc(i.texto)}</div>${respostaHtml}`;
-      
       let botoes = '';
-      if (canEditOrDelete) {
-        botoes += `<button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>`;
-      }
-      if (isAdmin) {
-        botoes += `<button class="sug-link" data-act="responder" data-id="${i.id}" type="button" style="color: var(--teal);">Responder</button>`;
-      }
-      if (canEditOrDelete) {
-        botoes += `<button class="sug-link danger" data-act="excluir" data-id="${i.id}" type="button">Excluir</button>`;
-      }
-
-      if(botoes !== '') {
-        corpo += `<div class="sug-actions">${botoes}</div>`;
-      }
+      if (canEditOrDelete) botoes += `<button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>`;
+      if (isAdmin) botoes += `<button class="sug-link" data-act="responder" data-id="${i.id}" type="button" style="color: var(--teal);">Responder</button>`;
+      if (canEditOrDelete) botoes += `<button class="sug-link danger" data-act="excluir" data-id="${i.id}" type="button">Excluir</button>`;
+      if(botoes !== '') corpo += `<div class="sug-actions">${botoes}</div>`;
     }
 
     return `
@@ -571,46 +603,156 @@ $("sugLista").addEventListener("click", async (e) => {
   try {
     if (act === "toggle") {
       await fb.updateDoc(ref, { concluida: el.checked });
-      
     } else if (act === "editar") {
       editId = id; editDraft = item ? item.texto : "";
       replyId = null;
       renderLista();
-      const ta = $("sugEditText"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
-      
     } else if (act === "cancelar") {
       editId = null; editDraft = ""; renderLista();
-      
     } else if (act === "salvar") {
       const texto = editDraft.trim();
       if (texto.length < 3) { aviso("A sugestão precisa ter pelo menos 3 caracteres."); return; }
       await fb.updateDoc(ref, { texto, editadoEm: fb.serverTimestamp() });
       editId = null; editDraft = ""; aviso("");
-
     } else if (act === "responder") {
       replyId = id; replyDraft = item.respostaAdmin || "";
       editId = null;
       renderLista();
-      const ta = $("sugReplyText"); if (ta) { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
-
     } else if (act === "cancelar-resposta") {
       replyId = null; replyDraft = ""; renderLista();
-
     } else if (act === "salvar-resposta") {
       const resposta = replyDraft.trim();
       await fb.updateDoc(ref, { respostaAdmin: resposta, respondidoEm: fb.serverTimestamp() });
       replyId = null; replyDraft = ""; aviso("");
-
     } else if (act === "excluir") {
-      if (!confirm("Excluir esta sugestão? Isso não pode ser desfeito.")) return;
+      if (!confirm("Excluir esta sugestão?")) return;
       await fb.deleteDoc(ref);
     }
   } catch (err) {
-    aviso("Não foi possível concluir a ação: Você não tem permissão.");
+    aviso("Não foi possível concluir a ação: Sem permissão.");
     if (act === "toggle") renderLista();
   }
 });
 
+
+// ---------- Lógica do Mural de Avisos (Modal) ----------
+function validarMuralForm(){
+  const ta = $("muralTexto");
+  const n = ta.value.trim().length;
+  $("muralCounter").textContent = `${n} / 600`;
+  $("muralEnviar").disabled = n < 3;
+}
+$("muralTexto").addEventListener("input", validarMuralForm);
+
+$("muralEnviar").addEventListener("click", async () => {
+  const texto = $("muralTexto").value.trim();
+  if (!db || texto.length < 3) return;
+  $("muralEnviar").disabled = true;
+
+  try {
+    if (muralEditId) {
+      // Atualizar aviso existente
+      await fb.updateDoc(fb.doc(db, COLECAO_MURAL, muralEditId), {
+        texto,
+        editadoEm: fb.serverTimestamp()
+      });
+      muralEditId = null;
+      $("muralFormTituloLabel").textContent = "Novo Comunicado";
+      $("muralEnviar").textContent = "Publicar Aviso";
+      $("muralCancelarEdicao").style.display = "none";
+    } else {
+      // Criar novo aviso com data de lançamento
+      await fb.addDoc(fb.collection(db, COLECAO_MURAL), {
+        texto,
+        criadoEm: fb.serverTimestamp()
+      });
+    }
+    $("muralTexto").value = "";
+    muralAviso("");
+  } catch (err) {
+    muralAviso("Erro ao salvar aviso: " + err.message);
+  }
+  validarMuralForm();
+});
+
+$("muralCancelarEdicao").addEventListener("click", () => {
+  muralEditId = null;
+  $("muralTexto").value = "";
+  $("muralFormTituloLabel").textContent = "Novo Comunicado";
+  $("muralEnviar").textContent = "Publicar Aviso";
+  $("muralCancelarEdicao").style.display = "none";
+  validarMuralForm();
+});
+
+function renderMuralLista(){
+  const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
+  
+  // Mostrar formulário apenas para o admin
+  $("muralFormWrap").style.display = isAdmin ? "block" : "none";
+  
+  // Atualizar contador no botão do cabeçalho
+  const totalAvisos = avisosMural.length;
+  $("muralCount").textContent = totalAvisos;
+  $("muralCount").style.display = totalAvisos ? "" : "none";
+
+  if (!avisosMural.length) {
+    $("muralLista").innerHTML = `<li class="sug-empty">Nenhum aviso publicado no momento. 📢</li>`;
+    return;
+  }
+
+  $("muralLista").innerHTML = avisosMural.map(a => {
+    let botoesAdmin = '';
+    if (isAdmin) {
+      botoesAdmin = `
+        <div class="sug-actions">
+          <button class="sug-link" data-mural-act="editar" data-id="${a.id}" type="button">Alterar</button>
+          <button class="sug-link danger" data-mural-act="excluir" data-id="${a.id}" type="button">Excluir</button>
+        </div>
+      `;
+    }
+
+    return `
+      <li class="sug" style="background: var(--paper);">
+        <div class="sug-body">
+          <div class="sug-meta">
+            <span class="sug-tag t-amber">COMUNICADO OFICIAL</span>
+            <span class="sug-date">Lançado em: <b>${fmtData(a.criadoEm)}</b> ${a.editadoEm ? '(editado)' : ''}</span>
+          </div>
+          <div class="sug-content">${esc(a.texto)}</div>
+          ${botoesAdmin}
+        </div>
+      </li>
+    `;
+  }).join("");
+}
+
+$("muralLista").addEventListener("click", async (e) => {
+  const el = e.target.closest("[data-mural-act]");
+  if (!el || !db) return;
+  const act = el.dataset.muralAct;
+  const id = el.dataset.id;
+  const avisoItem = avisosMural.find(a => a.id === id);
+
+  try {
+    if (act === "editar" && avisoItem) {
+      muralEditId = id;
+      $("muralTexto").value = avisoItem.texto;
+      $("muralFormTituloLabel").textContent = "Alterar Comunicado";
+      $("muralEnviar").textContent = "Guardar Alterações";
+      $("muralCancelarEdicao").style.display = "inline-block";
+      validarMuralForm();
+      $("muralTexto").focus();
+    } else if (act === "excluir") {
+      if (!confirm("Tem certeza que deseja excluir este aviso do mural?")) return;
+      await fb.deleteDoc(fb.doc(db, COLECAO_MURAL, id));
+    }
+  } catch (err) {
+    muralAviso("Erro ao executar ação: " + err.message);
+  }
+});
+
+
+// ---------- Firebase Inicialização e Autenticação ----------
 async function conectar(){
   try {
     const [appModule, storeModule, authModule] = await Promise.all([
@@ -638,15 +780,10 @@ async function conectar(){
         $("userEmailTxt").textContent = "";
       }
       
-      // MOSTRAR/ESCONDER BOTÃO DO MURAL CONSOANTE ADMIN
-      const btnEditarMural = document.getElementById("btnEditarMural");
-      if (btnEditarMural) {
-        btnEditarMural.style.display = (user && user.email === ADMIN_EMAIL) ? "block" : "none";
-      }
-      
       renderChips();
       validarForm();
       renderLista();
+      renderMuralLista();
     });
 
     $("btnLogin").addEventListener("click", async () => {
@@ -658,6 +795,7 @@ async function conectar(){
       authModule.signOut(authInstance);
     });
 
+    // Listener de Sugestões
     const q = storeModule.query(storeModule.collection(db, COLECAO), storeModule.orderBy("criadoEm", "desc"));
     storeModule.onSnapshot(q, (snap) => {
       itens = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
@@ -665,45 +803,13 @@ async function conectar(){
       renderLista();
     }, (err) => aviso("Não foi possível ler as sugestões: " + err.message));
 
-    // LÓGICA DO MURAL (dentro do conectar, após db estar pronto)
-    const DOC_MURAL_ID = "aviso_geral"; 
-    const refMural = fb.doc(db, "configuracoes", DOC_MURAL_ID);
-
-    fb.onSnapshot(refMural, (docSnap) => {
-      document.getElementById("muralWrapper").style.display = "block";
-      if (docSnap.exists()) {
-        const dados = docSnap.data();
-        document.getElementById("muralConteudo").innerHTML = esc(dados.texto || "").replace(/\n/g, "<br>");
-        document.getElementById("muralTextoInput").value = dados.texto || "";
-      } else {
-        document.getElementById("muralConteudo").textContent = "Nenhum aviso no momento.";
-      }
-    });
-
-    document.getElementById("btnEditarMural").addEventListener("click", () => {
-      document.getElementById("muralConteudo").style.display = "none";
-      document.getElementById("btnEditarMural").style.display = "none";
-      document.getElementById("muralEdicao").style.display = "block";
-    });
-
-    document.getElementById("btnCancelarMural").addEventListener("click", () => {
-      document.getElementById("muralConteudo").style.display = "block";
-      // Repõe o botão se for admin
-      if (currentUser && currentUser.email === ADMIN_EMAIL) {
-        document.getElementById("btnEditarMural").style.display = "block";
-      }
-      document.getElementById("muralEdicao").style.display = "none";
-    });
-
-    document.getElementById("btnSalvarMural").addEventListener("click", async () => {
-      const novoTexto = document.getElementById("muralTextoInput").value.trim();
-      try {
-        await fb.setDoc(refMural, { texto: novoTexto, atualizadoEm: fb.serverTimestamp() }, { merge: true });
-        document.getElementById("btnCancelarMural").click();
-      } catch (err) {
-        alert("Erro ao salvar aviso. Sem permissão.");
-      }
-    });
+    // Listener do Mural de Avisos (múltiplos avisos ordenados por data)
+    const qMural = storeModule.query(storeModule.collection(db, COLECAO_MURAL), storeModule.orderBy("criadoEm", "desc"));
+    storeModule.onSnapshot(qMural, (snap) => {
+      avisosMural = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
+      muralAviso("");
+      renderMuralLista();
+    }, (err) => muralAviso("Não foi possível carregar o mural: " + err.message));
 
   } catch (err) {
     aviso("Não foi possível carregar o Firebase: " + err.message);
