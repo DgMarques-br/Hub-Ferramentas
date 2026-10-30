@@ -3,307 +3,225 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Links</title>
+<title>Validador de Links · Hub</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
 <style>
+  /* Variáveis de Tema (Harmonizadas com o Hub) */
   :root{
-    --bg: #EEF0EF;
-    --paper: #FFFFFF;
-    --ink: #17211D;
-    --ink-soft: #576159;
-    --line: #DADFDA;
-    --line-soft: #E7EAE6;
-    --teal: #1F6F5C;
-    --teal-dark: #164F42;
-    --teal-wash: #E4F0EC;
-    --plum: #5B4B8A;
-    --plum-wash: #ECE8F5;
-    --red: #D93025;
-    --red-wash: #FCE8E6;
-    --amber: #B9762D;
-    --amber-wash: #FDF6EC;
-    --radius: 10px;
+    --bg: #F4F6F5; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
+    --line: #E2E6E4; --line-soft: #EEF0EF;
+    
+    /* Cores de Destaque */
+    --teal: #1F6F5C; --teal-dark: #164F42; --teal-wash: #E4F0EC;
+    --amber: #C27A2A; --amber-wash: #F7ECDE;
+    --plum: #67549C; --plum-wash: #ECE8F5;
+    --blue: #2563EB; --blue-wash: #EFF6FF;
+    --rose: #E11D48; --rose-wash: #FFE4E6;
+    --cyan: #0891B2; --cyan-wash: #ECFEFF;
+    --red: #D93025; --red-wash: #FCE8E6;
+    
+    --radius: 12px;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --ease: cubic-bezier(.22,.8,.3,1);
   }
+  
   :root[data-theme="dark"]{
-    --bg: #11201B;
-    --paper: #16231E;
-    --ink: #E8EEEC;
-    --ink-soft: #92A49C;
-    --line: #233830;
-    --line-soft: #1D2D27;
-    --teal: #3FB492;
-    --teal-dark: #7FDDBE;
-    --teal-wash: #1B3830;
-    --plum: #C2B0EC;
-    --plum-wash: #2B2440;
-    --red: #F28B82;
-    --red-wash: #3C1E1A;
-    --amber: #F6AD55;
-    --amber-wash: #3A2E1B;
+    --bg: #0A0F0D; --paper: #101614; --ink: #E8EEEC; --ink-soft: #92A49C;
+    --line: #1D2623; --line-soft: #161D1A;
+    
+    /* Cores de Destaque (Modo Escuro) */
+    --teal: #49C4A1; --teal-dark: #8DE0C6; --teal-wash: #142E26;
+    --amber: #EAA64B; --amber-wash: #332611;
+    --plum: #B89EFA; --plum-wash: #281D40;
+    --blue: #60A5FA; --blue-wash: #172554;
+    --rose: #FB7185; --rose-wash: #3C121A;
+    --cyan: #38BDF8; --cyan-wash: #082F49;
+    --red: #FA7970; --red-wash: #3C1E1A;
   }
+  
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
-  body{
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    transition: background .15s ease, color .15s ease;
+  html,body{ margin:0; padding:0; background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  
+  /* Transições Base */
+  body, .top, .controls-wrap, .mkt-card, .btn-buscar, .search-box select, .search-input-wrapper input, .card-produto, .btn-region, .filter-btn, .theme-toggle, .btn-abrir, .btn-voltar, .mensagem-global, .detalhe-box {
+    transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease, transform .25s var(--ease);
   }
 
-  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
+  /* Animações */
+  @keyframes fadeUp { from{ opacity:0; transform: translateY(16px); } to{ opacity:1; transform: none; } }
+  @keyframes fadeIn { from{ opacity:0; } to{ opacity:1; } }
+  .a-up { animation: fadeUp .5s var(--ease) both; animation-delay: calc(var(--d, 0) * 1ms); }
+
+  /* ---------- Cabeçalho ---------- */
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); position: relative; z-index: 20; }
   .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-  .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; transition: color 0.15s ease; }
-  .nav-back:hover { color: var(--teal); }
-  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--plum); font-weight: 600; margin: 0 0 6px; }
-  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ink); }
-  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 480px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; font-family: var(--sans); }
+  .nav-back:hover { color: var(--blue); transform: translateX(-3px); }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--blue); font-weight: 700; margin: 0 0 6px; }
+  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14px; max-width: 480px; line-height: 1.5; }
 
-  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
-  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
+  .theme-toggle:hover{ border-color: var(--blue); color: var(--ink); transform: translateY(-1px); }
 
-  .controls-wrap{ background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; }
+  /* ---------- Barra de Pesquisa ---------- */
+  .controls-wrap{ background: var(--paper); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 10; box-shadow: 0 4px 20px rgba(0,0,0,0.02); }
   .controls{ max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
   
-  /* Novo container Flex para o campo de busca e o seletor */
   .search-box{ position: relative; flex: 1 1 320px; min-width: 240px; display: flex; gap: 10px; }
   
-  /* Estilos do Select (Filtro) */
-  .search-box select {
-    padding: 11px 16px;
-    border-radius: var(--radius);
-    border: 1.5px solid var(--line);
-    background: var(--bg);
-    font-size: 14px;
-    font-weight: 600;
-    font-family: var(--sans);
-    color: var(--ink);
-    outline: none;
-    cursor: pointer;
-    transition: border-color .15s ease, background .15s ease;
-  }
-  .search-box select:focus { border-color: var(--plum); background: var(--paper); }
+  .search-box select { padding: 11px 16px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); font-size: 14px; font-weight: 600; font-family: var(--sans); color: var(--ink); outline: none; cursor: pointer; }
+  .search-box select:focus, .search-box select:hover { border-color: var(--blue); background: var(--paper); }
   
-  /* Campo de texto de busca adaptado */
-  .search-input-wrapper {
-    position: relative;
-    flex-grow: 1;
-  }
-  .search-input-wrapper input{ width: 100%; padding: 11px 16px 11px 40px; border-radius: var(--radius); border: 1.5px solid var(--line); background: var(--bg); font-size: 15px; font-family: var(--sans); color: var(--ink); outline: none; transition: border-color .15s ease, background .15s ease; }
-  .search-input-wrapper input:focus{ border-color: var(--plum); background: var(--paper); }
+  .search-input-wrapper { position: relative; flex-grow: 1; }
+  .search-input-wrapper input{ width: 100%; padding: 11px 16px 11px 40px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); font-size: 15px; font-family: var(--sans); color: var(--ink); outline: none; }
+  .search-input-wrapper input:focus, .search-input-wrapper input:hover{ border-color: var(--blue); background: var(--paper); box-shadow: 0 0 0 4px color-mix(in srgb, var(--blue) 12%, transparent); }
   .search-input-wrapper svg.icon-search{ position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; stroke: var(--ink-soft); }
   
-  .btn-buscar { padding: 11px 24px; font-size: 14px; background-color: var(--plum); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; font-weight: bold; transition: opacity 0.3s; white-space: nowrap; }
-  .btn-buscar:hover { opacity: 0.9; }
-  .btn-buscar:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-buscar { padding: 11px 24px; font-size: 14px; background-color: var(--blue); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; white-space: nowrap; font-family: var(--sans); }
+  :root[data-theme="dark"] .btn-buscar { color: #0A0F0D; }
+  .btn-buscar:hover:not(:disabled) { transform: translateY(-1px); opacity: 0.95; box-shadow: 0 4px 12px color-mix(in srgb, var(--blue) 30%, transparent); }
+  .btn-buscar:active:not(:disabled) { transform: translateY(0); }
+  .btn-buscar:disabled { opacity: 0.5; cursor: not-allowed; background: var(--line); color: var(--ink-soft); box-shadow: none; }
 
-  main{ max-width: 1180px; margin: 0 auto; padding: 24px 24px 60px; }
-  #resultado { display: none; margin-top: 10px; }
-  .mensagem-global { padding: 16px; border-radius: var(--radius); font-size: 14.5px; margin-bottom: 24px; border: 1px solid var(--line); }
-  .msg-info { background: var(--teal-wash); color: var(--teal-dark); border-color: var(--teal); }
+  /* ---------- Área Principal ---------- */
+  main{ max-width: 1180px; margin: 0 auto; padding: 30px 24px 60px; }
+  #resultado { display: none; }
+  
+  /* Mensagens */
+  .mensagem-global { padding: 16px; border-radius: var(--radius); font-size: 14.5px; margin-bottom: 24px; border: 1px solid var(--line); display: flex; align-items: center; gap: 10px; font-weight: 500; animation: fadeIn 0.3s ease; }
+  .msg-info { background: var(--blue-wash); color: var(--blue); border-color: var(--blue); }
   .msg-erro { background: var(--red-wash); color: var(--red); border-color: var(--red); }
   
-  /* Grelha Tela 1 */
-  .mkt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+  /* Spinner */
+  .loading-container { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+  .spinner { width: 18px; height: 18px; border: 3px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 0.85s linear infinite; }
+  .loading-text { animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+  /* ---------- Grelha Lojas (Visão Agrupada) ---------- */
+  .mkt-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
   .mkt-card {
     background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 24px 24px 20px; display: flex; flex-direction: column; align-items: center; text-align: center;
-    cursor: pointer; transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.03); position: relative;
+    padding: 24px; display: flex; flex-direction: column; align-items: center; text-align: center;
+    cursor: pointer; position: relative; overflow: hidden;
   }
-  .mkt-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.06); border-color: var(--teal); }
-  .mkt-card.static { cursor: default; transform: none; box-shadow: 0 2px 8px rgba(0,0,0,0.03); border-color: var(--line); }
+  .mkt-card::before{ content:""; position:absolute; left:0; top:0; height:3px; width:100%; background: var(--acc, var(--line)); transform: scaleX(0); transform-origin: left; transition: transform .4s var(--ease); }
   
-  .mkt-icon { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; background: var(--bg); color: var(--ink); margin-bottom: 16px; }
-  .mkt-title { font-size: 18px; font-weight: 700; color: var(--ink); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 8px; }
-  .mkt-count { font-size: 13.5px; color: var(--ink-soft); background: var(--line-soft); padding: 4px 12px; border-radius: 999px; }
+  /* Cores por Marketplace */
+  .mkt-card[data-loja*="mercado"] { --acc: #F3C300; border-top: 3px solid var(--acc); }
+  .mkt-card[data-loja*="amazon"] { --acc: #FF9900; border-top: 3px solid var(--acc); }
+  .mkt-card[data-loja*="shopee"] { --acc: #EE4D2D; border-top: 3px solid var(--acc); }
+  .mkt-card[data-loja*="magalu"] { --acc: #0086FF; border-top: 3px solid var(--acc); }
+  .mkt-card[data-loja*="tiktok"] { --acc: var(--ink); border-top: 3px solid var(--acc); }
+  .mkt-card[data-loja*="inpower"] { --acc: var(--teal); border-top: 3px solid var(--acc); }
 
-  /* Toggles SP/MG */
-  .region-toggles { display: flex; gap: 8px; justify-content: center; margin-top: 18px; width: 100%; border-top: 1px solid var(--line-soft); padding-top: 16px;}
-  .btn-region { background: var(--bg); border: 1px solid var(--line); color: var(--ink-soft); padding: 4px 14px; border-radius: 999px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; font-family: var(--sans); letter-spacing: 0.05em; }
-  .btn-region:hover { background: var(--line-soft); }
+  .mkt-card:hover:not(.static) { transform: translateY(-4px); box-shadow: 0 12px 24px -8px rgba(0,0,0,0.1); border-color: color-mix(in srgb, var(--acc) 40%, var(--line)); }
+  .mkt-card:hover:not(.static)::before{ transform: scaleX(1); }
+  .mkt-card.static { cursor: default; box-shadow: 0 2px 8px rgba(0,0,0,0.03); }
+  
+  .mkt-icon { width: 54px; height: 54px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 700; background: var(--bg); color: var(--ink); margin-bottom: 16px; border: 1px solid var(--line-soft); }
+  .mkt-title { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--ink); margin-bottom: 8px; letter-spacing: -0.01em; }
+  .mkt-count { font-size: 12.5px; font-weight: 600; color: var(--ink-soft); background: var(--bg); padding: 4px 12px; border-radius: 999px; border: 1px solid var(--line); }
+
+  /* Toggles Região */
+  .region-toggles { display: flex; gap: 8px; justify-content: center; margin-top: 20px; width: 100%; border-top: 1px solid var(--line-soft); padding-top: 16px; }
+  .btn-region { background: var(--bg); border: 1px solid var(--line); color: var(--ink-soft); padding: 5px 14px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--mono); letter-spacing: 0.08em; text-transform: uppercase; }
+  .btn-region:hover { border-color: var(--ink); color: var(--ink); }
   .btn-region.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
-  .mkt-card[data-loja*="mercado"] { border-top: 4px solid #F3C300; }
-  .mkt-card[data-loja*="amazon"] { border-top: 4px solid #FF9900; }
-  .mkt-card[data-loja*="shopee"] { border-top: 4px solid #EE4D2D; }
-  .mkt-card[data-loja*="magalu"] { border-top: 4px solid #0086FF; }
-  .mkt-card[data-loja*="tiktok"] { border-top: 4px solid #000000; }
-  .mkt-card[data-loja*="inpower"] { border-top: 4px solid var(--teal); }
-
-  /* Tela 2: Split View */
-  .mkt-split { display: flex; gap: 32px; align-items: flex-start; }
-  .mkt-left { flex: 0 0 300px; position: sticky; top: 120px; }
-  .mkt-right { flex: 1; }
+  /* ---------- Tela Interna (Detalhes por Loja) ---------- */
+  .mkt-split { display: flex; gap: 28px; align-items: flex-start; animation: fadeIn 0.4s ease; }
+  .mkt-left { flex: 0 0 280px; position: sticky; top: 110px; }
+  .mkt-right { flex: 1; min-width: 0; }
   
-  .btn-voltar { display: inline-flex; align-items: center; gap: 6px; background: transparent; border: 1.5px solid var(--line); color: var(--ink); padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; margin-bottom: 20px; transition: background 0.2s; font-family: var(--sans); width: 100%; justify-content: center; }
-  .btn-voltar:hover { background: var(--line-soft); }
+  .btn-voltar { display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: var(--bg); border: 1.5px solid var(--line); color: var(--ink-soft); padding: 10px 16px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; margin-bottom: 16px; font-family: var(--sans); width: 100%; }
+  .btn-voltar:hover { background: var(--paper); border-color: var(--ink); color: var(--ink); transform: translateY(-1px); }
 
-  /* Filtros */
-  .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; background: var(--paper); padding: 14px; border-radius: var(--radius); border: 1px solid var(--line); }
-  .filter-btn { padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-soft); font-size: 13.5px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-  .filter-btn:hover { border-color: var(--teal); color: var(--ink); }
-  .filter-btn.active { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  /* Filtros de Status */
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; background: var(--paper); padding: 12px; border-radius: var(--radius); border: 1px solid var(--line); }
+  .filter-btn { padding: 8px 14px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--ink-soft); font-size: 13px; font-weight: 600; cursor: pointer; }
+  .filter-btn:hover { border-color: var(--blue); color: var(--ink); }
+  .filter-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+  :root[data-theme="dark"] .filter-btn.active { color: #0A0F0D; }
 
   /* Cartões de Produtos */
   .card-produto { 
-    background: var(--paper); 
-    border: 1px solid var(--line); 
-    border-left: 4px solid var(--teal); 
-    border-radius: 8px; 
-    padding: 18px; 
-    margin-bottom: 16px; 
-    box-shadow: 0 1px 3px rgba(0,0,0,0.02); 
-    cursor: pointer;
-    transition: all 0.25s ease;
-    position: relative;
+    background: var(--paper); border: 1px solid var(--line); border-left: 4px solid var(--blue); 
+    border-radius: 10px; padding: 20px; margin-bottom: 16px; 
+    cursor: pointer; position: relative;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
   }
-  .card-produto:hover {
-    border-color: var(--teal);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
-  }
+  .card-produto:hover { border-color: var(--blue); box-shadow: 0 8px 20px rgba(0,0,0,0.06); transform: translateY(-2px); }
+  
   .card-produto.quebrado { border-left-color: var(--red); }
   .card-produto.sem-link { border-left-color: var(--amber); background: var(--amber-wash); }
+  .card-produto.sem-link:hover { border-color: var(--amber); }
+  .card-produto.quebrado:hover { border-color: var(--red); }
 
-  /* Estado Expandido do Card */
-  .card-produto.expanded {
-    border-color: var(--teal);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    padding-bottom: 22px;
-  }
+  .card-produto.expanded { border-color: var(--blue); box-shadow: 0 12px 28px rgba(0,0,0,0.08); padding-bottom: 24px; transform: none; }
   
-  .card-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; gap: 10px; flex-wrap: wrap;}
-  .card-aba { font-family: var(--mono); font-size: 11.5px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;}
-  .card-nac { font-family: var(--mono); font-size: 11.5px; background: var(--line-soft); color: var(--ink); padding: 4px 10px; border-radius: 4px; font-weight: bold; border: 1px solid var(--line); }
+  .card-topo { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 10px; flex-wrap: wrap; }
+  .card-aba { font-family: var(--mono); font-size: 11px; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
+  .card-nac { font-family: var(--mono); font-size: 10.5px; background: var(--bg); color: var(--ink); padding: 4px 8px; border-radius: 4px; font-weight: 700; border: 1px solid var(--line); letter-spacing: 0.05em; }
   
-  .card-titulo { font-size: 15.5px; font-weight: 600; color: var(--ink); margin-bottom: 18px; line-height: 1.4; }
+  .card-titulo { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 20px; line-height: 1.5; }
   
-  .card-rodape { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-soft); padding-top: 14px; flex-wrap: wrap; gap: 10px; }
-  .status-badge { font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
-  .status-badge.ativo { color: var(--teal-dark); }
+  .card-rodape { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-soft); padding-top: 16px; flex-wrap: wrap; gap: 12px; }
+  
+  .status-badge { font-size: 13.5px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+  .status-badge.ativo { color: var(--blue); }
   .status-badge.erro { color: var(--red); }
   .status-badge.aviso { color: var(--amber); }
   
-  .btn-abrir { display: inline-block; background: var(--plum-wash); color: var(--plum); font-weight: 600; text-decoration: none; font-size: 13.5px; padding: 8px 16px; border-radius: 6px; transition: background 0.2s; white-space: nowrap;}
-  .btn-abrir:hover { background: var(--line); }
+  .btn-abrir { display: inline-block; background: var(--blue-wash); color: var(--blue); font-weight: 600; text-decoration: none; font-size: 13px; padding: 8px 16px; border-radius: 6px; white-space: nowrap; border: 1px solid transparent; }
+  .btn-abrir:hover { background: var(--paper); border-color: var(--blue); transform: translateY(-1px); }
 
-  /* PAINEL DE INFORMAÇÕES EXTRAS (Colunas H, I, J) */
-  .card-detalhes {
-    display: none;
-    margin-top: 18px;
-    padding-top: 16px;
-    border-top: 1px dashed var(--line);
-    animation: fadeIn 0.2s ease-in-out;
-  }
-  .card-produto.expanded .card-detalhes {
-    display: block;
-  }
+  /* Detalhes Expandidos (Colunas H, I, J) */
+  .card-detalhes { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px dashed var(--line); animation: fadeIn 0.3s ease; }
+  .card-produto.expanded .card-detalhes { display: block; }
 
-  .detalhes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 12px;
-    margin-top: 10px;
-  }
+  .detalhes-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+  .detalhe-box { background: var(--bg); border: 1px solid var(--line-soft); padding: 14px 16px; border-radius: 8px; }
+  .detalhe-label { font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px; letter-spacing: 0.08em; }
+  .detalhe-valor { font-size: 14px; font-weight: 600; color: var(--ink); word-break: break-word; }
+  .detalhe-valor.pendente { color: var(--ink-soft); font-weight: 500; font-style: italic; }
 
-  .detalhe-box {
-    background: var(--bg);
-    border: 1px solid var(--line-soft);
-    padding: 12px 14px;
-    border-radius: 6px;
-  }
-
-  .detalhe-label {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
-    letter-spacing: 0.05em;
-  }
-
-  .detalhe-valor {
-    font-size: 13.5px;
-    font-weight: 600;
-    color: var(--ink);
-    word-break: break-word;
-  }
-
-  .detalhe-valor.pendente {
-    color: var(--ink-soft);
-    font-weight: 400;
-    font-style: italic;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-4px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
+  footer{ text-align: center; padding: 24px 24px 40px; color: var(--ink-soft); font-size: 12px; border-top: 1px solid var(--line); }
 
   @media (max-width: 850px){
     .mkt-split { flex-direction: column; }
-    .mkt-left { flex: none; width: 100%; position: relative; top: 0; }
+    .mkt-left { flex: none; width: 100%; position: relative; top: 0; margin-bottom: 10px; }
   }
-
-  /* Animação de Carregamento (Spinner) */
-  .loading-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 600;
-  }
-  .spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.85s linear infinite;
-  }
-  .loading-text {
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.6; }
-  }
-
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="top-inner">
-    <div>
-      <a href="index.html" class="nav-back">← Voltar ao Hub</a>
-      <p class="brand-eyebrow">Operacional</p>
+    <div class="a-up">
+      <a href="index.html" class="nav-back">← Voltar ao Hub Central</a>
+      <p class="brand-eyebrow">Apoio Operacional</p>
       <h1>Validador de Links</h1>
       <p class="subtitle">Pesquisa unificada em múltiplas abas de e-commerce e verificação de integridade de URLs na hora.</p>
     </div>
-    <div>
+    <div class="a-up" style="--d:100">
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
     </div>
   </div>
 </header>
 
-<div class="controls-wrap">
+<div class="controls-wrap a-up" style="--d:150">
   <div class="controls">
     <div class="search-box">
-      <!-- NOVO SELETOR DE FILTRO -->
+      <!-- SELETOR DE FILTRO -->
       <select id="tipoBusca">
-        <option value="geral">Em toda a linha (Geral)</option>
-        <option value="nac">Somente em NAC / SKU</option>
-        <option value="fabricante">Somente no Fabricante</option>
+        <option value="geral">Pesquisa Geral (Todas as colunas)</option>
+        <option value="nac">Código SKU / NAC Exato</option>
+        <option value="fabricante">Código do Fabricante</option>
       </select>
       
       <!-- CAMPO DE PESQUISA -->
@@ -312,7 +230,7 @@
         <input type="text" id="termo" placeholder="Digite sua pesquisa..." onkeydown="if(event.key === 'Enter') realizarBusca()">
       </div>
       
-      <button id="btn" class="btn-buscar" onclick="realizarBusca()">Pesquisar</button>
+      <button id="btn" class="btn-buscar" onclick="realizarBusca()">Procurar Links</button>
     </div>
   </div>
 </div>
@@ -321,7 +239,7 @@
   <div id="resultado"></div>
 </main>
 
-<footer>Integração via Google Apps Script · Interface Padrão</footer>
+<footer>Integração via Google Apps Script · Interface Padronizada</footer>
 
 <script>
     // IMPORTANTE: COLOQUE AQUI O SEU NOVO LINK GERADO!
@@ -345,23 +263,22 @@
 
     async function realizarBusca() {
         const termo = document.getElementById('termo').value.trim();
-        const tipoBusca = document.getElementById('tipoBusca').value; // Pega o tipo de busca selecionado
+        const tipoBusca = document.getElementById('tipoBusca').value; 
         const divResultado = document.getElementById('resultado');
         const botao = document.getElementById('btn');
 
         if (!termo) {
-            mostrarMensagemGlobal('msg-erro', 'Por favor, digite algo para buscar.');
+            mostrarMensagemGlobal('msg-erro', '⚠️ Por favor, digite um termo, SKU ou fabricante válido para pesquisar.');
             return;
         }
 
         botao.disabled = true;
         botao.innerText = 'A Pesquisar...';
-        mostrarMensagemGlobal('msg-info', '<div class="loading-container"><div class="spinner"></div><span class="loading-text">A varrer as lojas. Por favor, aguarde...</span></div>');
+        mostrarMensagemGlobal('msg-info', '<div class="loading-container"><div class="spinner"></div><span class="loading-text">A varrer base de dados de Lojas...</span></div>');
         dadosAgrupados = {};
         regiaoSelecionada = {};
 
         try {
-            // Agora envia o termo e o tipoBusca (nac, fabricante ou geral) para o backend
             const resposta = await fetch(`${API_URL}?busca=${encodeURIComponent(termo)}&tipo=${encodeURIComponent(tipoBusca)}&nocache=${Date.now()}`);
             const dados = await resposta.json();
 
@@ -383,14 +300,14 @@
 
                 renderizarGrelha();
             } else {
-                mostrarMensagemGlobal('msg-erro', '❌ Este item não foi localizado em nenhuma aba.');
+                mostrarMensagemGlobal('msg-erro', '❌ Este registo não foi localizado em nenhuma base de dados do E-commerce.');
             }
         } catch (erro) {
-            mostrarMensagemGlobal('msg-erro', '❌ Erro de conexão com a planilha. Tente novamente.');
+            mostrarMensagemGlobal('msg-erro', '❌ Falha na conexão com a API de validação. Tente novamente.');
             console.error(erro);
         } finally {
             botao.disabled = false;
-            botao.innerText = 'Pesquisar';
+            botao.innerText = 'Procurar Links';
         }
     }
 
@@ -420,10 +337,10 @@
         const totalBases = Object.keys(dadosAgrupados).length;
         
         let html = `<div class="mensagem-global msg-info" style="background:transparent; border:none; padding:0; margin-bottom: 24px;">
-            <strong style="font-size: 16px;">🔍 Agrupado em ${totalBases} Marketplace(s). Selecione para ver os anúncios:</strong>
+            <strong style="font-size: 16px;">🔍 Anúncio presente em ${totalBases} Marketplace(s). Selecione a loja para inspecionar os links:</strong>
         </div>`;
         
-        html += `<div class="mkt-grid">`;
+        html += `<div class="mkt-grid a-up">`;
         
         for (const base in dadosAgrupados) {
             const idBuscaCSS = base.toLowerCase().replace(/\s+/g, '');
@@ -446,7 +363,7 @@
             <div class="mkt-card" data-loja="${idBuscaCSS}" onclick="abrirLoja('${base}')">
                 <div class="mkt-icon">${icone}</div>
                 <div class="mkt-title">${base}</div>
-                <div class="mkt-count">${itensLoja.length} registo(s) ${regiaoAtual !== 'GERAL' ? 'em '+regiaoAtual : ''}</div>
+                <div class="mkt-count">${itensLoja.length} anúncio(s) ${regiaoAtual !== 'GERAL' ? 'em '+regiaoAtual : ''}</div>
                 ${togglesHtml}
             </div>`;
         }
@@ -491,7 +408,7 @@
                 <div class="mkt-card static" data-loja="${idBuscaCSS}">
                     <div class="mkt-icon">${icone}</div>
                     <div class="mkt-title" style="font-size: 16px;">${tituloLateral}</div>
-                    <div class="mkt-count">${itensLoja.length} registo(s) listado(s)</div>
+                    <div class="mkt-count">${itensLoja.length} anúncio(s) listado(s)</div>
                     ${togglesHtml}
                 </div>
             </div>
@@ -499,9 +416,9 @@
             <div class="mkt-right">
                 <div class="filter-bar">
                     <button class="filter-btn active" onclick="filtrarCards('todos', this)">Todos (${itensLoja.length})</button>
-                    <button class="filter-btn" onclick="filtrarCards('ativo', this)">✅ Ativos (${counts.ativos})</button>
-                    <button class="filter-btn" onclick="filtrarCards('semlink', this)">⚠️ Sem Link (${counts.semlink})</button>
-                    <button class="filter-btn" onclick="filtrarCards('quebrado', this)">❌ Quebrados (${counts.quebrados})</button>
+                    <button class="filter-btn" onclick="filtrarCards('ativo', this)">✅ Links Válidos (${counts.ativos})</button>
+                    <button class="filter-btn" onclick="filtrarCards('semlink', this)">⚠️ Em Falta (${counts.semlink})</button>
+                    <button class="filter-btn" onclick="filtrarCards('quebrado', this)">❌ Falha / 404 (${counts.quebrados})</button>
                 </div>
                 <div id="lista-cards-produtos">
         `;
@@ -514,20 +431,20 @@
             if (!item.temLink) {
                 classCard = 'sem-link';
                 tipoFiltro = 'semlink';
-                labelStatus = `<span class="status-badge aviso">⚠️ AVISO: Link em falta na planilha</span>`;
+                labelStatus = `<span class="status-badge aviso">⚠️ AVISO: Link não cadastrado</span>`;
             } else if (item.quebrado) {
                 classCard = 'quebrado';
                 tipoFiltro = 'quebrado';
-                labelStatus = `<span class="status-badge erro">❌ Link Quebrado (404)</span>`;
+                labelStatus = `<span class="status-badge erro">❌ ERRO: Anúncio offline ou inativo</span>`;
             } else {
                 classCard = '';
                 tipoFiltro = 'ativo';
-                labelStatus = `<span class="status-badge ativo">✅ Ativo no E-commerce</span>`;
+                labelStatus = `<span class="status-badge ativo">✅ Ativo no Marketplace</span>`;
             }
 
             const botaoAcao = item.temLink 
-                ? `<a href="${item.link}" target="_blank" class="btn-abrir" onclick="event.stopPropagation()">Abrir Anúncio ↗</a>` 
-                : `<span style="font-size:13px; color: var(--ink-soft); font-weight:600;">Sem link registado</span>`;
+                ? `<a href="${item.link}" target="_blank" class="btn-abrir" onclick="event.stopPropagation()">Inspecionar Anúncio ↗</a>` 
+                : `<span style="font-size:12.5px; color: var(--ink-soft); font-weight:700;">Sem URL atribuída</span>`;
 
             // Tratamento das colunas H, I, J
             const valGarantia = item.garantia && item.garantia.toString().trim() !== '' 
@@ -536,11 +453,11 @@
 
             const valData = item.dataAtualizacao && item.dataAtualizacao.toString().trim() !== '' 
                 ? item.dataAtualizacao 
-                : '<span class="detalhe-valor pendente">Não cadastrado</span>';
+                : '<span class="detalhe-valor pendente">Sem data de registo</span>';
 
             const valFiscal = item.validacaoFiscal && item.validacaoFiscal.toString().trim() !== '' 
                 ? item.validacaoFiscal 
-                : '<span class="detalhe-valor pendente">Pendente</span>';
+                : '<span class="detalhe-valor pendente">Validação Pendente</span>';
 
             html += `
                 <div class="card-produto ${classCard}" data-status="${tipoFiltro}" onclick="toggleExpandCard(this)">
@@ -554,19 +471,19 @@
                         ${botaoAcao}
                     </div>
 
-                    <!-- SEÇÃO EXPANSÍVEL (Colunas H, I, J) -->
+                    <!-- Detalhes Expansíveis -->
                     <div class="card-detalhes">
                         <div class="detalhes-grid">
                             <div class="detalhe-box">
-                                <div class="detalhe-label">Garantia</div>
+                                <div class="detalhe-label">Garantia Atribuída</div>
                                 <div class="detalhe-valor">${valGarantia}</div>
                             </div>
                             <div class="detalhe-box">
-                                <div class="detalhe-label">Última Atualização</div>
+                                <div class="detalhe-label">Última Atualização Registada</div>
                                 <div class="detalhe-valor">${valData}</div>
                             </div>
                             <div class="detalhe-box">
-                                <div class="detalhe-label">Validação Fiscal</div>
+                                <div class="detalhe-label">Estado da Validação Fiscal</div>
                                 <div class="detalhe-valor">${valFiscal}</div>
                             </div>
                         </div>
@@ -580,12 +497,10 @@
         window.scrollTo(0, 0);
     }
 
-    // Função para alternar a expansão do card
     function toggleExpandCard(cardElement) {
         cardElement.classList.toggle('expanded');
     }
 
-    // Função de Filtro Visual
     function filtrarCards(statusEscolhido, btnElemento) {
         document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
         btnElemento.classList.add('active');
@@ -606,6 +521,7 @@
         div.innerHTML = `<div class="mensagem-global ${classe}">${texto}</div>`;
     }
 
+    // Gestão de Temas
     const themeToggleBtn = document.getElementById('themeToggle');
     function applyTheme(theme){
       document.documentElement.setAttribute('data-theme', theme);

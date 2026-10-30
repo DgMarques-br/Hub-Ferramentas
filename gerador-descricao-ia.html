@@ -3,62 +3,159 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IA</title>
+<title>Gerador IA · Hub</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
+
+<!-- Highlight.js para Coloração de Código estilo VS Code -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-theme">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+
 <style>
+  /* Variáveis de Tema (Harmonizadas com o Hub) */
   :root{
-    --bg: #EEF0EF; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
-    --line: #DADFDA; --line-soft: #E7EAE6; --teal: #1F6F5C;
-    --plum: #5B4B8A; --plum-wash: #ECE8F5; --radius: 10px;
-    --mono: ui-monospace, Consolas, monospace;
+    --bg: #F4F6F5; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
+    --line: #E2E6E4; --line-soft: #EEF0EF;
+    
+    /* Cores de Destaque */
+    --teal: #1F6F5C; --teal-dark: #164F42; --teal-wash: #E4F0EC;
+    --amber: #C27A2A; --amber-wash: #F7ECDE;
+    --plum: #67549C; --plum-wash: #ECE8F5;
+    --blue: #2563EB; --blue-wash: #EFF6FF;
+    --rose: #E11D48; --rose-wash: #FFE4E6;
+    --cyan: #0891B2; --cyan-wash: #ECFEFF;
+    --red: #D93025; --red-wash: #FCE8E6;
+    
+    --radius: 12px;
+    --mono: ui-monospace, Consolas, "Courier New", monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     --serif: Georgia, serif;
+    --ease: cubic-bezier(.22,.8,.3,1);
   }
+  
   :root[data-theme="dark"]{
-    --bg: #11201B; --paper: #16231E; --ink: #E8EEEC; --ink-soft: #92A49C;
-    --line: #233830; --line-soft: #1D2D27; --plum: #C2B0EC; --plum-wash: #2B2440;
+    --bg: #0A0F0D; --paper: #101614; --ink: #E8EEEC; --ink-soft: #92A49C;
+    --line: #1D2623; --line-soft: #161D1A;
+    
+    /* Cores de Destaque (Modo Escuro) */
+    --teal: #49C4A1; --teal-dark: #8DE0C6; --teal-wash: #142E26;
+    --amber: #EAA64B; --amber-wash: #332611;
+    --plum: #B89EFA; --plum-wash: #281D40;
+    --blue: #60A5FA; --blue-wash: #172554;
+    --rose: #FB7185; --rose-wash: #3C121A;
+    --cyan: #38BDF8; --cyan-wash: #082F49;
+    --red: #FA7970; --red-wash: #3C1E1A;
   }
+  
   *{ box-sizing: border-box; }
-  body{ background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; margin:0; padding:0; transition: background .15s, color .15s; }
-  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
-  .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 24px; }
-  .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; }
-  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--plum); font-weight: 600; margin: 0 0 6px; }
-  h1{ font-family: var(--serif); font-size: 34px; margin: 0 0 6px; }
-  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; }
-  .theme-toggle{ border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  body{ background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; margin:0; padding:0; transition: background .3s ease, color .3s ease; }
   
-  main { max-width: 1180px; margin: 0 auto; padding: 32px 24px 60px; }
-  .split-view { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: start; }
-  @media (max-width: 850px){ .split-view { grid-template-columns: 1fr; } }
-  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; }
+  /* Animações */
+  @keyframes fadeUp { from{ opacity:0; transform: translateY(12px); } to{ opacity:1; transform: none; } }
+  .a-up { animation: fadeUp .4s var(--ease) both; animation-delay: calc(var(--d, 0) * 1ms); }
+
+  /* ---------- Cabeçalho ---------- */
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); position: relative; z-index: 20; transition: background-color .3s ease; }
+  .top-inner{ max-width: 1280px; margin: 0 auto; padding: 24px 24px 20px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; margin-bottom: 12px; font-family: var(--sans); transition: color .2s ease, transform .2s ease; }
+  .nav-back:hover { color: var(--plum); transform: translateX(-3px); }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--plum); font-weight: 700; margin: 0 0 4px; }
+  h1{ font-family: var(--serif); font-size: 32px; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 13.5px; max-width: 480px; line-height: 1.45; }
   
-  .form-group { margin-bottom: 20px; }
-  .form-group label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 8px; }
-  input, textarea { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); font-family: var(--sans); }
-  input:focus, textarea:focus { border-color: var(--plum); background: var(--paper); outline:none;}
-  textarea { min-height: 140px; resize: vertical; }
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: all .2s ease; }
+  .theme-toggle:hover{ border-color: var(--plum); color: var(--ink); transform: translateY(-1px); }
   
-  .actions { display: flex; gap: 12px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--line-soft); flex-wrap: wrap;}
-  .btn-primary { flex: 1; padding: 12px 20px; background-color: var(--plum); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; min-width: 150px;}
+  /* ---------- Estrutura Principal ---------- */
+  main { max-width: 1280px; margin: 0 auto; padding: 24px 24px 48px; }
+  .split-view { display: grid; grid-template-columns: minmax(360px, 1fr) 1.4fr; gap: 24px; align-items: start; }
+  @media (max-width: 980px){ .split-view { grid-template-columns: 1fr; } }
+  
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; display: flex; flex-direction: column; box-shadow: 0 4px 20px rgba(0,0,0,0.02); transition: background-color .3s ease, border-color .3s ease; }
+  
+  /* Inputs e Forms */
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--ink); }
+  input, textarea { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink); font-family: var(--sans); font-size: 13.5px; font-weight: 500; transition: border-color .2s ease, box-shadow .2s ease, background .3s ease; }
+  input:focus, textarea:focus { border-color: var(--plum); background: var(--paper); outline: none; box-shadow: 0 0 0 4px color-mix(in srgb, var(--plum) 15%, transparent); }
+  textarea { min-height: 90px; max-height: 140px; resize: vertical; line-height: 1.45; }
+  
+  /* Botões */
+  .actions { display: flex; gap: 10px; margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line-soft); flex-wrap: wrap;}
+  
+  .btn-primary { flex: 1; padding: 11px 20px; background-color: var(--plum); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 13.5px; min-width: 140px; transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease; }
+  :root[data-theme="dark"] .btn-primary { color: #0A0F0D; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px color-mix(in srgb, var(--plum) 30%, transparent); opacity: 0.95; }
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-secondary { flex: 1; padding: 12px 20px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; min-width: 150px;}
   
-  .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
-  .tab-btn { background: none; border: none; padding: 0 0 10px 0; font-size: 14px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; }
+  .btn-secondary { flex: 1; padding: 11px 16px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 12.5px; min-width: 130px; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+  .btn-secondary:hover { background: var(--line-soft); border-color: var(--ink); transform: translateY(-1px); }
+
+  /* UI Histórico Local */
+  .hist-log { margin: 0; padding-left: 18px; font-size: 12px; color: var(--ink-soft); max-height: 80px; overflow-y: auto; line-height: 1.5; }
+  
+  /* Abas / Tabs */
+  .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+  .tab-btn { background: none; border: none; padding: 0 0 8px 0; font-size: 14px; font-weight: 700; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; transition: color .2s ease, border-color .2s ease; }
+  .tab-btn:hover { color: var(--ink); }
   .tab-btn.active { color: var(--plum); border-bottom-color: var(--plum); }
-  .tab-content { display: none; flex-grow: 1; flex-direction: column; }
+  .tab-content { display: none; flex-direction: column; }
   .tab-content.active { display: flex; }
   
-  #htmlOutput { font-family: var(--mono); font-size: 13px; color: var(--ink-soft); min-height: 450px; }
-  .preview-box { border: 1.5px solid var(--line); border-radius: 8px; padding: 20px; background: var(--paper); min-height: 450px; }
+  /* Caixas de Código e Preview (Compactas e com Rolagem Interna) */
+  .code-block-wrapper {
+    position: relative;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #0d1117;
+  }
+  :root[data-theme="light"] .code-block-wrapper {
+    background: #f6f8fa;
+  }
+
+  .code-block-wrapper pre {
+    margin: 0;
+    padding: 16px;
+    height: 320px;
+    max-height: 320px;
+    overflow: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
   
-  .sources-box { margin-top: 16px; padding: 14px; background: var(--plum-wash); border-radius: 8px; }
-  .sources-title { font-size: 13px; font-weight: 700; color: var(--plum); margin-bottom: 6px; }
-  .sources-list { margin: 0; padding-left: 20px; font-size: 12px; color: var(--ink-soft); }
-  .sources-list a { color: var(--plum); text-decoration: none; font-weight: 600; }
+  .code-block-wrapper code {
+    font-family: var(--mono) !important;
+    background: transparent !important;
+    padding: 0 !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
   
-  .toast{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #17211D; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13.5px; opacity: 0; transition: all .2s ease; z-index: 100; }
+  .preview-box { 
+    border: 1.5px solid var(--line); 
+    border-radius: 8px; 
+    padding: 18px; 
+    background: var(--bg); 
+    height: 320px; 
+    max-height: 320px; 
+    font-size: 13.5px; 
+    line-height: 1.55; 
+    color: var(--ink); 
+    overflow-y: auto; 
+  }
+  
+  /* Fontes Box */
+  .sources-box { margin-top: 14px; padding: 12px 14px; background: var(--plum-wash); border-radius: 8px; border: 1px solid color-mix(in srgb, var(--plum) 20%, transparent); animation: fadeUp .3s var(--ease); }
+  .sources-title { font-size: 11px; font-weight: 700; color: var(--plum); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; font-family: var(--mono); }
+  .sources-list { margin: 0; padding-left: 18px; font-size: 12px; color: var(--ink-soft); line-height: 1.5; max-height: 90px; overflow-y: auto; }
+  .sources-list a { color: var(--plum); text-decoration: none; font-weight: 700; }
+  .sources-list a:hover { text-decoration: underline; }
+  
+  /* Toast */
+  .toast{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #17211D; color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: all .3s var(--ease); z-index: 100; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
   .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
 </style>
 </head>
@@ -66,19 +163,22 @@
 
 <header class="top">
   <div class="top-inner">
-    <div>
-      <a href="index.html" class="nav-back">← Voltar ao Hub</a>
-      <p class="brand-eyebrow">Motor de Criação</p>
-      <h1>Gerador de Descrições IA</h1>
-      <p class="subtitle">Faça suas descrições com IA juntamente com a exportação ao Word!</p>
+    <div class="a-up">
+      <a href="index.html" class="nav-back">← Voltar ao Hub Central</a>
+      <p class="brand-eyebrow">Motor de Criação IA</p>
+      <h1>Gerador de Descrições</h1>
+      <p class="subtitle">Pesquisa na web automática e criação de descrições enriquecidas via IA com exportação para o Word.</p>
     </div>
-    <div><button class="theme-toggle" id="themeToggle">🌙 Modo escuro</button></div>
+    <div class="a-up" style="--d:100">
+      <button class="theme-toggle" id="themeToggle">🌙 Modo escuro</button>
+    </div>
   </div>
 </header>
 
 <main>
   <div class="split-view">
-    <div class="card">
+    <!-- Configurações e Inputs (Lado Esquerdo) -->
+    <div class="card a-up" style="--d:150">
       <div class="form-group">
         <label>Chave API Groq</label>
         <input type="password" id="apiKeyGroq" placeholder="gsk_...">
@@ -87,47 +187,56 @@
         <label>Chave API Tavily</label>
         <input type="password" id="apiKeyTavily" placeholder="tvly-...">
       </div>
-      <div class="form-group" style="margin-top: 24px; border-top: 1px solid var(--line); padding-top: 16px;">
+      <div class="form-group" style="margin-top: 16px; border-top: 1px solid var(--line); padding-top: 16px;">
         <label style="color: var(--plum);">Histórico Recente (Local)</label>
-        <ul id="logAtividades" style="margin: 0; padding-left: 20px; font-size: 12.5px; color: var(--ink-soft); max-height: 100px; overflow-y: auto;">
-          <li>Nenhum registo recente.</li>
+        <ul id="logAtividades" class="hist-log">
+          <li>Nenhum registo recente encontrado.</li>
         </ul>
       </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-top: 12px;">
         <label>Nome do Produto / Modelo</label>
         <input type="text" id="tituloInput" placeholder="Ex: Placa Mãe Gigabyte Z790 Aero G AX">
       </div>
-      <div class="form-group" style="flex-grow: 1; display: flex; flex-direction: column;">
+      <div class="form-group">
         <label>Instruções Manuais / Forçar Dados (Opcional)</label>
-        <textarea id="rawInfoInput" placeholder="Ex: 'EAN: 8713439233804. NAC011068.'"></textarea>
+        <textarea id="rawInfoInput" placeholder="Ex: 'Garantia de 2 anos. EAN: 8713439233804. NAC011068.'"></textarea>
       </div>
       <div class="actions">
-        <button type="button" class="btn-primary" id="btnGerar" onclick="executarAutomacao()">✨ Pesquisar na Web e Gerar</button>
+        <button type="button" class="btn-primary" id="btnGerar" onclick="executarAutomacao()">✨ Procurar Info e Gerar</button>
       </div>
     </div>
 
-    <div class="card">
+    <!-- Resultados e Código (Lado Direito) -->
+    <div class="card a-up" style="--d:200">
       <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('html')">&lt;/&gt; HTML</button>
-        <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização</button>
+        <button class="tab-btn active" onclick="switchTab('html')">&lt;/&gt; Código HTML</button>
+        <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização de Cliente</button>
       </div>
       
+      <!-- Aba 1: Código HTML com Syntax Highlighting -->
       <div id="tab-html" class="tab-content active">
-        <textarea id="htmlOutput" readonly placeholder="A descrição formatada em HTML aparecerá aqui..."></textarea>
+        <div class="code-block-wrapper">
+          <pre><code id="htmlOutput" class="language-xml">Aguardando geração do código...</code></pre>
+        </div>
       </div>
+
+      <!-- Aba 2: Visualização Renderizada -->
       <div id="tab-preview" class="tab-content">
-        <div class="preview-box" id="previewOutput">Aguardando geração...</div>
+        <div class="preview-box" id="previewOutput">
+          <span style="color: var(--ink-soft); font-style: italic;">A aguardar processamento...</span>
+        </div>
       </div>
       
+      <!-- Fontes Retornadas pelo Tavily -->
       <div class="sources-box" id="sourcesBox" style="display:none;">
-        <div class="sources-title">Fontes Consultadas:</div>
+        <div class="sources-title">Fontes Consultadas Pela IA:</div>
         <ul class="sources-list" id="sourcesList"></ul>
       </div>
 
       <div class="actions">
         <button class="btn-secondary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
-        <button class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto</button>
-        <button class="btn-primary" style="background: #2B579A; min-width: 100%;" onclick="exportarParaWord()">📄 Exportar para Word (.doc)</button>
+        <button class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar p/ Excel (Liso)</button>
+        <button class="btn-primary" style="background: #2563EB; min-width: 100%; border: 1px solid #1D4ED8;" onclick="exportarParaWord()">📄 Exportar Limpo para Word (.doc)</button>
       </div>
     </div>
   </div>
@@ -136,11 +245,20 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// --- TEMA E LOCAL STORAGE ---
 const themeToggleBtn = document.getElementById('themeToggle');
+const hljsThemeLink = document.getElementById('hljs-theme');
+
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
   themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+  if (hljsThemeLink) {
+    hljsThemeLink.href = theme === 'dark' 
+      ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" 
+      : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css";
+  }
 }
+
 applyTheme(localStorage.getItem('sapCatalogTheme') || 'dark');
 themeToggleBtn.addEventListener('click', () => {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
@@ -155,10 +273,11 @@ keyTavily.value = localStorage.getItem('tavily_api_key') || '';
 keyGroq.addEventListener('input', () => localStorage.setItem('groq_api_key', keyGroq.value.trim()));
 keyTavily.addEventListener('input', () => localStorage.setItem('tavily_api_key', keyTavily.value.trim()));
 
+// --- INTERFACE TOAST E ABAS ---
 function showToast(msg) {
   const toast = document.getElementById('toast');
   toast.textContent = msg; toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2000);
+  setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
 function switchTab(tab) {
@@ -173,14 +292,17 @@ function switchTab(tab) {
   }
 }
 
+// --- GERAÇÃO (TAVILY + GROQ) ---
 async function executarAutomacao() {
-  const groqKey = keyGroq.value.trim(); const tavilyKey = keyTavily.value.trim();
+  const groqKey = keyGroq.value.trim(); 
+  const tavilyKey = keyTavily.value.trim();
   const titulo = document.getElementById('tituloInput').value.trim();
   const instrucoes = document.getElementById('rawInfoInput').value.trim();
   const btn = document.getElementById('btnGerar');
-  const sourcesBox = document.getElementById('sourcesBox'); const sourcesList = document.getElementById('sourcesList');
+  const sourcesBox = document.getElementById('sourcesBox'); 
+  const sourcesList = document.getElementById('sourcesList');
 
-  if (!groqKey || !tavilyKey || !titulo) { alert("Preencha as chaves e o título."); return; }
+  if (!groqKey || !tavilyKey || !titulo) { alert("⚠️ Necessita de preencher as Chaves API e o Título do produto."); return; }
   btn.disabled = true; sourcesBox.style.display = 'none'; sourcesList.innerHTML = '';
 
   try {
@@ -188,9 +310,9 @@ async function executarAutomacao() {
     try {
       const resRegras = await fetch('PADRÃO-DE-DESCRIÇÃO.txt');
       if(resRegras.ok) regrasExternas = await resRegras.text();
-    } catch(err) { console.warn("Aviso: TXT não encontrado."); }
+    } catch(err) { console.warn("Aviso: Documento TXT de padrão não encontrado. Prosseguindo sem ele."); }
 
-    // ---------- BUSCA CONFIÁVEL ----------
+    // --- PESQUISA TAVILY ---
     const DOMINIOS_RUINS = ['pinterest.com','youtube.com','facebook.com','instagram.com','tiktok.com','reddit.com','quora.com','olx.com.br'];
     const LOJAS = ['kabum.com.br','pichau.com.br','terabyteshop.com.br','mercadolivre.com.br','amazon.com.br','magazineluiza.com.br','fastshop.com.br','casasbahia.com.br','carrefour.com.br','americanas.com.br','techpowerup.com','notebookcheck.net','gsmarena.com','rtings.com'];
     const STOP = new Set(['para','com','sem','placa','mae','gamer','gaming','preto','branco','iluminado','fio','kit','conjunto','mouse','teclado','headset','fone','cabo','fonte','memoria','monitor']);
@@ -207,11 +329,11 @@ async function executarAutomacao() {
       if (profundidade === 'advanced') body.chunks_per_source = 3;
       const r = await fetch('https://api.tavily.com/search', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
       const d = await r.json();
-      if (!r.ok) throw new Error(d.detail?.error || d.message || 'Erro Tavily');
+      if (!r.ok) throw new Error(d.detail?.error || d.message || 'Erro Tavily Search');
       return d.results || [];
     };
 
-    btn.textContent = "🔍 A pesquisar na web...";
+    btn.textContent = "🔍 A varrer ficheiros da Web...";
     const consultas = [
       buscar(`${queryLimpa} ficha técnica especificações`, 'advanced'),
       buscar(`${queryLimpa} dimensões peso altura largura comprimento embalagem`, 'advanced')
@@ -267,11 +389,11 @@ async function executarAutomacao() {
     });
     if (contextoWeb.length > 9000) contextoWeb = contextoWeb.substring(0, 9000) + "\n\n[... TEXTO CORTADO ...]";
     if (!top.length) contextoWeb = "(nenhuma fonte encontrada)";
-    if (semMatch && top.length) showToast("⚠️ Nenhuma fonte citou o modelo exato. Confira os dados.");
+    if (semMatch && top.length) showToast("⚠️ Nenhuma fonte citou o modelo exato. Confira os dados finais.");
 
-    btn.textContent = "✨ A formatar com Groq...";
+    btn.textContent = "✨ A Estruturar Lógica na Groq...";
     const promptGroq = `
-Você é um especialista rigoroso na criação de descrições para e-commerce.
+Você é um especialista rigoroso na criação de descrições comerciais otimizadas para e-commerce.
 
 REGRAS DE NEGÓCIO OBRIGATÓRIAS:
 Leia e aplique CADA UMA das regras abaixo com atenção meticulosa.
@@ -326,7 +448,7 @@ DADOS DO PRODUTO:
 Nome: ${titulo}
 Instruções extras do usuário: ${instrucoes}
 
-INFORMAÇÕES RECOLHIDAS DA WEB:
+INFORMAÇÕES RECOLHIDAS DA WEB (NUNCA INVENTE NADA DAQUI):
 ${contextoWeb}
 `;
 
@@ -341,109 +463,107 @@ ${contextoWeb}
     });
 
     const groqData = await groqRes.json();
-    if (groqData.error) throw new Error(groqData.error.message || "Erro Groq");
+    if (groqData.error) throw new Error(groqData.error.message || "Erro de Integração Groq");
 
     if (groqData.choices && groqData.choices[0]?.message?.content) {
       let htmlGerado = groqData.choices[0].message.content;
       htmlGerado = htmlGerado.replace(/```html/g, '').replace(/```/g, '').trim();
 
-      document.getElementById('htmlOutput').value = htmlGerado;
+      // 1. Atualizar o bloco de código com Syntax Highlighting
+      const codeEl = document.getElementById('htmlOutput');
+      codeEl.textContent = htmlGerado;
+      codeEl.removeAttribute('data-highlighted');
+      if (window.hljs) hljs.highlightElement(codeEl);
+
+      // 2. Atualizar a caixa de visualização renderizada
       document.getElementById('previewOutput').innerHTML = htmlGerado;
 
       if (linksUteis.length > 0) {
         linksUteis.forEach(item => {
           const li = document.createElement('li');
           const a = document.createElement('a'); a.href = item.url; a.target = "_blank"; a.textContent = item.title;
-          const tag = document.createElement('span'); tag.textContent = ' — ' + item.host + (item.oficial ? ' · 🏭 oficial' : item.loja ? ' · 🛒 loja' : '') + (item.medidas ? ' · 📏 medidas' : '');
+          const tag = document.createElement('span'); tag.textContent = ' — ' + item.host + (item.oficial ? ' · 🏭 Oficial' : item.loja ? ' · 🛒 Loja' : '') + (item.medidas ? ' · 📏 Encontrou Medidas' : '');
           li.appendChild(a); li.appendChild(tag); sourcesList.appendChild(li);
         });
         sourcesBox.style.display = 'block';
       }
-      showToast(/VERIFICAR/.test(htmlGerado) ? "Gerado — há campos VERIFICAR (dado não encontrado)." : "Descrição gerada com sucesso!");
+      showToast(/VERIFICAR/.test(htmlGerado) ? "⚠️ Gerado — Confirme os campos com [VERIFICAR]." : "✅ Descrição formulada com sucesso!");
     
       atualizarHistorico(titulo);
     }
   } catch (err) {
-    alert("Erro no processo: " + err.message);
+    alert("Houve uma falha técnica no processo: " + err.message);
   } finally {
-    btn.disabled = false; btn.textContent = "✨ Pesquisar na Web e Gerar";
+    btn.disabled = false; btn.textContent = "✨ Procurar Info e Gerar";
   }
 }
 
-function copiarTexto(elId, label) {
-  const el = document.getElementById(elId); if (!el.value) return;
-  el.select(); document.execCommand('copy'); showToast(label + " copiado com sucesso!");
+// --- FUNÇÕES DE CÓPIA ---
+function obterTextoCodigo() {
+  const el = document.getElementById('htmlOutput');
+  return el.textContent || el.innerText || '';
 }
 
-// ==========================================
-// FUNÇÃO DE LIMPEZA EXTREMA
-// ==========================================
+function copiarTexto(elId, label) {
+  const texto = obterTextoCodigo();
+  if (!texto || texto === 'Aguardando geração do código...') return;
+  
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(texto).then(() => showToast("✓ " + label + " copiado com sucesso!"));
+  } else {
+    const ta = document.createElement('textarea'); ta.value = texto;
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta); showToast("✓ " + label + " copiado com sucesso!");
+  }
+}
+
 function obterTextoPurissimo(html) {
-  // 1. O PULO DO GATO: Remove as quebras de linha FÍSICAS ocultas no código da IA
-  // Sem isso, a linha vazia dobrava a cada processamento.
   let txt = html.replace(/\r?\n/g, ''); 
-  
-  // 2. Converte apenas o que importa (o <br> da web) em quebras reais do sistema (\n)
   txt = txt.replace(/<br\s*[\/]?>/gi, '\n');
-  
-  // 3. Destrói absolutamente todas as outras tags de HTML (inclusive spans e negritos)
   txt = txt.replace(/<[^>]+>/g, '');
   
-  // 4. Decodifica símbolos perdidos
   const ta = document.createElement('textarea');
   ta.innerHTML = txt;
   txt = ta.value;
   
-  // 5. Remove espaços nas laterais de cada linha
   txt = txt.split('\n').map(l => l.trim()).join('\n');
-  
-  // 6. Garante que nunca existam espaços duplos
   txt = txt.replace(/\n{3,}/g, '\n\n');
-  
   return txt.trim();
 }
 
-// ==========================================
-// CÓPIA LIMPA (PERFEITA PARA MERCADO LIVRE)
-// ==========================================
 function copiarRenderizado() {
-  const htmlContent = document.getElementById('htmlOutput').value;
-  if(!htmlContent.trim()) { showToast('Nenhum texto para copiar.'); return; }
+  const htmlContent = obterTextoCodigo();
+  if(!htmlContent.trim() || htmlContent === 'Aguardando geração do código...') { showToast('⚠️ Nenhum texto gerado para copiar.'); return; }
   
   let textoPuro = obterTextoPurissimo(htmlContent);
 
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(textoPuro).then(() => showToast('Texto copiado perfeitamente liso!'));
+    navigator.clipboard.writeText(textoPuro).then(() => showToast('✓ Texto liso copiado perfeitamente!'));
   } else {
     const ta = document.createElement('textarea'); ta.value = textoPuro;
     document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-    document.body.removeChild(ta); showToast('Texto copiado perfeitamente liso!');
+    document.body.removeChild(ta); showToast('✓ Texto liso copiado perfeitamente!');
   }
 }
 
-// ==========================================
-// EXPORTAÇÃO WORD (ESPAÇAMENTO APERTADO, ZERO NEGRITO)
-// ==========================================
+// --- EXPORTAÇÃO PARA DOC ---
 function exportarParaWord() {
-  const htmlContent = document.getElementById('htmlOutput').value;
-  if(!htmlContent.trim()) { showToast('Nenhum conteúdo para exportar.'); return; }
+  const htmlContent = obterTextoCodigo();
+  if(!htmlContent.trim() || htmlContent === 'Aguardando geração do código...') { showToast('⚠️ Necessita gerar a descrição primeiro.'); return; }
   
-  let tituloProduto = document.getElementById('tituloInput').value.trim() || 'Descricao_Produto';
-  
+  let tituloProduto = document.getElementById('tituloInput').value.trim() || 'Produto_Descricao';
   const nacMatch = htmlContent.match(/NAC\d+/i);
-  let nacPrefixo = nacMatch ? nacMatch[0].toUpperCase() : 'NAC_ND';
+  let nacPrefixo = nacMatch ? nacMatch[0].toUpperCase() : 'NO_NAC';
 
   let nomeArquivo = `${nacPrefixo} - ${tituloProduto}`;
   nomeArquivo = nomeArquivo.replace(/[\\/:*?"<>|]/g, '').trim();
 
   let textoPuro = obterTextoPurissimo(htmlContent);
-
-  // Cada linha de texto vira um parágrafo estrutural no Word com zero margens.
   let htmlParaWord = textoPuro.split('\n').map(linha => {
      return `<p style="margin:0; padding:0; font-family: Arial, sans-serif; font-size: 11pt;">${linha === '' ? '&nbsp;' : linha}</p>`;
   }).join('');
 
-  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export HTML To Doc</title></head><body>";
+  const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Export DOC</title></head><body>";
   const postHtml = "</body></html>";
   const htmlDoc = preHtml + htmlParaWord + postHtml;
 
@@ -455,7 +575,7 @@ function exportarParaWord() {
   if (navigator.msSaveOrOpenBlob) { navigator.msSaveOrOpenBlob(blob, nomeArquivo + '.doc'); } 
   else { downloadLink.href = url; downloadLink.download = nomeArquivo + '.doc'; downloadLink.click(); }
   document.body.removeChild(downloadLink);
-  showToast('Ficheiro Word exportado com espaçamento perfeito!');
+  showToast('✓ Ficheiro Word processado e baixado!');
 }
 
 // --- HISTÓRICO LOCAL ---
@@ -464,18 +584,16 @@ function atualizarHistorico(novoTitulo) {
   
   if (novoTitulo) {
     const dataHora = new Date().toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short" });
-    logs.unshift(`[${dataHora}] ${novoTitulo}`);
-    if (logs.length > 5) logs.pop(); // Guarda só os últimos 5
+    logs.unshift(`[${dataHora}] - ${novoTitulo}`);
+    if (logs.length > 6) logs.pop(); 
     localStorage.setItem('iaLogs', JSON.stringify(logs));
   }
   
   const lista = document.getElementById('logAtividades');
   if (logs.length > 0) {
-    lista.innerHTML = logs.map(l => `<li>${l}</li>`).join('');
+    lista.innerHTML = logs.map(l => `<li style="margin-bottom: 4px;">${l}</li>`).join('');
   }
 }
-
-// Carregar ao iniciar
 atualizarHistorico(null);
 </script>
 </body>

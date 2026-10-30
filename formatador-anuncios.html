@@ -3,104 +3,95 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formatador</title>
+<title>Formatador de Anúncios · Hub</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
+
+<!-- Highlight.js para Coloração de Código estilo VS Code -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" id="hljs-theme">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/xml.min.js"></script>
+
 <style>
+  /* Variáveis de Tema (Harmonizadas com o Hub) */
   :root{
-    --bg: #EEF0EF;
-    --paper: #FFFFFF;
-    --ink: #17211D;
-    --ink-soft: #576159;
-    --line: #DADFDA;
-    --line-soft: #E7EAE6;
-    --teal: #1F6F5C;
-    --teal-dark: #164F42;
-    --teal-wash: #E4F0EC;
-    --plum: #5B4B8A;
-    --plum-wash: #ECE8F5;
-    --amber: #B9762D;
-    --amber-wash: #F7ECDE;
-    --red: #D93025;
-    --red-wash: #FCE8E6;
-    --radius: 10px;
+    --bg: #F4F6F5; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
+    --line: #E2E6E4; --line-soft: #EEF0EF;
+    
+    --teal: #1F6F5C; --teal-dark: #164F42; --teal-wash: #E4F0EC;
+    --amber: #C27A2A; --amber-wash: #F7ECDE;
+    --plum: #67549C; --plum-wash: #ECE8F5;
+    --rose: #E11D48; --rose-wash: #FFE4E6;
+    --red: #D93025; --red-wash: #FCE8E6;
+    
+    --radius: 12px;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --ease: cubic-bezier(.22,.8,.3,1);
   }
+  
   :root[data-theme="dark"]{
-    --bg: #11201B;
-    --paper: #16231E;
-    --ink: #E8EEEC;
-    --ink-soft: #92A49C;
-    --line: #233830;
-    --line-soft: #1D2D27;
-    --teal: #3FB492;
-    --teal-dark: #7FDDBE;
-    --teal-wash: #1B3830;
-    --plum: #C2B0EC;
-    --plum-wash: #2B2440;
-    --amber: #E3A95D;
-    --amber-wash: #39301A;
-    --red: #F28B82;
-    --red-wash: #3C1E1A;
+    --bg: #0A0F0D; --paper: #101614; --ink: #E8EEEC; --ink-soft: #92A49C;
+    --line: #1D2623; --line-soft: #161D1A;
+    
+    --teal: #49C4A1; --teal-dark: #8DE0C6; --teal-wash: #142E26;
+    --amber: #EAA64B; --amber-wash: #332611;
+    --plum: #B89EFA; --plum-wash: #281D40;
+    --rose: #FB7185; --rose-wash: #3C121A;
+    --red: #FA7970; --red-wash: #3C1E1A;
   }
+  
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; }
   body{
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-    transition: background .15s ease, color .15s ease;
+    background: var(--bg); color: var(--ink); font-family: var(--sans);
+    height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+    -webkit-font-smoothing: antialiased; transition: background .3s ease, color .3s ease;
   }
 
   /* ---------- Header compacto ---------- */
-  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); flex: 0 0 auto; }
-  .top-inner{ max-width: 1400px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); flex: 0 0 auto; z-index: 20; }
+  .top-inner{ max-width: 1400px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .top-left{ display: flex; align-items: center; gap: 18px; min-width: 0; }
-  .nav-back { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; white-space: nowrap; transition: color 0.15s ease; }
+  .nav-back { font-size: 13px; font-weight: 700; color: var(--ink-soft); text-decoration: none; white-space: nowrap; transition: color 0.15s ease; }
   .nav-back:hover { color: var(--amber); }
-  .brand-eyebrow{ font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 600; margin: 0 0 2px; }
-  h1{ font-family: var(--serif); font-size: 22px; line-height: 1.1; margin: 0; letter-spacing: -0.01em; color: var(--ink); }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 700; margin: 0 0 2px; }
+  h1{ font-family: var(--serif); font-size: 21px; line-height: 1.1; margin: 0; letter-spacing: -0.01em; color: var(--ink); }
   .subtitle{ margin:0; color: var(--ink-soft); font-size: 12.5px; }
   .title-block{ border-left: 1px solid var(--line); padding-left: 18px; }
 
-  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 6px 12px; border-radius: 999px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 6px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: all .2s ease; }
   .theme-toggle:hover{ border-color: var(--amber); color: var(--ink); }
 
-  /* ---------- Layout Grid (ocupa a tela toda) ---------- */
+  /* ---------- Layout Grid ---------- */
   main { flex: 1 1 auto; min-height: 0; width: 100%; max-width: 1400px; margin: 0 auto; padding: 14px 24px 6px; }
   .split-view { display: grid; grid-template-columns: 1.15fr 1fr; gap: 16px; height: 100%; }
 
-  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; flex-direction: column; min-height: 0; min-width: 0; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; box-shadow: 0 4px 24px rgba(0,0,0,0.02); display: flex; flex-direction: column; min-height: 0; min-width: 0; }
 
-  /* ---------- Formulário ---------- */
-  .form-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto minmax(60px, 1fr) auto minmax(60px, 0.8fr); gap: 10px 14px; }
+  /* ---------- Formulário Reestruturado (Equilibrado) ---------- */
+  .form-grid { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto minmax(50px, 1fr) auto minmax(50px, 0.8fr) auto; gap: 10px 14px; overflow-y: auto; padding-right: 4px; }
   .span-2 { grid-column: 1 / -1; }
   .field { display: flex; flex-direction: column; min-height: 0; min-width: 0; }
-  .field.grow textarea { flex: 1 1 auto; min-height: 0; }
-  .field label, .lbl { display: block; font-size: 12.5px; font-weight: 600; color: var(--ink); margin-bottom: 4px; }
-  .lbl .opt { font-weight: 400; color: var(--ink-soft); font-size: 11.5px; }
+  .field.grow textarea { flex: 1 1 auto; min-height: 60px; }
+  .field label, .lbl { display: block; font-size: 11.5px; font-weight: 700; color: var(--ink); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .lbl .opt { font-weight: 400; color: var(--ink-soft); font-size: 11px; text-transform: none; letter-spacing: 0; }
   .hint { font-size: 11px; color: var(--ink-soft); margin-top: 3px; line-height: 1.3; display: block; }
 
   input[type="text"], textarea {
-    width: 100%; padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--line);
-    background: var(--bg); font-size: 13.5px; font-family: var(--sans); color: var(--ink);
-    outline: none; transition: border-color .15s ease, background .15s ease;
+    width: 100%; padding: 8px 11px; border-radius: 8px; border: 1.5px solid var(--line);
+    background: var(--bg); font-size: 13px; font-family: var(--sans); color: var(--ink);
+    outline: none; transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
   }
-  input[type="text"]:focus, textarea:focus { border-color: var(--amber); background: var(--paper); }
-  input:disabled { cursor: not-allowed; }
+  input[type="text"]:focus, textarea:focus { border-color: var(--amber); background: var(--paper); box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 15%, transparent); }
+  input:disabled { cursor: not-allowed; opacity: 0.6; }
   textarea { resize: none; }
 
   .row-cond { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
 
   /* Segmented Control */
-  .segmented { display: flex; gap: 4px; background: var(--bg); padding: 3px; border-radius: 999px; border: 1px solid var(--line); width: fit-content; }
-  .seg-btn { border: none; background: transparent; padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all .15s ease; }
+  .segmented { display: flex; gap: 4px; background: var(--bg); padding: 3px; border-radius: 999px; border: 1.5px solid var(--line); width: fit-content; }
+  .seg-btn { border: none; background: transparent; padding: 5px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; transition: all .15s ease; }
   .seg-btn.active { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
   .seg-btn.active[data-val="novo"] { color: var(--teal-dark); }
   .seg-btn.active[data-val="recondicionado"] { color: var(--amber); }
@@ -108,218 +99,109 @@
   /* Dimensões */
   .dims-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
   .dims-header .lbl { margin-bottom: 0; }
-  .btn-add-dim { background: var(--red); color: white; border: none; font-size: 11.5px; font-weight: bold; padding: 2px 9px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
+  .btn-add-dim { background: var(--red); color: white; border: none; font-size: 11px; font-weight: bold; padding: 2px 10px; border-radius: 6px; cursor: pointer; transition: opacity 0.2s; }
   .btn-add-dim:hover { opacity: 0.9; }
-  #containerDims { max-height: 112px; overflow-y: auto; }
+  #containerDims { max-height: 105px; overflow-y: auto; }
   .dim-bloco { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; align-items: end; margin-bottom: 6px; }
   .dim-bloco .dim-nome-wrap, .dim-bloco .btn-remover-bloco { display: none; }
   #containerDims.multi .dim-bloco { grid-template-columns: 1.4fr repeat(4, 1fr) auto; }
   #containerDims.multi .dim-nome-wrap { display: block; }
   #containerDims.multi .btn-remover-bloco { display: block; }
-  .dim-bloco label { font-size: 11px; font-weight: 600; color: var(--ink-soft); display: block; margin-bottom: 2px; }
-  .dim-bloco input { padding: 6px 9px; font-size: 13px; }
-  .btn-remover-bloco { background: transparent; border: none; color: var(--red); font-size: 12px; font-weight: bold; cursor: pointer; padding: 0 2px 8px; }
+  .dim-bloco label { font-size: 10.5px; font-weight: 600; color: var(--ink-soft); display: block; margin-bottom: 2px; text-transform: none; }
+  .dim-bloco input { padding: 6px 9px; font-size: 12.5px; }
+  .btn-remover-bloco { background: transparent; border: none; color: var(--red); font-size: 11.5px; font-weight: bold; cursor: pointer; padding: 0 2px 8px; }
   .btn-remover-bloco:hover { text-decoration: underline; }
 
-  /* Identificação */
+  /* Identificação Grid */
   .ident-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
   .ident-grid input:last-child { grid-column: 1 / -1; }
 
   /* Botões de Ação */
   .actions { display: flex; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft); flex: 0 0 auto; }
-  .btn-primary { flex: 1; padding: 9px 20px; font-size: 14px; background-color: var(--amber); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; text-align: center; }
-  .btn-primary:hover { opacity: 0.9; }
-  .btn-secondary { padding: 9px 18px; font-size: 13.5px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
+  .btn-primary { flex: 1; padding: 10px 20px; font-size: 13.5px; background-color: var(--amber); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: opacity 0.2s; text-align: center; }
+  :root[data-theme="dark"] .btn-primary { color: #0A0F0D; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-secondary { padding: 10px 18px; font-size: 13px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
   .btn-secondary:hover { background: var(--line-soft); }
 
   /* ---------- Resultados ---------- */
-  .tabs { display: flex; gap: 16px; border-bottom: 1px solid var(--line); margin-bottom: 10px; flex: 0 0 auto; }
-  .tab-btn { background: none; border: none; padding: 0 0 8px 0; font-size: 13.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tabs { display: flex; gap: 12px; border-bottom: 1px solid var(--line); margin-bottom: 12px; flex: 0 0 auto; }
+  .tab-btn { background: none; border: none; padding: 0 0 8px 0; font-size: 13.5px; font-weight: 700; color: var(--ink-soft); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; }
   .tab-btn:hover { color: var(--ink); }
   .tab-btn.active { color: var(--amber); border-bottom-color: var(--amber); }
 
   .tab-content { display: none; flex: 1 1 auto; min-height: 0; }
   .tab-content.active { display: flex; flex-direction: column; }
 
-  #htmlOutput { flex: 1 1 auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.5; color: var(--ink-soft); background: var(--bg); height: 100%; }
+  /* Syntax Highlighting Container */
+  .code-block-wrapper {
+    position: relative;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: #0d1117;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+  }
+  :root[data-theme="light"] .code-block-wrapper { background: #f6f8fa; }
 
+  .code-block-wrapper pre {
+    margin: 0;
+    padding: 14px 16px;
+    flex: 1 1 auto;
+    overflow: auto;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+  
+  .code-block-wrapper code {
+    font-family: var(--mono) !important;
+    background: transparent !important;
+    padding: 0 !important;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+  
   .preview-box {
     flex: 1 1 auto; min-height: 0; overflow-y: auto;
-    border: 1.5px solid var(--line); border-radius: 8px; padding: 14px; background: var(--paper);
+    border: 1.5px solid var(--line); border-radius: 8px; padding: 16px; background: var(--paper);
     font-family: Arial, sans-serif;
   }
 
-  .aviso-validacao { display: none; margin-top: 8px; padding: 7px 12px; border-radius: 8px; background: var(--amber-wash); border: 1px solid var(--amber); color: var(--amber); font-size: 12.5px; font-weight: 600; flex: 0 0 auto; }
+  .aviso-validacao { display: none; margin-top: 8px; padding: 7px 12px; border-radius: 8px; background: var(--amber-wash); border: 1px solid var(--amber); color: var(--amber); font-size: 12px; font-weight: 600; flex: 0 0 auto; }
 
-  /* Toast Notification */
+  /* Toast */
   .toast{ position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: #17211D; color: #fff; padding: 10px 18px; border-radius: 8px; font-size: 13.5px; opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; z-index: 100; }
   .toast.show{ opacity: 1; transform: translateX(-50%) translateY(0); }
 
-  footer{ flex: 0 0 auto; text-align: center; padding: 4px 24px 8px; color: var(--ink-soft); font-size: 11px; }
+  footer{ flex: 0 0 auto; text-align: center; padding: 6px 24px 8px; color: var(--ink-soft); font-size: 11px; }
 
-  /* =========================================================
-     VISUAL REFINADO (camada de estilo por cima do layout)
-     ========================================================= */
+  /* Visual de Fundo Harmonizado */
   body{
     background:
-      radial-gradient(900px 420px at 8% -8%, color-mix(in srgb, var(--amber) 16%, transparent), transparent 60%),
-      radial-gradient(800px 420px at 100% 0%, color-mix(in srgb, var(--teal) 14%, transparent), transparent 60%),
+      radial-gradient(900px 420px at 8% -8%, color-mix(in srgb, var(--amber) 12%, transparent), transparent 60%),
+      radial-gradient(800px 420px at 100% 0%, color-mix(in srgb, var(--teal) 10%, transparent), transparent 60%),
       var(--bg);
     background-attachment: fixed;
   }
-  ::-webkit-scrollbar{ width: 8px; height: 8px; }
+  ::-webkit-scrollbar{ width: 6px; height: 6px; }
   ::-webkit-scrollbar-thumb{ background: var(--line); border-radius: 99px; }
   ::-webkit-scrollbar-thumb:hover{ background: var(--ink-soft); }
 
-  /* Header */
   header.top{
-    background: color-mix(in srgb, var(--paper) 82%, transparent);
+    background: color-mix(in srgb, var(--paper) 85%, transparent);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
-    position: relative;
   }
-  header.top::after{
-    content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px;
-    background: linear-gradient(90deg, var(--amber), var(--teal) 55%, transparent);
-    opacity:.85;
-  }
-  .nav-back{
-    padding: 6px 12px; border-radius: 999px; border: 1.5px solid var(--line);
-    background: var(--bg); font-size: 12.5px;
-  }
-  .nav-back:hover{ border-color: var(--amber); transform: translateX(-2px); }
-  .title-block{ border-left: none; padding-left: 0; display: flex; align-items: center; gap: 12px; }
-  .title-block::before{
-    content:"</>"; display:grid; place-items:center; width:38px; height:38px; flex:0 0 auto;
-    border-radius: 11px; color:#fff; font-family: var(--mono); font-weight: 700; font-size: 13px;
-    background: linear-gradient(135deg, var(--amber), #D9923E);
-    box-shadow: 0 6px 14px color-mix(in srgb, var(--amber) 38%, transparent);
-  }
-  .brand-eyebrow{ margin: 0 0 1px; }
-  h1{ font-size: 21px; }
-  .subtitle{
-    padding: 5px 12px; border-radius: 999px; background: var(--teal-wash);
-    color: var(--teal-dark); font-size: 12px; font-weight: 500; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis; min-width: 0;
-  }
-  .theme-toggle{ box-shadow: 0 1px 2px rgba(0,0,0,.05); }
-  .theme-toggle:hover{ transform: translateY(-1px); }
-
-  /* Cards */
-  .card{
-    border-radius: 16px; padding: 16px 18px; position: relative; overflow: hidden;
-    border: 1px solid var(--line);
-    box-shadow: 0 10px 30px -12px rgba(23,33,29,.18), 0 2px 6px rgba(23,33,29,.04);
-  }
-  .card::before{
-    content:""; position:absolute; left:0; top:0; right:0; height:3px;
-    background: linear-gradient(90deg, var(--amber), color-mix(in srgb, var(--amber) 20%, transparent));
-  }
-  .split-view > .card:last-child::before{
-    background: linear-gradient(90deg, var(--teal), color-mix(in srgb, var(--teal) 20%, transparent));
-  }
-  :root[data-theme="dark"] .card{ box-shadow: 0 10px 30px -12px rgba(0,0,0,.55); }
-
-  /* Labels */
-  .field label, .lbl{
-    font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-    color: var(--ink-soft); margin-bottom: 5px; display: flex; align-items: center; gap: 6px;
-  }
-  .field > label::before, .lbl::before{
-    content:""; width: 6px; height: 6px; border-radius: 2px; background: var(--amber); flex: 0 0 auto;
-  }
-  .lbl .opt{ text-transform: none; letter-spacing: 0; font-weight: 400; }
-  .dim-bloco label{ text-transform: none; letter-spacing: 0; font-size: 11px; }
-  .dim-bloco label::before{ display:none; }
-  .hint{ font-size: 10.5px; opacity: .9; }
-
-  /* Inputs */
-  input[type="text"], textarea{
-    border-radius: 10px; border: 1.5px solid var(--line);
-    background: color-mix(in srgb, var(--bg) 70%, var(--paper));
-    padding: 8px 11px;
-  }
-  input[type="text"]::placeholder, textarea::placeholder{ color: color-mix(in srgb, var(--ink-soft) 65%, transparent); }
-  input[type="text"]:hover, textarea:hover{ border-color: color-mix(in srgb, var(--amber) 45%, var(--line)); }
-  input[type="text"]:focus, textarea:focus{
-    border-color: var(--amber); background: var(--paper);
-    box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber) 18%, transparent);
-  }
-  input:disabled{ opacity: .6; }
-
-  /* Condição */
-  .segmented{ padding: 3px; background: var(--bg); border-radius: 12px; border: 1.5px solid var(--line); }
-  .seg-btn{ border-radius: 9px; padding: 6px 16px; font-size: 12.5px; }
-  .seg-btn:hover:not(.active){ color: var(--ink); }
-  .seg-btn.active[data-val="novo"]{ background: var(--teal-wash); color: var(--teal-dark); box-shadow: inset 0 0 0 1.5px var(--teal); }
-  .seg-btn.active[data-val="recondicionado"]{ background: var(--amber-wash); color: var(--amber); box-shadow: inset 0 0 0 1.5px var(--amber); }
-  .seg-btn.active[data-val="novo"]::before{ content:"● "; font-size: 9px; vertical-align: 1px; }
-  .seg-btn.active[data-val="recondicionado"]::before{ content:"● "; font-size: 9px; vertical-align: 1px; }
-
-  /* Dimensões em painel */
-  #containerDims{
-    background: color-mix(in srgb, var(--bg) 60%, var(--paper));
-    border: 1.5px dashed var(--line); border-radius: 12px; padding: 8px 10px 4px;
-  }
-  .btn-add-dim{
-    border-radius: 999px; padding: 2px 11px; font-size: 11px;
-    background: linear-gradient(135deg, var(--red), #E8584E);
-    box-shadow: 0 3px 8px color-mix(in srgb, var(--red) 32%, transparent);
-  }
-  .btn-add-dim:hover{ transform: translateY(-1px); opacity: 1; }
-  .dim-bloco input{ background: var(--paper); }
-
-  /* Botões */
-  .actions{ border-top: 1px dashed var(--line); gap: 10px; }
-  .btn-primary{
-    border-radius: 11px; padding: 10px 20px; letter-spacing: .01em;
-    background: linear-gradient(135deg, var(--amber), #D9923E);
-    box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--amber) 60%, transparent);
-    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
-  }
-  .btn-primary:hover{ opacity: 1; transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 12px 22px -6px color-mix(in srgb, var(--amber) 65%, transparent); }
-  .btn-primary:active{ transform: translateY(0); }
-  .btn-secondary{ border-radius: 11px; padding: 10px 18px; background: var(--bg); }
-  .btn-secondary:hover{ background: var(--paper); border-color: var(--amber); transform: translateY(-1px); }
-
-  /* Abas em pílula */
-  .tabs{
-    display: inline-flex; width: fit-content; gap: 4px; padding: 3px; border: 1.5px solid var(--line);
-    border-radius: 12px; background: var(--bg); margin-bottom: 12px;
-  }
-  .tab-btn{ padding: 6px 14px; border: none; border-radius: 9px; font-size: 12.5px; }
-  .tab-btn.active{ background: var(--teal-wash); color: var(--teal-dark); box-shadow: inset 0 0 0 1.5px var(--teal); border-bottom-color: transparent; }
-
-  /* Saída de código estilo editor */
-  #htmlOutput{
-    background: #0F1B17; color: #BFE8D8; border-color: #1F3A30; border-radius: 12px;
-    padding: 14px 16px; font-size: 12.5px; line-height: 1.6;
-  }
-  #htmlOutput::placeholder{ color: #5E8274; }
-  #htmlOutput:focus{ box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 22%, transparent); border-color: var(--teal); background: #0F1B17; }
-  .preview-box{
-    border-radius: 12px; padding: 18px 20px; background: #fff; color: #17211D;
-    border: 1.5px solid var(--line); box-shadow: inset 0 1px 3px rgba(0,0,0,.04);
-    line-height: 1.55;
-  }
-
-  .aviso-validacao{ border-radius: 10px; }
-  .toast{ border-radius: 12px; background: var(--ink); color: var(--paper); box-shadow: 0 10px 24px rgba(0,0,0,.25); }
-  footer{ opacity: .8; }
-
-  @media (max-width: 900px){
-    .subtitle{ display: none; }
-    .title-block::before{ width: 34px; height: 34px; }
-  }
-
-  /* Telas estreitas: volta ao fluxo normal (não cabe lado a lado) */
+  
   @media (max-width: 900px){
     body{ height: auto; overflow: auto; }
     main{ padding-bottom: 24px; }
     .split-view{ grid-template-columns: 1fr; height: auto; }
     .form-grid{ grid-template-columns: 1fr; grid-template-rows: none; }
-    .field.grow textarea{ min-height: 100px; }
-    #htmlOutput, .preview-box{ min-height: 360px; }
+    .code-block-wrapper, .preview-box{ min-height: 350px; }
     .subtitle{ display: none; }
   }
 </style>
@@ -330,11 +212,11 @@
   <div class="top-inner">
     <div class="top-left">
       <a href="index.html" class="nav-back">← Voltar ao Hub</a>
-      <div class="title-block">
+      <div class="title-block" style="padding-left:14px; margin-left:14px; border-left:1px solid var(--line);">
         <p class="brand-eyebrow">Operacional</p>
         <h1>Formatador de Anúncios</h1>
       </div>
-      <p class="subtitle">Padronização automática de descrições HTML para plataformas ERP, Linx, Tiktok e Magalu.</p>
+      <p class="subtitle">Padronização automática de descrições HTML para ERP e marketplaces.</p>
     </div>
     <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
   </div>
@@ -352,7 +234,7 @@
           <input type="text" id="tituloOrig" placeholder="Ex: PLACA MÃE ASUS PRIME A520M-E AM4 MATX DDR4">
         </div>
 
-        <!-- 2. Condição + 7. Garantia -->
+        <!-- 2. Condição + Garantia -->
         <div class="field span-2">
           <div class="row-cond">
             <div>
@@ -363,8 +245,8 @@
               </div>
             </div>
             <div id="garantiaWrap">
-              <label for="garantiaOrig">Garantia (Meses/Dias)</label>
-              <input type="text" id="garantiaOrig" placeholder="Ex: 1 ano" value="1 ano" title="Ignorado automaticamente para produtos recondicionados.">
+              <label for="garantiaOrig">Garantia</label>
+              <input type="text" id="garantiaOrig" placeholder="Ex: 1 ano" value="1 ano">
             </div>
           </div>
         </div>
@@ -372,25 +254,25 @@
         <!-- 3. Descrição -->
         <div class="field grow">
           <label for="descOrig">Descrição</label>
-          <textarea id="descOrig" placeholder="Cole o texto descritivo e comercial do produto..."></textarea>
+          <textarea id="descOrig" placeholder="Texto descritivo e comercial do produto..."></textarea>
         </div>
 
         <!-- 4. Especificações -->
         <div class="field grow">
           <label for="specsOrig">Especificações</label>
-          <textarea id="specsOrig" placeholder="Marca: Asus&#10;Modelo: Prime A520M-E&#10;Chipset: AMD A520..."></textarea>
+          <textarea id="specsOrig" placeholder="Marca: Asus&#10;Modelo: Prime A520M-E"></textarea>
           <span class="hint">Formato "Chave: Valor" aplica negrito na chave.</span>
         </div>
 
         <!-- 5. Dimensões Dinâmicas -->
         <div class="field span-2">
           <div class="dims-header">
-            <span class="lbl">Dimensões e Peso <span class="opt">(opcional · use 1+ para kits)</span></span>
+            <span class="lbl">Dimensões e Peso <span class="opt">(opcional · kits)</span></span>
             <button type="button" class="btn-add-dim" onclick="adicionarBlocoDimensao()">1+</button>
           </div>
           <div id="containerDims">
             <div class="dim-bloco" data-index="0">
-              <div class="dim-nome-wrap"><label>Nome do Item</label><input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse..."></div>
+              <div class="dim-nome-wrap"><label>Nome do Item</label><input type="text" class="dim-nome" placeholder="Ex: Teclado"></div>
               <div><label>Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
               <div><label>Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
               <div><label>Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
@@ -403,19 +285,26 @@
         <!-- 6. Itens Inclusos -->
         <div class="field grow">
           <label for="itensOrig">Itens Inclusos</label>
-          <textarea id="itensOrig" placeholder="1 Placa-mãe&#10;2 Cabos SATA&#10;Manual do usuário..."></textarea>
-          <span class="hint">Um item por linha. Marcadores (-, *, •) são removidos.</span>
+          <textarea id="itensOrig" placeholder="1 Placa-mãe&#10;2 Cabos SATA"></textarea>
+          <span class="hint">Um item por linha. Marcadores são removidos.</span>
         </div>
 
-        <!-- 8. Identificação (EAN, Anatel e NAC) -->
+        <!-- 7. Identificação (EAN, Anatel e NAC) -->
         <div class="field">
-          <label>Identificação (EAN, Anatel e NAC)</label>
+          <label>Identificação</label>
           <div class="ident-grid">
             <input type="text" id="eanOrig" placeholder="Código EAN">
             <input type="text" id="anatelOrig" placeholder="Homologação Anatel">
             <input type="text" id="nacOrig" placeholder="Número NAC (Ex: 013738)">
           </div>
-          <span class="hint">O prefixo "NAC" é adicionado automaticamente.</span>
+          <span class="hint">Prefixo "NAC" incluído automaticamente.</span>
+        </div>
+
+        <!-- 8. Observações / Notas Fiscais (Preenche o "buraco" abaixo) -->
+        <div class="field span-2">
+          <label for="obsOrig">Observações / Garantia Adicional <span class="opt">(Opcional)</span></label>
+          <input type="text" id="obsOrig" placeholder="Ex: Produto com nota fiscal e selo de autenticidade original.">
+          <span class="hint">Adiciona uma linha de observação ou nota personalizada ao final do anúncio.</span>
         </div>
 
       </div>
@@ -435,36 +324,49 @@
         <button class="tab-btn" onclick="switchTab('preview')">👁️ Visualização Real</button>
       </div>
 
+      <!-- Saída de Código (Highlight.js) -->
       <div id="tab-html" class="tab-content active">
-        <textarea id="htmlOutput" readonly placeholder="O HTML formatado aparecerá aqui..."></textarea>
+        <div class="code-block-wrapper">
+          <pre><code id="htmlOutput" class="language-xml">O código formatado aparecerá aqui...</code></pre>
+        </div>
       </div>
+
+      <!-- Saída Visual -->
       <div id="tab-preview" class="tab-content">
         <div class="preview-box" id="previewOutput">
-          <span style="color: var(--ink-soft); font-size: 14px;">Nenhuma pré-visualização disponível.</span>
+          <span style="color: var(--ink-soft); font-size: 13.5px;">Nenhuma pré-visualização disponível.</span>
         </div>
       </div>
 
       <div class="actions">
-        <button type="button" class="btn-primary" onclick="copiarTexto('htmlOutput', 'HTML')">📋 Copiar HTML</button>
+        <button type="button" class="btn-primary" onclick="copiarTextoCodigo()">📋 Copiar HTML</button>
         <button type="button" class="btn-secondary" onclick="copiarRenderizado()">📝 Copiar Texto s/ HTML</button>
       </div>
     </div>
   </div>
 </main>
 
-<footer>Lógica puramente estrutural. Os dados não são enviados para nenhum servidor.</footer>
+<footer>Lógica puramente estrutural no seu navegador. Nenhuma informação é enviada externamente.</footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// --- GESTÃO DE TEMA ---
+// --- TEMA E HIGHLIGHT.JS ---
 const themeToggleBtn = document.getElementById('themeToggle');
+const hljsThemeLink = document.getElementById('hljs-theme');
+
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
   themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+  if (hljsThemeLink) {
+    hljsThemeLink.href = theme === 'dark' 
+      ? "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" 
+      : "https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css";
+  }
 }
 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+
 themeToggleBtn.addEventListener('click', () => {
   const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   applyTheme(next);
@@ -504,10 +406,10 @@ function switchTab(tab) {
   }
 }
 
-// --- GESTÃO DE BLOCOS DINÂMICOS DE DIMENSÕES ---
+// --- DIMENSÕES DINÂMICAS ---
 function blocoDimensaoHTML() {
   return `
-    <div class="dim-nome-wrap"><label>Nome do Item</label><input type="text" class="dim-nome" placeholder="Ex: Teclado, Mouse..."></div>
+    <div class="dim-nome-wrap"><label>Nome do Item</label><input type="text" class="dim-nome" placeholder="Ex: Teclado"></div>
     <div><label>Altura</label><input type="text" class="dim-altura" placeholder="Ex: 5"></div>
     <div><label>Comprimento</label><input type="text" class="dim-comprimento" placeholder="Ex: 22"></div>
     <div><label>Largura</label><input type="text" class="dim-largura" placeholder="Ex: 22"></div>
@@ -537,11 +439,10 @@ function atualizarVisibilidadeBlocosDims() {
   const container = document.getElementById('containerDims');
   const blocos = container.querySelectorAll('.dim-bloco');
   blocos.forEach((b, idx) => b.setAttribute('data-index', idx + 1));
-  // Modo kit (vários itens): mostra nome do item e botão remover
   container.classList.toggle('multi', blocos.length > 1);
 }
 
-// --- LÓGICA DE FORMATAÇÃO ---
+// --- FORMATAÇÃO HTML ---
 function formatarTituloCase(texto) {
   const excecoes = ['e', 'de', 'da', 'do', 'das', 'dos', 'a', 'o', 'em', 'para', 'com'];
   const pular = ['USB', 'HDMI', 'SSD', 'NVME', 'DDR4', 'DDR5', 'WIFI', 'WI-FI', 'PC', 'MATX', 'ATX', 'AM4', 'AM5', 'RGB', 'LED'];
@@ -562,6 +463,7 @@ function processarHTML() {
   const eanInput = document.getElementById('eanOrig').value.trim();
   const anatelInput = document.getElementById('anatelOrig').value.trim();
   const nacInput = document.getElementById('nacOrig').value.trim();
+  const obsInput = document.getElementById('obsOrig').value.trim();
   const aviso = document.getElementById('avisoValidacao');
 
   if(!tituloInput) {
@@ -571,21 +473,17 @@ function processarHTML() {
   }
   aviso.style.display = 'none';
 
-  // 1. Título
   let tituloFormatado = formatarTituloCase(tituloInput);
   if (condicaoAtual === 'recondicionado') {
     tituloFormatado += " - Recondicionado";
   }
 
-  // 2. Processar Blocos de Texto
   let blocoDescricao = descInput.split('\n').map(l => l.trim()).filter(l => l !== '');
   let blocoSpecs = specsInput.split('\n').map(l => l.trim()).filter(l => l !== '');
-
   let blocoItens = itensInput.split('\n')
     .map(l => l.replace(/^[-*•]\s*/, '').trim())
     .filter(l => l !== '');
 
-  // 3. Processar Dimensões Dinâmicas
   const blocosDimsDOM = document.querySelectorAll('.dim-bloco');
   let dadosDimensoes = [];
 
@@ -607,19 +505,14 @@ function processarHTML() {
     }
   });
 
-  // --- MONTAGEM DO HTML ---
+  // MONTAGEM HTML
   let html = `<span style="font-size:14px;"><strong>${tituloFormatado}</strong></span><br><br>\n`;
 
-  // Bloco Descrição
   html += `<span style="font-size:12px;">\n`;
-  if(blocoDescricao.length > 0) {
-    html += blocoDescricao.join('<br>\n') + `<br>\n`;
-  } else {
-    html += `(Descrição não fornecida)<br>\n`;
-  }
+  if(blocoDescricao.length > 0) { html += blocoDescricao.join('<br>\n') + `<br>\n`; } 
+  else { html += `(Descrição não fornecida)<br>\n`; }
   html += `</span><br>\n`;
 
-  // Bloco Especificações
   html += `<span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br>\n`;
   html += `<span style="font-size:12px;">\n`;
   if(blocoSpecs.length > 0) {
@@ -638,16 +531,12 @@ function processarHTML() {
   }
   html += `</span><br>\n`;
 
-  // Bloco Dimensões Dinâmicas (Só exibe se houver preenchimento)
   if(dadosDimensoes.length > 0) {
     html += `<span style="font-size:12px;"><strong>DIMENSÕES E PESO</strong></span><br>\n`;
     html += `<span style="font-size:12px;">\n`;
-
     const multiplos = dadosDimensoes.length > 1 || dadosDimensoes[0].nome !== "";
-
     dadosDimensoes.forEach(d => {
       let prefixo = multiplos && d.nome ? `<strong>${d.nome}</strong> - ` : "";
-
       if(d.altura) html += `${prefixo}<strong>Altura:</strong> ${d.altura}<br>\n`;
       if(d.largura) html += `${prefixo}<strong>Largura:</strong> ${d.largura}<br>\n`;
       if(d.comprimento) html += `${prefixo}<strong>Comprimento:</strong> ${d.comprimento}<br>\n`;
@@ -656,52 +545,52 @@ function processarHTML() {
     html += `</span><br>\n`;
   }
 
-  // Bloco Itens Inclusos
   html += `<span style="font-size:12px;"><strong>ITENS INCLUSOS</strong></span><br>\n`;
   html += `<span style="font-size:12px;">\n`;
   if(blocoItens.length > 0) {
-    blocoItens.forEach(item => {
-      html += `${item}<br>\n`;
-    });
+    blocoItens.forEach(item => { html += `${item}<br>\n`; });
   } else {
     html += `O produto e seus acessórios padrão de fábrica.<br>\n`;
   }
   html += `</span><br>\n`;
 
-  // Bloco Rodapé
   html += `<span style="font-size:12px;">\n`;
   if (condicaoAtual === 'recondicionado') {
     html += `ATENÇÃO - PRODUTO RECONDICIONADO<br>\n`;
-    html += `Produto recondicionado com garantia de 3 meses. Todos os itens passam por testes rigorosos de funcionamento. As embalagens podem apresentar avarias, sem impacto no funcionamento do produto.<br>\n`;
+    html += `Produto recondicionado com garantia de 3 meses. Testado rigorosamente.<br>\n`;
   } else {
     const gar = garantiaInput ? garantiaInput : "prazo confirmado";
     html += `Imagens de caráter ilustrativo.<br>\n`;
     html += `Informações divulgadas de acordo com o manual do fabricante.<br>\n`;
     html += `Produto novo na caixa, lacrado com NF e garantia do fabricante de ${gar}.<br>\n`;
-    html += `Em caso de dúvidas sobre informações técnicas, utilização, limitações e manuseio do produto, verifique o manual do fabricante.<br>\n`;
   }
 
-  // Identificação (EAN, Anatel e NAC)
+  if (obsInput) {
+    html += `${obsInput}<br>\n`;
+  }
+
   if (eanInput || anatelInput || nacInput) {
     html += `<br>\n`;
     if (eanInput) html += `<strong>EAN:</strong> ${eanInput}<br>\n`;
     if (anatelInput) html += `<strong>ANATEL:</strong> ${anatelInput}<br>\n`;
     if (nacInput) html += `<strong>NAC${nacInput}</strong><br>\n`;
   }
-
   html += `</span>`;
 
-  // Saída
-  document.getElementById('htmlOutput').value = html;
+  const codeEl = document.getElementById('htmlOutput');
+  codeEl.textContent = html;
+  codeEl.removeAttribute('data-highlighted');
+  if (window.hljs) hljs.highlightElement(codeEl);
+
   document.getElementById('previewOutput').innerHTML = html;
 }
 
-// --- FUNÇÕES UTILITÁRIAS ---
+// --- UTILITÁRIOS ---
 function limparCampos() {
   document.getElementById('tituloOrig').value = '';
   document.getElementById('descOrig').value = '';
   document.getElementById('specsOrig').value = '';
-
+  
   const container = document.getElementById('containerDims');
   container.innerHTML = '<div class="dim-bloco" data-index="0">' + blocoDimensaoHTML() + '</div>';
   atualizarVisibilidadeBlocosDims();
@@ -711,14 +600,15 @@ function limparCampos() {
   document.getElementById('eanOrig').value = '';
   document.getElementById('anatelOrig').value = '';
   document.getElementById('nacOrig').value = '';
-  document.getElementById('htmlOutput').value = '';
-  document.getElementById('previewOutput').innerHTML = '<span style="color: var(--ink-soft); font-size: 14px;">Nenhuma pré-visualização disponível.</span>';
+  document.getElementById('obsOrig').value = '';
+  
+  document.getElementById('htmlOutput').textContent = 'O código formatado aparecerá aqui...';
+  document.getElementById('previewOutput').innerHTML = '<span style="color: var(--ink-soft); font-size: 13.5px;">Nenhuma pré-visualização disponível.</span>';
   document.getElementById('avisoValidacao').style.display = 'none';
   condicaoAtual = 'novo';
   document.querySelectorAll('#condicaoSeg .seg-btn')[0].click();
 
-  // Limpa o rascunho guardado na memória
-  localStorage.removeItem('formatadorDraft');
+  localStorage.removeItem('formatadorAnunciosDraft');
 }
 
 function showToast(msg) {
@@ -729,15 +619,26 @@ function showToast(msg) {
   window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
-function copiarTexto(elementId, label) {
-  const el = document.getElementById(elementId);
-  if(!el.value) {
-    showToast('Nenhum conteúdo para copiar.');
+function copiarTextoCodigo() {
+  const el = document.getElementById('htmlOutput');
+  const texto = el.textContent || el.innerText;
+  
+  if(!texto || texto === 'O código formatado aparecerá aqui...') {
+    showToast('Nenhum conteúdo HTML para copiar.');
     return;
   }
-  el.select();
-  document.execCommand('copy');
-  showToast(label + ' copiado para a área de transferência!');
+  
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(texto).then(() => showToast('HTML copiado com sucesso!'));
+  } else {
+    const ta = document.createElement('textarea');
+    ta.value = texto;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast('HTML copiado com sucesso!');
+  }
 }
 
 function copiarRenderizado() {
@@ -748,9 +649,7 @@ function copiarRenderizado() {
   }
 
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(prev.innerText).then(() => {
-      showToast('Texto simples copiado!');
-    });
+    navigator.clipboard.writeText(prev.innerText).then(() => showToast('Texto liso copiado!'));
   } else {
     const ta = document.createElement('textarea');
     ta.value = prev.innerText;
@@ -758,42 +657,38 @@ function copiarRenderizado() {
     ta.select();
     document.execCommand('copy');
     document.body.removeChild(ta);
-    showToast('Texto simples copiado!');
+    showToast('Texto liso copiado!');
   }
 }
 
-// --- LÓGICA DE AUTOSAVE ---
-const formInputs = ['tituloOrig', 'descOrig', 'specsOrig', 'itensOrig', 'garantiaOrig', 'eanOrig', 'anatelOrig', 'nacOrig'];
+// --- AUTOSAVE ---
+const formInputs = ['tituloOrig', 'descOrig', 'specsOrig', 'itensOrig', 'garantiaOrig', 'eanOrig', 'anatelOrig', 'nacOrig', 'obsOrig'];
 
 function saveDraft() {
   const draft = {};
   formInputs.forEach(id => draft[id] = document.getElementById(id).value);
-  // Guardar também o estado do botão "Condição"
   draft['condicao'] = condicaoAtual;
-  localStorage.setItem('formatadorDraft', JSON.stringify(draft));
+  localStorage.setItem('formatadorAnunciosDraft', JSON.stringify(draft));
 }
 
 function loadDraft() {
-  const saved = localStorage.getItem('formatadorDraft');
+  const saved = localStorage.getItem('formatadorAnunciosDraft');
   if (saved) {
     const draft = JSON.parse(saved);
     formInputs.forEach(id => {
       if(draft[id] !== undefined) document.getElementById(id).value = draft[id];
     });
-    // Restaurar botão de condição
     if(draft['condicao'] && draft['condicao'] !== condicaoAtual) {
        document.querySelector(`[data-val="${draft['condicao']}"]`).click();
     }
   }
 }
 
-// Aciona o save a cada tecla digitada
 formInputs.forEach(id => {
   document.getElementById(id).addEventListener('input', saveDraft);
 });
 document.getElementById('condicaoSeg').addEventListener('click', saveDraft);
 
-// Carrega ao abrir a página
 window.addEventListener('DOMContentLoaded', loadDraft);
 </script>
 </body>

@@ -3,259 +3,214 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formatador de Imagens</title>
+<title>Formatador de Imagens · Hub</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <style>
+  /* Variáveis de Tema (Harmonizadas com o Hub) */
   :root{
-    --bg: #EEF0EF;
-    --paper: #FFFFFF;
-    --ink: #17211D;
-    --ink-soft: #576159;
-    --line: #DADFDA;
-    --line-soft: #E7EAE6;
-    --teal: #1F6F5C;
-    --teal-dark: #164F42;
-    --teal-wash: #E4F0EC;
-    --plum: #5B4B8A;
-    --plum-wash: #ECE8F5;
-    --amber: #B9762D;
-    --amber-wash: #F7ECDE;
-    --red: #D93025;
-    --red-wash: #FCE8E6;
-    --radius: 10px;
+    --bg: #F4F6F5; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
+    --line: #E2E6E4; --line-soft: #EEF0EF;
+    
+    /* Cores de Destaque */
+    --teal: #1F6F5C; --teal-dark: #164F42; --teal-wash: #E4F0EC;
+    --amber: #C27A2A; --amber-wash: #F7ECDE;
+    --plum: #67549C; --plum-wash: #ECE8F5;
+    --blue: #2563EB; --blue-wash: #EFF6FF;
+    --rose: #E11D48; --rose-wash: #FFE4E6;
+    --cyan: #0891B2; --cyan-wash: #ECFEFF;
+    --red: #D93025; --red-wash: #FCE8E6;
+    
+    --radius: 12px;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+    --ease: cubic-bezier(.22,.8,.3,1);
   }
+  
   :root[data-theme="dark"]{
-    --bg: #11201B;
-    --paper: #16231E;
-    --ink: #E8EEEC;
-    --ink-soft: #92A49C;
-    --line: #233830;
-    --line-soft: #1D2D27;
-    --teal: #3FB492;
-    --teal-dark: #7FDDBE;
-    --teal-wash: #1B3830;
-    --plum: #C2B0EC;
-    --plum-wash: #2B2440;
-    --amber: #E3A95D;
-    --amber-wash: #39301A;
-    --red: #F28B82;
-    --red-wash: #3C1E1A;
+    --bg: #0A0F0D; --paper: #101614; --ink: #E8EEEC; --ink-soft: #92A49C;
+    --line: #1D2623; --line-soft: #161D1A;
+    
+    /* Cores de Destaque (Modo Escuro) */
+    --teal: #49C4A1; --teal-dark: #8DE0C6; --teal-wash: #142E26;
+    --amber: #EAA64B; --amber-wash: #332611;
+    --plum: #B89EFA; --plum-wash: #281D40;
+    --blue: #60A5FA; --blue-wash: #172554;
+    --rose: #FB7185; --rose-wash: #3C121A;
+    --cyan: #38BDF8; --cyan-wash: #082F49;
+    --red: #FA7970; --red-wash: #3C1E1A;
   }
+  
   *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; }
-  body{
-    background: var(--bg);
-    color: var(--ink);
-    font-family: var(--sans);
-    min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
-    transition: background .15s ease, color .15s ease;
+  html,body{ margin:0; padding:0; background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  
+  /* Transições Base */
+  body, .top, .card, .btn-primary, .btn-secondary, .theme-toggle, .drop-zone, .btn-upload, .input-text, select {
+    transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease, transform .25s var(--ease);
   }
 
-  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
+  /* Animações */
+  @keyframes fadeUp { from{ opacity:0; transform: translateY(16px); } to{ opacity:1; transform: none; } }
+  .a-up { animation: fadeUp .5s var(--ease) both; animation-delay: calc(var(--d, 0) * 1ms); }
+
+  /* ---------- Cabeçalho ---------- */
+  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); position: relative; z-index: 20; }
   .top-inner{ max-width: 1180px; margin: 0 auto; padding: 28px 24px 22px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
-  .nav-back { display: inline-block; font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; transition: color 0.15s ease; }
-  .nav-back:hover { color: var(--teal); }
-  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal); font-weight: 600; margin: 0 0 6px; }
-  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 6px; letter-spacing: -0.01em; color: var(--ink); }
-  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 520px; }
+  .nav-back { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; font-weight: 700; color: var(--ink-soft); text-decoration: none; margin-bottom: 16px; font-family: var(--sans); }
+  .nav-back:hover { color: var(--rose); transform: translateX(-3px); }
+  .brand-eyebrow{ font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--rose); font-weight: 700; margin: 0 0 6px; }
+  h1{ font-family: var(--serif); font-size: 34px; line-height: 1.1; margin: 0 0 8px; letter-spacing: -0.01em; color: var(--ink); }
+  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14px; max-width: 480px; line-height: 1.5; }
 
-  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; transition: background .15s ease, color .15s ease, border-color .15s ease; }
-  .theme-toggle:hover{ border-color: var(--teal); color: var(--ink); }
+  .theme-toggle{ display: inline-flex; align-items: center; gap: 7px; border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
+  .theme-toggle:hover{ border-color: var(--rose); color: var(--ink); transform: translateY(-1px); }
 
-  main { max-width: 1000px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
+  /* ---------- Área Principal ---------- */
+  main { max-width: 1040px; margin: 0 auto; padding: 40px 24px 60px; text-align: center; }
   
-  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 32px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); position: relative; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius); padding: 36px; box-shadow: 0 4px 24px rgba(0,0,0,0.02); position: relative; }
   
-  body.drag-active .card {
-    border: 2px dashed var(--teal);
-    background: var(--teal-wash);
-  }
+  body.drag-active .card { border: 2px dashed var(--rose); background: var(--rose-wash); }
 
+  /* ---------- Zona de Drop ---------- */
   .drop-zone {
-    width: 100%;
-    max-width: 400px;
-    height: 300px;
-    margin: 0 auto 24px;
-    border: 2px dashed var(--ink-soft);
-    border-radius: var(--radius);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg);
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    overflow: hidden;
+    width: 100%; max-width: 480px; height: 320px; margin: 0 auto;
+    border: 2px dashed var(--ink-soft); border-radius: var(--radius);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    background: var(--bg); cursor: pointer; position: relative; overflow: hidden;
   }
-  
-  .drop-zone:hover, .drop-zone.dragover { border-color: var(--teal); background: var(--teal-wash); }
-  .drop-zone-text { font-size: 14px; font-weight: 600; color: var(--ink-soft); margin-bottom: 12px; pointer-events: none; }
-  .btn-upload { padding: 10px 20px; font-size: 14px; background-color: var(--ink-soft); color: #fff; border: none; border-radius: 6px; font-weight: bold; pointer-events: none; }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--rose); background: var(--rose-wash); transform: scale(1.02); }
+  .drop-zone-text { font-size: 14.5px; font-weight: 600; color: var(--ink-soft); margin-bottom: 16px; pointer-events: none; line-height: 1.5; }
+  .btn-upload { padding: 11px 24px; font-size: 14px; background-color: var(--ink-soft); color: var(--bg); border: none; border-radius: 8px; font-weight: 700; pointer-events: none; }
+  :root[data-theme="dark"] .btn-upload { color: var(--ink); }
   #fileInput { display: none; }
 
-  .preview-container { display: none; margin-top: 20px; }
+  /* ---------- Preview e Edição ---------- */
+  .preview-container { display: none; }
   .preview-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center;}
   
-  .preview-layout {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-  }
-  @media (min-width: 768px) {
-    .preview-layout { flex-direction: row; align-items: stretch; justify-content: center; text-align: left; }
-  }
+  .preview-layout { display: flex; flex-direction: column; align-items: center; gap: 32px; }
+  @media (min-width: 768px) { .preview-layout { flex-direction: row; align-items: stretch; justify-content: center; text-align: left; } }
 
-  .editor-area { display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 380px; }
+  .editor-area { display: flex; flex-direction: column; gap: 16px; align-items: center; width: 100%; max-width: 420px; }
 
   .title-controls { display: flex; align-items: center; gap: 8px; }
-  .btn-move {
-    background: var(--bg); border: 1px solid var(--line); color: var(--ink);
-    border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer;
-    transition: all 0.15s ease;
-  }
-  .btn-move:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-wash); }
+  .btn-move { background: var(--bg); border: 1px solid var(--line); color: var(--ink); border-radius: 6px; padding: 4px 10px; font-size: 12px; cursor: pointer; transition: all 0.15s ease; font-weight: bold;}
+  .btn-move:hover { border-color: var(--rose); color: var(--rose); background: var(--rose-wash); }
   .btn-move:disabled { opacity: 0.3; cursor: not-allowed; }
 
+  /* Ajuste Dinâmico da Imagem dependendo da Proporção */
   .image-wrapper {
-    width: 100%;
-    max-width: 380px;
-    aspect-ratio: 1/1;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    background-image: repeating-linear-gradient(45deg, #ccc 25%, transparent 25%, transparent 75%, #ccc 75%, #ccc), repeating-linear-gradient(45deg, #ccc 25%, #fff 25%, #fff 75%, #ccc 75%, #ccc);
-    background-position: 0 0, 10px 10px;
-    background-size: 20px 20px;
-    flex-shrink: 0;
-    overflow: hidden;
+    width: 100%; max-width: 420px; border: 1px solid var(--line); border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08); flex-shrink: 0; overflow: hidden;
+    background-image: repeating-linear-gradient(45deg, var(--line-soft) 25%, transparent 25%, transparent 75%, var(--line-soft) 75%, var(--line-soft)), repeating-linear-gradient(45deg, var(--line-soft) 25%, var(--bg) 25%, var(--bg) 75%, var(--line-soft) 75%, var(--line-soft));
+    background-position: 0 0, 10px 10px; background-size: 20px 20px;
+    transition: aspect-ratio 0.3s ease;
   }
+  .image-wrapper.ratio-1-1 { aspect-ratio: 1/1; }
+  .image-wrapper.ratio-4-5 { aspect-ratio: 4/5; }
+  .image-wrapper.ratio-16-9 { aspect-ratio: 16/9; }
+  
   .preview-image { width: 100%; height: 100%; object-fit: contain; }
 
-  .filmstrip {
-    display: flex;
-    gap: 12px;
-    width: 100%;
-    overflow-x: auto;
-    padding: 6px 4px 10px;
-    justify-content: flex-start;
-  }
-  
+  /* Filmstrip (Miniaturas) */
+  .filmstrip { display: flex; gap: 12px; width: 100%; overflow-x: auto; padding: 6px 4px 12px; justify-content: flex-start; }
   .filmstrip::-webkit-scrollbar { height: 6px; }
   .filmstrip::-webkit-scrollbar-track { background: var(--bg); border-radius: 4px; }
   .filmstrip::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
 
   .thumb-wrap {
-    width: 64px;
-    height: 64px;
-    flex-shrink: 0;
-    border: 2px solid var(--line);
-    border-radius: 6px;
-    cursor: grab;
-    position: relative;
-    background: var(--paper);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.2s;
+    width: 68px; height: 68px; flex-shrink: 0; border: 2px solid var(--line); border-radius: 8px;
+    cursor: grab; position: relative; background: var(--paper); display: flex; justify-content: center; align-items: center; transition: all 0.2s;
   }
   .thumb-wrap:active { cursor: grabbing; }
-  .thumb-wrap:hover { border-color: var(--teal-dark); }
-  .thumb-wrap.active { border-color: var(--teal); box-shadow: 0 0 0 2px var(--teal-wash); }
+  .thumb-wrap:hover { border-color: var(--rose-wash); transform: translateY(-2px); }
+  .thumb-wrap.active { border-color: var(--rose); box-shadow: 0 4px 12px color-mix(in srgb, var(--rose) 20%, transparent); transform: translateY(-2px); }
   .thumb-wrap.dragging { opacity: 0.4; }
-  .thumb-wrap.drag-over-thumb { border-color: var(--teal); transform: scale(1.08); }
+  .thumb-wrap.drag-over-thumb { border-color: var(--rose); transform: scale(1.08); }
 
   .thumb-img { max-width: 100%; max-height: 100%; border-radius: 4px; object-fit: contain; pointer-events: none; }
   
-  .thumb-delete {
-    position: absolute; top: -6px; right: -6px; background: var(--red); color: white; border: none;
-    border-radius: 50%; width: 18px; height: 18px; font-size: 10px; font-weight: bold;
-    display: none; align-items: center; justify-content: center; cursor: pointer; padding: 0;
-  }
+  .thumb-delete { position: absolute; top: -8px; right: -8px; background: var(--red); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 10px; font-weight: bold; display: none; align-items: center; justify-content: center; cursor: pointer; padding: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
   .thumb-wrap:hover .thumb-delete { display: flex; }
 
-  .thumb-add {
-    background: var(--bg); border: 2px dashed var(--ink-soft);
-    color: var(--ink-soft); font-size: 24px; font-weight: normal; cursor: pointer;
-    transition: all 0.2s ease;
-  }
-  .thumb-add:hover { background: var(--teal-wash); border-color: var(--teal); color: var(--teal); transform: scale(1.05); }
+  .thumb-add { background: var(--bg); border: 2px dashed var(--ink-soft); color: var(--ink-soft); font-size: 24px; font-weight: normal; cursor: pointer; transition: all 0.2s ease; }
+  .thumb-add:hover { background: var(--rose-wash); border-color: var(--rose); color: var(--rose); transform: scale(1.05); }
 
-  .ajustes-panel {
-    background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
-    padding: 24px; width: 100%; max-width: 320px; display: flex; flex-direction: column; gap: 20px;
-  }
+  /* ---------- Painel de Ajustes ---------- */
+  .ajustes-panel { background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 28px; width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 20px; }
 
-  .ajuste-grupo { display: flex; flex-direction: column; gap: 6px; }
-  .ajuste-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 2px; }
-  .ajuste-valor { color: var(--teal); font-family: var(--mono); }
+  .ajuste-grupo { display: flex; flex-direction: column; gap: 8px; text-align: left; }
+  .ajuste-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .ajuste-valor { color: var(--rose); font-family: var(--mono); }
 
-  .input-text { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); font-size: 13.5px; font-family: var(--sans); outline: none; }
-  .input-text:focus { border-color: var(--teal); }
+  /* Inputs unificados */
+  .input-text, select { width: 100%; padding: 10px 14px; border-radius: 8px; border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); font-size: 14px; font-family: var(--sans); font-weight: 600; outline: none; }
+  .input-text:focus, select:focus { border-color: var(--rose); box-shadow: 0 0 0 4px color-mix(in srgb, var(--rose) 15%, transparent); }
+  select { cursor: pointer; }
 
   .color-picker-wrap { display: flex; align-items: center; gap: 12px; }
-  .input-color { width: 36px; height: 36px; padding: 0; border: none; border-radius: 6px; cursor: pointer; background: transparent; }
+  .input-color { width: 40px; height: 40px; padding: 0; border: none; border-radius: 8px; cursor: pointer; background: transparent; }
   .input-color::-webkit-color-swatch-wrapper { padding: 0; }
-  .input-color::-webkit-color-swatch { border: 1px solid var(--line); border-radius: 6px; }
+  .input-color::-webkit-color-swatch { border: 1.5px solid var(--line); border-radius: 8px; }
 
   input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
   input[type=range]:focus { outline: none; }
   input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: var(--line); border-radius: 99px; }
-  input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--teal); cursor: pointer; -webkit-appearance: none; margin-top: -5px; border: 2px solid var(--paper); box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  input[type=range]::-webkit-slider-thumb { height: 18px; width: 18px; border-radius: 50%; background: var(--rose); cursor: pointer; -webkit-appearance: none; margin-top: -6px; border: 2px solid var(--paper); box-shadow: 0 2px 4px rgba(0,0,0,0.15); transition: transform 0.1s; }
+  input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.15); }
   input[type=range]:focus::-webkit-slider-runnable-track { background: var(--line-soft); }
 
-  .divider { height: 1px; background: var(--line); margin: 4px 0; }
+  .divider { height: 1px; background: var(--line); margin: 6px 0; }
   
-  .acoes-ajuste { display: flex; justify-content: space-between; align-items: center; }
-  .btn-acao-texto { background: none; border: none; font-size: 12px; font-weight: 600; cursor: pointer; text-decoration: underline; padding: 0; }
+  .acoes-ajuste { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .btn-acao-texto { background: none; border: none; font-size: 12.5px; font-weight: 700; cursor: pointer; text-decoration: underline; padding: 0; }
   .btn-resetar { color: var(--ink-soft); }
   .btn-resetar:hover { color: var(--red); }
-  .btn-aplicar-todas { color: var(--teal); }
-  .btn-aplicar-todas:hover { color: var(--teal-dark); }
+  .btn-aplicar-todas { color: var(--rose); }
+  .btn-aplicar-todas:hover { color: var(--rose-wash); }
 
-  .actions { display: flex; gap: 12px; justify-content: center; margin-top: 32px; }
-  .btn-primary { padding: 12px 24px; font-size: 14.5px; background-color: var(--teal); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: opacity 0.2s; }
-  .btn-primary:hover { opacity: 0.9; }
+  .actions { display: flex; gap: 14px; justify-content: center; margin-top: 40px; flex-wrap: wrap; }
+  .btn-primary { padding: 12px 28px; font-size: 15px; background-color: var(--rose); color: #fff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; }
+  :root[data-theme="dark"] .btn-primary { color: #0A0F0D; }
+  .btn-primary:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 16px color-mix(in srgb, var(--rose) 30%, transparent); opacity: 0.95; }
+  .btn-primary:active:not(:disabled) { transform: translateY(0); }
   .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
-  .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 600; transition: background 0.2s; }
-  .btn-secondary:hover { background: var(--line-soft); }
+  
+  .btn-secondary { padding: 12px 20px; font-size: 14px; background: transparent; color: var(--ink); border: 1.5px solid var(--line); border-radius: 8px; cursor: pointer; font-weight: 700; }
+  .btn-secondary:hover { background: var(--line-soft); border-color: var(--ink); color: var(--ink); transform: translateY(-1px); }
 
-  footer{ text-align: center; padding: 18px 24px 34px; color: var(--ink-soft); font-size: 12px; }
+  footer{ text-align: center; padding: 24px 24px 40px; color: var(--ink-soft); font-size: 12px; border-top: 1px solid var(--line); }
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="top-inner">
-    <div>
-      <a href="index.html" class="nav-back">← Voltar ao Hub</a>
-      <p class="brand-eyebrow">Mídia</p>
-      <h1>Formatador de Imagem</h1>
-      <p class="subtitle">Enquadramento e cor em lote. Edite cada página e reordene como desejar.</p>
+    <div class="a-up">
+      <a href="index.html" class="nav-back">← Voltar ao Hub Central</a>
+      <p class="brand-eyebrow">Tratamento de Mídia</p>
+      <h1>Formatador de Imagens</h1>
+      <p class="subtitle">Ajuste dimensões, cores e enquadramento em lote. Perfeito para manter a padronização de catálogos e anúncios.</p>
     </div>
-    <div>
+    <div class="a-up" style="--d:100">
       <button class="theme-toggle" id="themeToggle" type="button">🌙 Modo escuro</button>
     </div>
   </div>
 </header>
 
 <main>
-  <div class="card">
+  <div class="card a-up" style="--d:150">
     
-    <!-- Zona de Drop -->
+    <!-- Zona de Drop Inicial -->
     <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
-      <div class="drop-zone-text">coloque aqui até 15 imagens<br>desejadas</div>
-      <button class="btn-upload">pesquisar no PC</button>
+      <div class="drop-zone-text">Arraste até 15 imagens aqui<br>ou clique para procurar</div>
+      <button class="btn-upload">Pesquisar no Dispositivo</button>
     </div>
     <input type="file" id="fileInput" accept="image/*" multiple>
 
-    <!-- Área de Resultado e Edição -->
+    <!-- Área de Edição -->
     <div class="preview-container" id="previewContainer">
       <div class="preview-layout">
         
@@ -264,13 +219,13 @@
           <div class="preview-title" style="width:100%;">
             <div class="title-controls">
               <span id="lblPaginaAtual">Página 1</span>
-              <button class="btn-move" id="btnMoverEsq" onclick="moverPaginaAtual(-1)" title="Mover para esquerda">◀</button>
-              <button class="btn-move" id="btnMoverDir" onclick="moverPaginaAtual(1)" title="Mover para direita">▶</button>
+              <button class="btn-move" id="btnMoverEsq" onclick="moverPaginaAtual(-1)" title="Página anterior">◀</button>
+              <button class="btn-move" id="btnMoverDir" onclick="moverPaginaAtual(1)" title="Página seguinte">▶</button>
             </div>
-            <span style="font-size: 12px; color: var(--ink-soft); font-weight: normal;">(1200 x 1200px)</span>
+            <span style="font-size: 12.5px; color: var(--ink-soft); font-weight: 600;" id="lblResolucaoDesc">(1200 x 1200px)</span>
           </div>
 
-          <div class="image-wrapper">
+          <div class="image-wrapper ratio-1-1" id="previewWrapper">
             <img id="resultImage" class="preview-image" src="" alt="Pré-visualização">
           </div>
 
@@ -281,19 +236,29 @@
         <!-- Lado Direito: Painel de Ajustes -->
         <div class="ajustes-panel">
           
+          <div class="ajuste-grupo">
+            <label class="ajuste-header" for="inpResolucao">Formato de Saída</label>
+            <select id="inpResolucao">
+              <option value="1200x1200">Quadrado (1200 x 1200px) - Padrão e-commerce</option>
+              <option value="1080x1080">Quadrado (1080 x 1080px) - Redes Sociais</option>
+              <option value="1080x1350">Vertical (1080 x 1350px) - Formato 4:5</option>
+              <option value="1920x1080">Horizontal (1920 x 1080px) - Formato 16:9</option>
+            </select>
+          </div>
+
           <div class="ajuste-grupo" style="margin-bottom: 4px;">
-            <label class="ajuste-header" for="inpNomeArquivo">Nome do Produto (para o arquivo ZIP)</label>
-            <input type="text" id="inpNomeArquivo" class="input-text" placeholder="Ex: JBL_Quantum">
+            <label class="ajuste-header" for="inpNomeArquivo">Nome do ZIP (Download)</label>
+            <input type="text" id="inpNomeArquivo" class="input-text" placeholder="Ex: Produto_Fotos_Formatadas">
           </div>
 
           <div class="divider"></div>
 
           <!-- Cor de Fundo -->
           <div class="ajuste-grupo">
-            <label class="ajuste-header">Fundo da Página Atual</label>
+            <label class="ajuste-header">Preenchimento (Fundo)</label>
             <div class="color-picker-wrap">
               <input type="color" id="inpCorFundo" class="input-color" value="#FFFFFF">
-              <span style="font-size: 12px; color: var(--ink-soft); line-height: 1.3;">Selecione a cor para preencher as bordas.</span>
+              <span style="font-size: 12.5px; color: var(--ink-soft); font-weight: 500; line-height: 1.3;">Cor para áreas vazias da imagem atual.</span>
             </div>
           </div>
 
@@ -323,23 +288,23 @@
           </div>
 
           <div class="acoes-ajuste">
-            <button class="btn-acao-texto btn-resetar" onclick="resetarFiltrosPagina()">Resetar esta página</button>
-            <button class="btn-acao-texto btn-aplicar-todas" onclick="aplicarConfigATodas()" title="Aplica as cores e filtros atuais em todas as imagens">Aplicar a todas</button>
+            <button class="btn-acao-texto btn-resetar" onclick="resetarFiltrosPagina()">Resetar esta foto</button>
+            <button class="btn-acao-texto btn-aplicar-todas" onclick="aplicarConfigATodas()" title="Aplica fundo e filtros a todas as fotos">Aplicar a todas</button>
           </div>
 
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-primary" id="btnDownload">Baixar Imagens (ZIP)</button>
-        <button class="btn-secondary" onclick="limparTudo()">Começar do Zero</button>
+        <button class="btn-primary" id="btnDownload">Transferir Lote de Imagens (ZIP)</button>
+        <button class="btn-secondary" onclick="limparTudo()">Apagar tudo e Recomeçar</button>
       </div>
     </div>
 
   </div>
 </main>
 
-<footer>Processamento local no navegador. Nenhuma inteligência artificial ou envio de dados externo.</footer>
+<footer>Processamento 100% seguro no seu navegador. Nenhuma imagem é enviada para servidores externos.</footer>
 
 <script>
 // --- GESTÃO DE TEMA ---
@@ -360,13 +325,16 @@ themeToggleBtn.addEventListener('click', () => {
 const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 const previewContainer = document.getElementById('previewContainer');
+const previewWrapper = document.getElementById('previewWrapper');
 const resultImage = document.getElementById('resultImage');
 const filmstripContainer = document.getElementById('filmstripContainer');
 const btnDownload = document.getElementById('btnDownload');
 const lblPaginaAtual = document.getElementById('lblPaginaAtual');
+const lblResolucaoDesc = document.getElementById('lblResolucaoDesc');
 const btnMoverEsq = document.getElementById('btnMoverEsq');
 const btnMoverDir = document.getElementById('btnMoverDir');
 
+const inpResolucao = document.getElementById('inpResolucao');
 const inpNomeArquivo = document.getElementById('inpNomeArquivo');
 const inpCorFundo = document.getElementById('inpCorFundo');
 const inpBrilho = document.getElementById('inpBrilho');
@@ -380,28 +348,41 @@ let paginas = [];
 let paginaAtualIndex = 0;
 const LIMITE_IMAGENS = 15;
 
-// --- DRAG & DROP NA TELA TODA (GLOBAL) ---
+// Obter as dimensões selecionadas
+function obterDimensoes() {
+  const val = inpResolucao.value;
+  const [w, h] = val.split('x').map(Number);
+  return { w, h };
+}
+
+// Alterar o rácio do Preview visual
+inpResolucao.addEventListener('change', () => {
+  const { w, h } = obterDimensoes();
+  lblResolucaoDesc.textContent = `(${w} x ${h}px)`;
+  
+  previewWrapper.classList.remove('ratio-1-1', 'ratio-4-5', 'ratio-16-9');
+  if (w === h) previewWrapper.classList.add('ratio-1-1');
+  else if (w === 1080 && h === 1350) previewWrapper.classList.add('ratio-4-5');
+  else if (w === 1920 && h === 1080) previewWrapper.classList.add('ratio-16-9');
+  
+  gerarPreviewNoCanvas();
+});
+
+// --- DRAG & DROP GLOBAL ---
 ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
   window.addEventListener(eventName, e => { e.preventDefault(); e.stopPropagation(); }, false);
 });
 
-window.addEventListener('dragover', () => {
-  document.body.classList.add('drag-active');
-});
-
+window.addEventListener('dragover', () => { document.body.classList.add('drag-active'); });
 ['dragleave', 'drop'].forEach(eventName => {
   window.addEventListener(eventName, (e) => {
-    if (e.type === 'drop' || (e.clientX === 0 && e.clientY === 0)) {
-      document.body.classList.remove('drag-active');
-    }
+    if (e.type === 'drop' || (e.clientX === 0 && e.clientY === 0)) { document.body.classList.remove('drag-active'); }
   });
 });
 
 window.addEventListener('drop', (e) => {
   document.body.classList.remove('drag-active');
-  if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-    processarArquivos(e.dataTransfer.files);
-  }
+  if (e.dataTransfer && e.dataTransfer.files.length > 0) processarArquivos(e.dataTransfer.files);
 });
 
 fileInput.addEventListener('change', function() {
@@ -411,7 +392,7 @@ fileInput.addEventListener('change', function() {
   }
 });
 
-// --- PROCESSAMENTO DOS ARQUIVOS ---
+// --- PROCESSAMENTO ---
 function processarArquivos(files) {
   let arquivosArray = Array.from(files).filter(f => f.type.match('image.*'));
   
@@ -419,7 +400,7 @@ function processarArquivos(files) {
 
   let espacoLivre = LIMITE_IMAGENS - paginas.length;
   if (arquivosArray.length > espacoLivre) {
-    alert(`Você só pode adicionar mais ${espacoLivre} imagem(ns). O limite é de 15 imagens por lote.`);
+    alert(`Só é possível adicionar mais ${espacoLivre} imagem(ns). Limite é de 15 imagens por sessão.`);
     arquivosArray = arquivosArray.slice(0, espacoLivre);
   }
   if(arquivosArray.length === 0) return;
@@ -436,22 +417,12 @@ function processarArquivos(files) {
     reader.onload = function(e) {
       const img = new Image();
       img.onload = function() {
-        
-        paginas.push({
-          id: Date.now() + Math.random(),
-          imgObjeto: img,
-          bg: "#FFFFFF",
-          brilho: 100,
-          contraste: 100,
-          saturacao: 100
-        });
-
+        paginas.push({ id: Date.now() + Math.random(), imgObjeto: img, bg: "#FFFFFF", brilho: 100, contraste: 100, saturacao: 100 });
         carregadas++;
         
         if(carregadas === arquivosArray.length) {
           dropZone.style.display = 'none';
           previewContainer.style.display = 'block';
-          
           renderizarFilmstrip();
           selecionarPagina(indexInicialNovas);
         }
@@ -465,26 +436,18 @@ function processarArquivos(files) {
 // --- REORDENAÇÃO DE PÁGINAS ---
 function moverPagina(fromIndex, toIndex) {
   if (toIndex < 0 || toIndex >= paginas.length) return;
-  
   const item = paginas.splice(fromIndex, 1)[0];
   paginas.splice(toIndex, 0, item);
   
-  if (paginaAtualIndex === fromIndex) {
-    paginaAtualIndex = toIndex;
-  } else if (paginaAtualIndex > fromIndex && paginaAtualIndex <= toIndex) {
-    paginaAtualIndex--;
-  } else if (paginaAtualIndex < fromIndex && paginaAtualIndex >= toIndex) {
-    paginaAtualIndex++;
-  }
+  if (paginaAtualIndex === fromIndex) paginaAtualIndex = toIndex;
+  else if (paginaAtualIndex > fromIndex && paginaAtualIndex <= toIndex) paginaAtualIndex--;
+  else if (paginaAtualIndex < fromIndex && paginaAtualIndex >= toIndex) paginaAtualIndex++;
   
   selecionarPagina(paginaAtualIndex);
 }
+function moverPaginaAtual(direcao) { moverPagina(paginaAtualIndex, paginaAtualIndex + direcao); }
 
-function moverPaginaAtual(direcao) {
-  moverPagina(paginaAtualIndex, paginaAtualIndex + direcao);
-}
-
-// --- NAVEGAÇÃO E UI ---
+// --- UI E MINIATURAS ---
 function renderizarFilmstrip() {
   filmstripContainer.innerHTML = '';
 
@@ -494,35 +457,14 @@ function renderizarFilmstrip() {
     thumbWrap.draggable = true;
     thumbWrap.onclick = () => selecionarPagina(index);
     
-    // Drag & drop para reordenar miniaturas
-    thumbWrap.addEventListener('dragstart', (e) => {
-      e.stopPropagation();
-      e.dataTransfer.setData('text/plain', index);
-      thumbWrap.classList.add('dragging');
-    });
-
-    thumbWrap.addEventListener('dragend', () => {
-      thumbWrap.classList.remove('dragging');
-    });
-
-    thumbWrap.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      thumbWrap.classList.add('drag-over-thumb');
-    });
-
-    thumbWrap.addEventListener('dragleave', () => {
-      thumbWrap.classList.remove('drag-over-thumb');
-    });
-
+    thumbWrap.addEventListener('dragstart', (e) => { e.stopPropagation(); e.dataTransfer.setData('text/plain', index); thumbWrap.classList.add('dragging'); });
+    thumbWrap.addEventListener('dragend', () => { thumbWrap.classList.remove('dragging'); });
+    thumbWrap.addEventListener('dragover', (e) => { e.preventDefault(); e.stopPropagation(); thumbWrap.classList.add('drag-over-thumb'); });
+    thumbWrap.addEventListener('dragleave', () => { thumbWrap.classList.remove('drag-over-thumb'); });
     thumbWrap.addEventListener('drop', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      thumbWrap.classList.remove('drag-over-thumb');
+      e.preventDefault(); e.stopPropagation(); thumbWrap.classList.remove('drag-over-thumb');
       const fromIndex = parseInt(e.dataTransfer.getData('text/plain'), 10);
-      if (!isNaN(fromIndex) && fromIndex !== index) {
-        moverPagina(fromIndex, index);
-      }
+      if (!isNaN(fromIndex) && fromIndex !== index) moverPagina(fromIndex, index);
     });
     
     const img = document.createElement('img');
@@ -530,25 +472,17 @@ function renderizarFilmstrip() {
     img.className = 'thumb-img';
     
     const btnDel = document.createElement('button');
-    btnDel.className = 'thumb-delete';
-    btnDel.innerHTML = '✕';
-    btnDel.title = "Remover imagem";
-    btnDel.onclick = (e) => {
-      e.stopPropagation();
-      removerPagina(index);
-    };
+    btnDel.className = 'thumb-delete'; btnDel.innerHTML = '✕'; btnDel.title = "Remover imagem";
+    btnDel.onclick = (e) => { e.stopPropagation(); removerPagina(index); };
 
     thumbWrap.appendChild(img);
     thumbWrap.appendChild(btnDel);
     filmstripContainer.appendChild(thumbWrap);
   });
 
-  // Botão de Adicionar (+)
   if (paginas.length < LIMITE_IMAGENS) {
     const addWrap = document.createElement('div');
-    addWrap.className = 'thumb-wrap thumb-add';
-    addWrap.innerHTML = '+';
-    addWrap.title = "Clique ou arraste imagens para qualquer lugar da tela";
+    addWrap.className = 'thumb-wrap thumb-add'; addWrap.innerHTML = '+'; addWrap.title = "Clique ou arraste imagens adicionais";
     addWrap.onclick = () => fileInput.click();
     filmstripContainer.appendChild(addWrap);
   }
@@ -556,162 +490,113 @@ function renderizarFilmstrip() {
 
 function selecionarPagina(index) {
   if (paginas.length === 0) return;
-  
   paginaAtualIndex = index;
-  lblPaginaAtual.textContent = `Página ${index + 1} de ${paginas.length}`;
+  lblPaginaAtual.textContent = `Página ${index + 1} / ${paginas.length}`;
   
-  btnMoverEsq.disabled = (index === 0);
-  btnMoverDir.disabled = (index === paginas.length - 1);
+  btnMoverEsq.disabled = (index === 0); btnMoverDir.disabled = (index === paginas.length - 1);
 
   const cfg = paginas[index];
-  inpCorFundo.value = cfg.bg;
-  inpBrilho.value = cfg.brilho;
-  inpContraste.value = cfg.contraste;
-  inpSaturacao.value = cfg.saturacao;
+  inpCorFundo.value = cfg.bg; inpBrilho.value = cfg.brilho; inpContraste.value = cfg.contraste; inpSaturacao.value = cfg.saturacao;
   
-  atualizarTextosSliders();
-  renderizarFilmstrip();
-  gerarPreviewNoCanvas();
+  atualizarTextosSliders(); renderizarFilmstrip(); gerarPreviewNoCanvas();
 }
 
 function removerPagina(index) {
   paginas.splice(index, 1);
-  if (paginas.length === 0) {
-    limparTudo();
-  } else {
-    if (paginaAtualIndex >= paginas.length) {
-      paginaAtualIndex = paginas.length - 1;
-    }
-    selecionarPagina(paginaAtualIndex);
-  }
+  if (paginas.length === 0) limparTudo();
+  else { if (paginaAtualIndex >= paginas.length) paginaAtualIndex = paginas.length - 1; selecionarPagina(paginaAtualIndex); }
 }
 
-// --- DESENHO NO CANVAS DA PRÉVIA ---
+// --- DESENHO NO CANVAS ---
 function gerarPreviewNoCanvas() {
   if (paginas.length === 0) return;
   
   const cfg = paginas[paginaAtualIndex];
+  const { w: widthAlvo, h: heightAlvo } = obterDimensoes();
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  const TAMANHO_ALVO = 1200;
   
-  canvas.width = TAMANHO_ALVO;
-  canvas.height = TAMANHO_ALVO;
+  canvas.width = widthAlvo;
+  canvas.height = heightAlvo;
   
   ctx.fillStyle = cfg.bg;
-  ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
+  ctx.fillRect(0, 0, widthAlvo, heightAlvo);
   
   ctx.filter = `brightness(${cfg.brilho}%) contrast(${cfg.contraste}%) saturate(${cfg.saturacao}%)`;
   
   const ratioOriginal = cfg.imgObjeto.width / cfg.imgObjeto.height;
+  const ratioAlvo = widthAlvo / heightAlvo;
+  
   let drawWidth, drawHeight;
-  if (cfg.imgObjeto.width > cfg.imgObjeto.height) {
-    drawWidth = TAMANHO_ALVO; drawHeight = TAMANHO_ALVO / ratioOriginal;
+  
+  // Lógica de conter a imagem dentro do retângulo/quadrado
+  if (ratioOriginal > ratioAlvo) {
+    drawWidth = widthAlvo; drawHeight = widthAlvo / ratioOriginal;
   } else {
-    drawHeight = TAMANHO_ALVO; drawWidth = TAMANHO_ALVO * ratioOriginal;
+    drawHeight = heightAlvo; drawWidth = heightAlvo * ratioOriginal;
   }
   
-  const x = (TAMANHO_ALVO - drawWidth) / 2;
-  const y = (TAMANHO_ALVO - drawHeight) / 2;
+  const x = (widthAlvo - drawWidth) / 2;
+  const y = (heightAlvo - drawHeight) / 2;
   
   ctx.drawImage(cfg.imgObjeto, x, y, drawWidth, drawHeight);
   resultImage.src = canvas.toDataURL('image/jpeg', 0.95);
 }
 
-// --- EVENTOS DE EDIÇÃO EM TEMPO REAL ---
-function atualizarTextosSliders() {
-  valBrilho.textContent = `${inpBrilho.value}%`;
-  valContraste.textContent = `${inpContraste.value}%`;
-  valSaturacao.textContent = `${inpSaturacao.value}%`;
-}
-
+// --- EVENTOS E AJUSTES ---
+function atualizarTextosSliders() { valBrilho.textContent = `${inpBrilho.value}%`; valContraste.textContent = `${inpContraste.value}%`; valSaturacao.textContent = `${inpSaturacao.value}%`; }
 function salvarAlteracaoAtual() {
   if(paginas.length === 0) return;
-  paginas[paginaAtualIndex].bg = inpCorFundo.value;
-  paginas[paginaAtualIndex].brilho = inpBrilho.value;
-  paginas[paginaAtualIndex].contraste = inpContraste.value;
-  paginas[paginaAtualIndex].saturacao = inpSaturacao.value;
-  
-  atualizarTextosSliders();
-  gerarPreviewNoCanvas();
+  paginas[paginaAtualIndex].bg = inpCorFundo.value; paginas[paginaAtualIndex].brilho = inpBrilho.value; paginas[paginaAtualIndex].contraste = inpContraste.value; paginas[paginaAtualIndex].saturacao = inpSaturacao.value;
+  atualizarTextosSliders(); gerarPreviewNoCanvas();
 }
 
-[inpBrilho, inpContraste, inpSaturacao, inpCorFundo].forEach(input => {
-  input.addEventListener('input', salvarAlteracaoAtual);
-});
+[inpBrilho, inpContraste, inpSaturacao, inpCorFundo].forEach(input => { input.addEventListener('input', salvarAlteracaoAtual); });
 
-function resetarFiltrosPagina() {
-  inpBrilho.value = 100;
-  inpContraste.value = 100;
-  inpSaturacao.value = 100;
-  salvarAlteracaoAtual(); 
-}
-
+function resetarFiltrosPagina() { inpBrilho.value = 100; inpContraste.value = 100; inpSaturacao.value = 100; inpCorFundo.value = "#FFFFFF"; salvarAlteracaoAtual(); }
 function aplicarConfigATodas() {
   if(paginas.length === 0) return;
   const cfgAtual = paginas[paginaAtualIndex];
-  
-  paginas.forEach(p => {
-    p.bg = cfgAtual.bg;
-    p.brilho = cfgAtual.brilho;
-    p.contraste = cfgAtual.contraste;
-    p.saturacao = cfgAtual.saturacao;
-  });
-  alert("As configurações atuais foram aplicadas a todas as páginas!");
+  paginas.forEach(p => { p.bg = cfgAtual.bg; p.brilho = cfgAtual.brilho; p.contraste = cfgAtual.contraste; p.saturacao = cfgAtual.saturacao; });
+  alert("O fundo e filtros foram aplicados a todas as páginas da sessão!");
 }
-
 function limparTudo() {
-  paginas = [];
-  paginaAtualIndex = 0;
-  fileInput.value = "";
-  inpNomeArquivo.value = "";
-  previewContainer.style.display = 'none';
-  dropZone.style.display = 'flex';
+  paginas = []; paginaAtualIndex = 0; fileInput.value = ""; inpNomeArquivo.value = "";
+  previewContainer.style.display = 'none'; dropZone.style.display = 'flex';
 }
 
 // --- GERAÇÃO DO ZIP ---
 btnDownload.addEventListener('click', () => {
   if (paginas.length === 0) return;
 
-  btnDownload.textContent = "Compactando...";
-  btnDownload.disabled = true;
-  
+  btnDownload.textContent = "A Processar as imagens..."; btnDownload.disabled = true;
   let nomeBase = inpNomeArquivo.value.trim() || "Produto";
   
   const zip = new JSZip();
-  const TAMANHO_ALVO = 1200;
+  const { w: widthAlvo, h: heightAlvo } = obterDimensoes();
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
-  canvas.width = TAMANHO_ALVO;
-  canvas.height = TAMANHO_ALVO;
+  canvas.width = widthAlvo; canvas.height = heightAlvo;
 
   for(let i = 0; i < paginas.length; i++) {
       let cfg = paginas[i];
-
-      ctx.fillStyle = cfg.bg;
-      ctx.fillRect(0, 0, TAMANHO_ALVO, TAMANHO_ALVO);
-      
+      ctx.fillStyle = cfg.bg; ctx.fillRect(0, 0, widthAlvo, heightAlvo);
       ctx.filter = `brightness(${cfg.brilho}%) contrast(${cfg.contraste}%) saturate(${cfg.saturacao}%)`;
       
       const ratioOriginal = cfg.imgObjeto.width / cfg.imgObjeto.height;
+      const ratioAlvo = widthAlvo / heightAlvo;
       let drawWidth, drawHeight;
-      if (cfg.imgObjeto.width > cfg.imgObjeto.height) {
-        drawWidth = TAMANHO_ALVO; drawHeight = TAMANHO_ALVO / ratioOriginal;
-      } else {
-        drawHeight = TAMANHO_ALVO; drawWidth = TAMANHO_ALVO * ratioOriginal;
-      }
+      if (ratioOriginal > ratioAlvo) { drawWidth = widthAlvo; drawHeight = widthAlvo / ratioOriginal; } 
+      else { drawHeight = heightAlvo; drawWidth = heightAlvo * ratioOriginal; }
       
-      const x = (TAMANHO_ALVO - drawWidth) / 2;
-      const y = (TAMANHO_ALVO - drawHeight) / 2;
+      const x = (widthAlvo - drawWidth) / 2; const y = (heightAlvo - drawHeight) / 2;
       
       ctx.drawImage(cfg.imgObjeto, x, y, drawWidth, drawHeight);
       ctx.filter = 'none';
 
       let dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       let base64Data = dataUrl.split(',')[1];
-      
       let nomeArquivoFinal = `${i + 1}.jpg`;
-      
       zip.file(nomeArquivoFinal, base64Data, {base64: true});
   }
 
@@ -719,12 +604,9 @@ btnDownload.addEventListener('click', () => {
       const a = document.createElement('a');
       a.href = URL.createObjectURL(conteudoZip);
       a.download = `${nomeBase}.zip`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       
-      btnDownload.textContent = "Baixar Imagens (ZIP)";
-      btnDownload.disabled = false;
+      btnDownload.textContent = "Transferir Lote de Imagens (ZIP)"; btnDownload.disabled = false;
   });
 });
 </script>

@@ -6,28 +6,47 @@
 <title>Hub · Ferramentas Internas</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
 <style>
-  /* Variáveis originais do projeto */
+  /* Variáveis do Projeto - Modo Claro */
   :root{
-    --bg: #EEF0EF; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
-    --line: #DADFDA; --line-soft: #E7EAE6; --teal: #1F6F5C; --teal-dark: #164F42;
-    --teal-wash: #E4F0EC; --amber: #B9762D; --amber-wash: #F7ECDE;
-    --plum: #5B4B8A; --plum-wash: #ECE8F5; --red: #D93025; --radius: 10px;
+    --bg: #F4F6F5; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
+    --line: #E2E6E4; --line-soft: #EEF0EF;
+    
+    /* Paleta de Cores Secundárias (Modo Claro) */
+    --teal: #1F6F5C; --teal-dark: #164F42; --teal-wash: #E4F0EC;
+    --amber: #C27A2A; --amber-wash: #F7ECDE;
+    --plum: #67549C; --plum-wash: #ECE8F5;
+    --blue: #2563EB; --blue-wash: #EFF6FF;
+    --rose: #E11D48; --rose-wash: #FFE4E6;
+    --cyan: #0891B2; --cyan-wash: #ECFEFF;
+    
+    --red: #D93025; --radius: 10px;
     --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
     --ease: cubic-bezier(.22,.8,.3,1);
   }
+  
+  /* Tema Escuro Profundo com Acentos Vibrantes */
   :root[data-theme="dark"]{
-    --bg: #11201B; --paper: #16231E; --ink: #E8EEEC; --ink-soft: #92A49C;
-    --line: #233830; --line-soft: #1D2D27; --teal: #3FB492; --teal-dark: #7FDDBE;
-    --teal-wash: #1B3830; --amber: #E3A95D; --amber-wash: #39301A;
-    --plum: #C2B0EC; --plum-wash: #2B2440; --red: #F28B82;
+    --bg: #0A0F0D; --paper: #101614; --ink: #E8EEEC; --ink-soft: #92A49C;
+    --line: #1D2623; --line-soft: #161D1A;
+    
+    /* Paleta de Cores Secundárias (Modo Escuro) */
+    --teal: #49C4A1; --teal-dark: #8DE0C6; --teal-wash: #142E26;
+    --amber: #EAA64B; --amber-wash: #332611;
+    --plum: #B89EFA; --plum-wash: #281D40;
+    --blue: #60A5FA; --blue-wash: #172554;
+    --rose: #FB7185; --rose-wash: #3C121A;
+    --cyan: #38BDF8; --cyan-wash: #082F49;
+    
+    --red: #FA7970;
   }
+  
   *{ box-sizing: border-box; }
   html,body{ margin:0; padding:0; background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; -webkit-font-smoothing: antialiased; }
   body{ display: flex; flex-direction: column; }
 
-  /* Transição suave ao trocar de tema */
+  /* Transições suaves */
   body, .top, .topbar, .hero, .card, .btn-sm, .qa-btn, .sug-modal, .footer-bar, .count-pill, .tag, .card-icon{
     transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease, transform .25s var(--ease);
   }
@@ -38,7 +57,7 @@
   @keyframes fadeIn   { from{ opacity:0; } to{ opacity:1; } }
   @keyframes popIn    { from{ opacity:0; transform: translateY(14px) scale(.97); } to{ opacity:1; transform: none; } }
   @keyframes growBar  { from{ transform: scaleY(0); } to{ transform: scaleY(1); } }
-  @keyframes pulseDot { 0%,100%{ box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 45%, transparent); } 50%{ box-shadow: 0 0 0 5px transparent; } }
+  @keyframes pulseDot { 0%,100%{ box-shadow: 0 0 0 0 color-mix(in srgb, var(--plum) 45%, transparent); } 50%{ box-shadow: 0 0 0 5px transparent; } }
   @keyframes countPop { 0%{ transform: scale(.4); opacity:0; } 70%{ transform: scale(1.18); } 100%{ transform: scale(1); opacity:1; } }
 
   .a-down { animation: fadeDown .5s var(--ease) both; }
@@ -66,7 +85,7 @@
   .user-badge { display: none; align-items: center; gap: 10px; background: var(--paper); border: 1px solid var(--line); padding: 3px 4px 3px 12px; border-radius: 8px; animation: fadeIn .3s ease; }
   .user-email { font-size: 12.5px; font-weight: 600; color: var(--ink); }
   .btn-logout { background: var(--red); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
-  :root[data-theme="dark"] .btn-logout{ color: #11201B; }
+  :root[data-theme="dark"] .btn-logout{ color: #0A0F0D; }
   .btn-logout:hover { opacity: 0.8; }
 
   /* ---------- Hero ---------- */
@@ -77,13 +96,20 @@
   .quick{ display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
   .quick-label{ font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
   .quick-row{ display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  
+  /* Botões de Ação Rápida */
   .qa-btn{ display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; text-decoration: none; white-space: nowrap; }
   .qa-btn svg{ width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--ease); }
   .qa-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px -6px rgba(0,0,0,.14); border-color: var(--teal); }
   .qa-btn:hover svg{ transform: scale(1.15); }
   .qa-btn:active{ transform: translateY(0); }
+  
+  /* Destaques de Cor dos Botões */
   .qa-btn.highlight{ background: var(--amber-wash); border-color: var(--amber); color: var(--amber); }
   .qa-btn.highlight:hover{ box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--amber) 55%, transparent); }
+  
+  .qa-btn.panel{ background: var(--plum-wash); border-color: var(--plum); color: var(--plum); }
+  .qa-btn.panel:hover{ border-color: var(--plum); box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--plum) 55%, transparent); }
 
   .qa-badge, .count{ display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 7px; border-radius: 99px; font-size: 11px; font-weight: 700; background: color-mix(in srgb, currentColor 14%, transparent); color: inherit; }
   .count.pop{ animation: countPop .4s var(--ease); }
@@ -95,36 +121,40 @@
   .section-head{ display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
   .section-head .bar{ width: 3px; height: 14px; background: var(--amber); border-radius: 2px; transform-origin: top; animation: growBar .5s var(--ease) .35s both; }
   .section-head .label{ font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--ink); }
-  .count-pill{ font-family: var(--mono); font-size: 10px; font-weight: 700; background: var(--teal-wash); color: var(--teal-dark); padding: 2px 7px; border-radius: 5px; }
+  .count-pill{ font-family: var(--mono); font-size: 10px; font-weight: 700; background: var(--teal-wash); color: var(--teal); padding: 2px 7px; border-radius: 5px; }
   .section-head .hint{ margin-left: auto; font-size: 12.5px; color: var(--ink-soft); }
 
   .hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
   .card-link { text-decoration: none; color: inherit; display: block; }
 
-  .tool{ --acc: var(--teal); --acc-wash: var(--teal-wash); --acc-dark: var(--teal-dark); }
-  .tool[data-accent="amber"]{ --acc: var(--amber); --acc-wash: var(--amber-wash); --acc-dark: var(--amber); }
-  .tool[data-accent="plum"]{ --acc: var(--plum); --acc-wash: var(--plum-wash); --acc-dark: var(--plum); }
+  /* Mapeamento de Cores para os Cards */
+  .tool{ --acc: var(--teal); --acc-wash: var(--teal-wash); }
+  .tool[data-accent="amber"]{ --acc: var(--amber); --acc-wash: var(--amber-wash); }
+  .tool[data-accent="plum"]{ --acc: var(--plum); --acc-wash: var(--plum-wash); }
+  .tool[data-accent="blue"]{ --acc: var(--blue); --acc-wash: var(--blue-wash); }
+  .tool[data-accent="rose"]{ --acc: var(--rose); --acc-wash: var(--rose-wash); }
+  .tool[data-accent="cyan"]{ --acc: var(--cyan); --acc-wash: var(--cyan-wash); }
 
   .card { position: relative; overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 18px; height: 100%; display: flex; flex-direction: column; }
   .card::before{ content:""; position:absolute; left:0; top:0; height:2px; width:100%; background: var(--acc); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
-  .card-link:hover .card { transform: translateY(-5px); box-shadow: 0 16px 32px -14px rgba(0,0,0,.2); border-color: color-mix(in srgb, var(--acc) 55%, var(--line)); }
+  .card-link:hover .card { transform: translateY(-5px); box-shadow: 0 16px 32px -14px rgba(0,0,0,.3); border-color: color-mix(in srgb, var(--acc) 55%, var(--line)); }
   .card-link:hover .card::before{ transform: scaleX(1); }
   .card-link:active .card{ transform: translateY(-2px); }
   .card-link:focus-visible{ outline: none; }
   .card-link:focus-visible .card{ box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 35%, transparent); }
 
   .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-  .card-icon { width: 38px; height: 38px; border-radius: 9px; background: var(--acc-wash); color: var(--acc-dark); display: flex; align-items: center; justify-content: center; transition: transform .35s var(--ease); }
+  .card-icon { width: 38px; height: 38px; border-radius: 9px; background: var(--acc-wash); color: var(--acc); display: flex; align-items: center; justify-content: center; transition: transform .35s var(--ease); }
   .card-link:hover .card-icon{ transform: scale(1.1) rotate(-6deg); }
   .card-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
-  .tag { font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 4px; font-weight: 700; background: var(--acc-wash); color: var(--acc-dark); }
+  .tag { font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 4px; font-weight: 700; background: var(--acc-wash); color: var(--acc); }
 
   .card-title { font-family: var(--serif); font-size: 21px; font-weight: 600; margin: 0 0 8px; color: var(--ink); letter-spacing: -0.005em; }
   .card-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 0 0 20px; flex-grow: 1; }
 
   .card-foot{ display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-soft); padding-top: 13px; }
-  .go{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--acc-dark); }
+  .go{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--acc); }
   .go svg{ width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--ease); }
   .card-link:hover .go svg{ transform: translate(3px,-3px); }
   .code{ font-family: var(--mono); font-size: 10.5px; color: var(--ink-soft); letter-spacing: .04em; }
@@ -137,10 +167,10 @@
   .footer-right{ text-align: right; font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
 
   /* ---------- Modais ---------- */
-  .sug-overlay{ position: fixed; inset: 0; background: rgba(17,32,27,.55); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+  .sug-overlay{ position: fixed; inset: 0; background: rgba(10,15,13,.75); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
   .sug-overlay.open{ display: flex; animation: fadeIn .22s ease both; backdrop-filter: blur(3px); }
   .sug-overlay.open .sug-modal{ animation: popIn .35s var(--ease) both; }
-  .sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: 14px; width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+  .sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: 14px; width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
   .sug-head{ display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); }
   .sug-head h2{ margin: 0; font-size: 18px; font-family: var(--serif); }
   .sug-head p{ margin: 2px 0 0; font-size: 12.5px; color: var(--ink-soft); }
@@ -154,7 +184,7 @@
   .sug-chip{ border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft); padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; transition: all .15s ease; }
   .sug-chip:hover:not(:disabled){ border-color: var(--teal); color: var(--ink); transform: translateY(-1px); }
   .sug-chip:disabled{ cursor: not-allowed; opacity: 0.6; }
-  .sug-chip.sel{ background: var(--teal-wash); border-color: var(--teal); color: var(--teal-dark); }
+  .sug-chip.sel{ background: var(--teal-wash); border-color: var(--teal); color: var(--teal); }
   .sug-text{ width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; transition: border-color .15s ease, box-shadow .15s ease; }
   .sug-text:focus{ outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 16%, transparent); }
   .sug-text:disabled{ background: var(--bg); color: var(--ink-soft); cursor: not-allowed; }
@@ -162,7 +192,7 @@
   .sug-counter{ font-size: 12px; color: var(--ink-soft); }
   .sug-btn{ background: var(--teal); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 13.5px; font-family: var(--sans); cursor: pointer; transition: transform .15s ease, opacity .15s ease; }
   .sug-btn:hover:not(:disabled){ transform: translateY(-1px); opacity: .95; }
-  :root[data-theme="dark"] .sug-btn{ color: #11201B; }
+  :root[data-theme="dark"] .sug-btn{ color: #0A0F0D; }
   .sug-btn:disabled{ background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
   .sug-btn.ghost{ background: var(--bg); color: var(--ink-soft); border: 1.5px solid var(--line); }
   :root[data-theme="dark"] .sug-btn.ghost{ color: var(--ink-soft); }
@@ -181,7 +211,7 @@
   .sug-body{ flex: 1; min-width: 0; }
   .sug-meta{ display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
   .sug-tag{ font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 5px; font-weight: 700; }
-  .sug-tag.t-teal{ background: var(--teal-wash); color: var(--teal-dark); }
+  .sug-tag.t-teal{ background: var(--teal-wash); color: var(--teal); }
   .sug-tag.t-plum{ background: var(--plum-wash); color: var(--plum); }
   .sug-tag.t-amber{ background: var(--amber-wash); color: var(--amber); }
   .sug-date{ font-size: 11.5px; color: var(--ink-soft); }
@@ -195,7 +225,7 @@
   .sug-empty{ text-align: center; color: var(--ink-soft); font-size: 14px; padding: 24px 0; }
 
   .sug-admin-reply { margin-top: 12px; padding: 12px; background: var(--teal-wash); border-left: 4px solid var(--teal); border-radius: 4px; }
-  .sug-admin-reply-label { display: block; font-size: 11px; font-weight: 700; color: var(--teal-dark); text-transform: uppercase; margin-bottom: 4px; }
+  .sug-admin-reply-label { display: block; font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; margin-bottom: 4px; }
   .sug-admin-reply-text { font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
   :root[data-theme="dark"] .sug-admin-reply-text { color: var(--ink); }
 
@@ -216,12 +246,19 @@
     .footer-right{ text-align: center; }
   }
 
-  /* Respeita quem prefere menos movimento */
+  /* Fade suave na troca de tema: aplicado só durante a troca, em TODOS os elementos
+     (inclui o <html>, que pinta o fundo da página e antes não tinha transição) */
+  html.theme-fading,
+  html.theme-fading *,
+  html.theme-fading *::before,
+  html.theme-fading *::after{
+    transition: background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease, fill .4s ease, stroke .4s ease !important;
+  }
+
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation: none !important; transition: none !important; }
   }
-</style>
-</head>
+</style></head>
 <body>
 
 <header class="top">
@@ -266,7 +303,7 @@
       <div class="quick a-up" style="--d:180">
         <span class="quick-label">Acessos rápidos</span>
         <div class="quick-row">
-          <a href="painel-validacao.html" class="qa-btn">
+          <a href="painel-validacao.html" class="qa-btn panel">
             <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
             Painel de Validação
             <span class="qa-badge" id="validBadge" style="display:none;"></span>
@@ -299,6 +336,7 @@
   </div>
 
   <div class="hub-grid">
+    <!-- 1. Catálogo SAP (Verde Esmeralda) -->
     <a href="catalogo-busca-sap.html" class="card-link tool a-up" data-accent="teal" style="--d:320">
       <div class="card">
         <div class="card-header">
@@ -314,7 +352,8 @@
       </div>
     </a>
 
-    <a href="buscador-links.html" class="card-link tool a-up" data-accent="teal" style="--d:390">
+    <!-- 2. Validador de Links (Azul Elétrico) -->
+    <a href="buscador-links.html" class="card-link tool a-up" data-accent="blue" style="--d:390">
       <div class="card">
         <div class="card-header">
           <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg></div>
@@ -329,6 +368,7 @@
       </div>
     </a>
 
+    <!-- 3. Formatador de Anúncios (Âmbar / Dourado) -->
     <a href="formatador-anuncios.html" class="card-link tool a-up" data-accent="amber" style="--d:460">
       <div class="card">
         <div class="card-header">
@@ -344,7 +384,8 @@
       </div>
     </a>
 
-    <a href="formatador-imagem.html" class="card-link tool a-up" data-accent="teal" style="--d:530">
+    <!-- 4. Formatador de Imagens (Coral / Rose) -->
+    <a href="formatador-imagem.html" class="card-link tool a-up" data-accent="rose" style="--d:530">
       <div class="card">
         <div class="card-header">
           <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
@@ -359,7 +400,8 @@
       </div>
     </a>
 
-    <a href="Dashboard_Marketplaces.html" class="card-link tool a-up" data-accent="amber" style="--d:600">
+    <!-- 5. Dashboard de Métricas (Ciano) -->
+    <a href="Dashboard_Marketplaces.html" class="card-link tool a-up" data-accent="cyan" style="--d:600">
       <div class="card">
         <div class="card-header">
           <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
@@ -374,10 +416,11 @@
       </div>
     </a>
 
-    <a href="gerador-descricao-ia.html" class="card-link tool a-up" data-accent="teal" style="--d:670">
+    <!-- 6. Gerador de Descrições IA (Roxo / Violeta) -->
+    <a href="gerador-descricao-ia.html" class="card-link tool a-up" data-accent="plum" style="--d:670">
       <div class="card">
         <div class="card-header">
-          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83"/></svg></div>
           <span class="tag">IA (Testes finais)</span>
         </div>
         <h2 class="card-title">Gerador de Descrições IA</h2>
@@ -481,8 +524,13 @@ function applyTheme(theme){
 }
 const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
 applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
+let themeFadeTimer;
 themeToggleBtn.addEventListener('click', () => {
-  const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  const root = document.documentElement;
+  const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  root.classList.add('theme-fading');
+  clearTimeout(themeFadeTimer);
+  themeFadeTimer = setTimeout(() => root.classList.remove('theme-fading'), 500);
   applyTheme(next);
   localStorage.setItem('sapCatalogTheme', next);
 });
