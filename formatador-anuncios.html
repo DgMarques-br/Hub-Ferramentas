@@ -513,7 +513,7 @@ function processarHTML() {
   else { html += `(Descrição não fornecida)<br>\n`; }
   html += `</span><br>\n`;
 
-  html += `<span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br>\n`;
+  html += `<span style="font-size:14px;"><strong>ESPECIFICAÇÕES</strong></span><br><br>\n`;
   html += `<span style="font-size:12px;">\n`;
   if(blocoSpecs.length > 0) {
     blocoSpecs.forEach(spec => {
@@ -563,6 +563,7 @@ function processarHTML() {
     html += `Imagens de caráter ilustrativo.<br>\n`;
     html += `Informações divulgadas de acordo com o manual do fabricante.<br>\n`;
     html += `Produto novo na caixa, lacrado com NF e garantia do fabricante de ${gar}.<br>\n`;
+    html += `Em caso de dúvidas sobre informações técnicas, utilização, limitações e manuseio do produto, verifique o manual do fabricante.<br>\n`;
   }
 
   if (obsInput) {
