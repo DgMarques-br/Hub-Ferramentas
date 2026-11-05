@@ -5,472 +5,476 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hub · Ferramentas Internas</title>
 <link rel="icon" type="image/png" href="img/Logotipo.png">
+<script>
+  const storedTheme = localStorage.getItem('sapCatalogTheme');
+  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  document.documentElement.setAttribute('data-theme', storedTheme || (prefersDark ? 'dark' : 'light'));
+  if(localStorage.getItem('hubReducedMotion') === 'true') document.documentElement.classList.add('reduced-motion');
+</script>
 <style>
-  /* Variáveis do Projeto - Modo Claro */
-  :root{
-    --bg: #F4F6F5; --paper: #FFFFFF; --ink: #17211D; --ink-soft: #576159;
-    --line: #E2E6E4; --line-soft: #EEF0EF;
-    
-    /* Paleta de Cores Secundárias (Modo Claro) */
-    --teal: #1F6F5C; --teal-dark: #164F42; --teal-wash: #E4F0EC;
-    --amber: #C27A2A; --amber-wash: #F7ECDE;
-    --plum: #67549C; --plum-wash: #ECE8F5;
-    --blue: #2563EB; --blue-wash: #EFF6FF;
-    --rose: #E11D48; --rose-wash: #FFE4E6;
-    --cyan: #0891B2; --cyan-wash: #ECFEFF;
-    
-    --red: #D93025; --radius: 10px;
-    --mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
-    --ease: cubic-bezier(.22,.8,.3,1);
-  }
-  
-  /* Tema Escuro Profundo com Acentos Vibrantes */
-  :root[data-theme="dark"]{
-    --bg: #0A0F0D; --paper: #101614; --ink: #E8EEEC; --ink-soft: #92A49C;
-    --line: #1D2623; --line-soft: #161D1A;
-    
-    /* Paleta de Cores Secundárias (Modo Escuro) */
-    --teal: #49C4A1; --teal-dark: #8DE0C6; --teal-wash: #142E26;
-    --amber: #EAA64B; --amber-wash: #332611;
-    --plum: #B89EFA; --plum-wash: #281D40;
-    --blue: #60A5FA; --blue-wash: #172554;
-    --rose: #FB7185; --rose-wash: #3C121A;
-    --cyan: #38BDF8; --cyan-wash: #082F49;
-    
-    --red: #FA7970;
-  }
-  
-  *{ box-sizing: border-box; }
-  html,body{ margin:0; padding:0; background: var(--bg); color: var(--ink); font-family: var(--sans); min-height: 100vh; -webkit-font-smoothing: antialiased; }
-  body{ display: flex; flex-direction: column; }
+:root{--bg:#F7F6F3;--paper:#FFFFFF;--ink:#17211D;--ink-soft:#5F6B64;--line:#E8EBE9;--line-soft:#F0F2F1;--teal:#1F6F5C;--teal-dark:#164F42;--teal-wash:#E4F0EC;--amber:#C2610F;--amber-wash:#FDEFE3;--plum:#67549C;--plum-wash:#ECE8F5;--blue:#2563EB;--blue-wash:#EAF2FF;--rose:#E11D48;--rose-wash:#FFE4E6;--cyan:#0891B2;--cyan-wash:#E3F8FC;--red:#D93025;--radius:12px;--mono:ui-monospace,SFMono-Regular,"SF Mono",Consolas,"Liberation Mono",Menlo,monospace;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;--serif:Georgia,"Iowan Old Style","Palatino Linotype","Book Antiqua",serif;
+--spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+--bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+--glow1:rgba(244,162,97,.18);--glow2:rgba(73,196,161,.12);color-scheme:light}
 
-  /* Transições suaves */
-  body, .top, .topbar, .hero, .card, .btn-sm, .qa-btn, .sug-modal, .footer-bar, .count-pill, .tag, .card-icon{
-    transition: background-color .3s ease, border-color .3s ease, color .3s ease, box-shadow .3s ease, transform .25s var(--ease);
-  }
+:root[data-theme="dark"]{--bg:#0A0F0D;--paper:#101614;--ink:#E8EEEC;--ink-soft:#92A49C;--line:#1D2623;--line-soft:#161D1A;--teal:#49C4A1;--teal-dark:#8DE0C6;--teal-wash:#142E26;--amber:#EAA64B;--amber-wash:#332611;--plum:#B89EFA;--plum-wash:#281D40;--blue:#60A5FA;--blue-wash:#172554;--rose:#FB7185;--rose-wash:#3C121A;--cyan:#38BDF8;--cyan-wash:#082F49;--red:#FA7970;--glow1:rgba(234,166,75,.08);--glow2:rgba(73,196,161,.07);color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);min-height:100vh;-webkit-font-smoothing:antialiased; overflow-x:hidden;}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 
-  /* ---------- Animações ---------- */
-  @keyframes fadeUp   { from{ opacity:0; transform: translateY(16px); } to{ opacity:1; transform: none; } }
-  @keyframes fadeDown { from{ opacity:0; transform: translateY(-10px); } to{ opacity:1; transform: none; } }
-  @keyframes fadeIn   { from{ opacity:0; } to{ opacity:1; } }
-  @keyframes popIn    { from{ opacity:0; transform: translateY(14px) scale(.97); } to{ opacity:1; transform: none; } }
-  @keyframes growBar  { from{ transform: scaleY(0); } to{ transform: scaleY(1); } }
-  @keyframes pulseDot { 0%,100%{ box-shadow: 0 0 0 0 color-mix(in srgb, var(--plum) 45%, transparent); } 50%{ box-shadow: 0 0 0 5px transparent; } }
-  @keyframes countPop { 0%{ transform: scale(.4); opacity:0; } 70%{ transform: scale(1.18); } 100%{ transform: scale(1); opacity:1; } }
+/* Transições Base */
+body,.sidebar,.topbar,.card,.chip,.nav-item,.btn-sm,.footer-bar,.side-card,.field,.user-badge,.sort, .sug-modal, .icon-opt, .sug {transition:all 0.5s var(--spring)}
 
-  .a-down { animation: fadeDown .5s var(--ease) both; }
-  .a-up   { animation: fadeUp .6s var(--ease) both; animation-delay: calc(var(--d, 0) * 1ms); }
+/* Animações */
+@keyframes slideSpring{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:none}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popInExtreme{0%{opacity:0;transform:translateY(30px) scale(0.9)}100%{opacity:1;transform:none}}
+@keyframes pulseDot{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--plum) 45%,transparent)}50%{box-shadow:0 0 0 6px transparent}}
+@keyframes countPop{0%{transform:scale(0) rotate(-15deg);opacity:0}70%{transform:scale(1.3) rotate(10deg)}100%{transform:scale(1);opacity:1}}
+@keyframes floatyExtreme{0%,100%{transform:translateY(0) rotate(0deg)}25%{transform:translateY(-8px) rotate(2deg)}50%{transform:translateY(3px) rotate(-1deg)}75%{transform:translateY(-5px) rotate(1deg)}}
+@keyframes wiggleDrag{0%,100%{transform:rotate(-3deg) scale(1.05)}50%{transform:rotate(3deg) scale(1.05)}}
+@keyframes spinCrazy{to{transform:rotate(360deg)}}
+@keyframes pulseChip{0%,100%{transform:scale(1.05) translateY(-3px); box-shadow:0 8px 16px rgba(31, 111, 92, 0.3)}50%{transform:scale(1.1) translateY(-5px); box-shadow:0 12px 24px rgba(31, 111, 92, 0.5)}}
+@keyframes ambientGlow{0%{opacity:0.5}100%{opacity:1}}
 
-  /* ---------- Barra superior ---------- */
-  header.top{ background: var(--paper); border-bottom: 1px solid var(--line); }
-  .topbar{ border-bottom: 1px solid var(--line); }
-  .topbar-inner{ max-width: 1180px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-  .brand{ display: flex; align-items: center; gap: 12px; min-width: 0; }
-  .brand-logo{ width: 30px; height: 30px; border-radius: 8px; background: var(--amber-wash); color: var(--amber); display: grid; place-items: center; flex: 0 0 auto; transition: transform .35s var(--ease); }
-  .brand-logo:hover{ transform: rotate(-8deg) scale(1.08); }
-  .brand-logo svg{ width: 17px; height: 17px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .brand-eyebrow{ font-family: var(--mono); font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber); font-weight: 700; margin: 0; white-space: nowrap; }
-  .brand-sep{ width: 1px; height: 16px; background: var(--line); }
-  .brand-sub{ font-size: 12.5px; color: var(--ink-soft); white-space: nowrap; }
+.a-up{animation:slideSpring 0.7s var(--spring) both;animation-delay:calc(var(--d,0)*1ms)}
+.a-down{animation:fadeDown 0.6s var(--spring) both}
+.pop-card{animation:popInExtreme 0.6s var(--spring) both;}
+html.reduced-motion *, html.reduced-motion *::before, html.reduced-motion *::after { animation: none !important; transition: none !important; }
 
-  .topbar-actions{ display: flex; align-items: center; gap: 8px; }
-  .btn-sm{ display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 6px 12px; border-radius: 8px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; white-space: nowrap; }
-  .btn-sm svg{ width: 14px; height: 14px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .btn-sm:hover{ border-color: var(--teal); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0,0,0,.06); }
-  .btn-sm:active{ transform: translateY(0); }
+/* Layout Geral (Escalado ~80%) */
+.shell{display:grid;grid-template-columns:230px minmax(0,1fr);min-height:100vh}
 
-  /* Login / usuário */
-  .user-badge { display: none; align-items: center; gap: 10px; background: var(--paper); border: 1px solid var(--line); padding: 3px 4px 3px 12px; border-radius: 8px; animation: fadeIn .3s ease; }
-  .user-email { font-size: 12.5px; font-weight: 600; color: var(--ink); }
-  .btn-logout { background: var(--red); color: white; border: none; padding: 4px 10px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
-  :root[data-theme="dark"] .btn-logout{ color: #0A0F0D; }
-  .btn-logout:hover { opacity: 0.8; }
+/* Sidebar */
+.sidebar{position:sticky;top:0;height:100vh;background:var(--paper);border-right:1px solid var(--line);padding:18px 14px;display:flex;flex-direction:column;gap:4px; z-index:100;}
+.brand{display:flex;align-items:center;gap:10px;padding:0 8px 18px; cursor:pointer;}
+.brand-logo{width:32px;height:32px;border-radius:10px;background:var(--amber-wash);color:var(--amber);display:grid;place-items:center;flex:0 0 auto;transition:all 0.5s var(--bounce)}
+.brand:hover .brand-logo{transform:rotate(12deg) scale(1.15); box-shadow:0 6px 12px rgba(194, 97, 15, 0.2); border-radius: 12px;}
+.brand-logo svg,.nav-item svg,.chip svg,.ico svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.4s var(--spring)}
+.brand-name{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800; transition:all 0.3s ease;}
+.brand:hover .brand-name{color:var(--amber); letter-spacing:.25em;}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--ink);font-size:13px;text-decoration:none;border:0;background:none;cursor:pointer;text-align:left;width:100%;transition:all 0.4s var(--spring)}
+.nav-item:hover{background:var(--line-soft);transform:translateX(5px) scale(1.01); box-shadow: -3px 3px 8px rgba(0,0,0,0.02);}
+.nav-item:hover svg{transform:scale(1.15) rotate(4deg); color:var(--amber);}
+.nav-item:active{transform:translateX(2px) scale(0.96);}
+.nav-item.active{background:var(--amber-wash);color:var(--amber);font-weight:700; transform:scale(1.01);}
+.nav-item[aria-disabled="true"]{cursor:default;opacity:.6}
+.nav-item[aria-disabled="true"]:hover{transform:none; box-shadow:none;}
+.nav-sep{height:1px;background:var(--line);margin:10px 8px; border-radius:1px;}
+.qa-badge,.count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:99px;font-size:10px;font-weight:800;background:color-mix(in srgb,currentColor 14%,transparent);color:inherit;margin-left:auto}
+.count.pop{animation:countPop 0.5s var(--bounce)}
+#validBadge.running{animation:pulseDot 1.2s ease-in-out infinite}
+#btnConfig:hover svg{animation:spinCrazy 4s linear infinite;}
 
-  /* ---------- Hero ---------- */
-  .hero-inner{ max-width: 1180px; margin: 0 auto; padding: 38px 24px 34px; display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; flex-wrap: wrap; }
-  h1{ font-family: var(--serif); font-size: 40px; line-height: 1.08; margin: 0 0 12px; letter-spacing: -0.015em; color: var(--ink); }
-  .subtitle{ margin:0; color: var(--ink-soft); font-size: 14.5px; max-width: 520px; line-height: 1.55; }
+/* Side Card */
+.side-card{margin-top:auto;background:var(--line-soft);border-radius:16px;padding:16px;transition:all 0.5s var(--spring); cursor:pointer;}
+.side-card:hover{transform:translateY(-5px) scale(1.02);background:color-mix(in srgb,var(--line-soft) 40%,var(--amber-wash)); box-shadow:0 10px 20px -8px rgba(194, 97, 15, 0.2);}
+.side-card .ico{width:32px;height:32px;border-radius:10px;background:var(--amber-wash);color:var(--amber);display:grid;place-items:center;margin-bottom:10px;transition:all 0.5s var(--bounce)}
+.side-card:hover .ico{transform:rotate(-12deg) scale(1.2); border-radius: 14px;}
+.side-card h3{margin:0 0 4px;font-size:13.5px; font-weight:800;}
+.side-card p{margin:0 0 12px;font-size:12px;line-height:1.4;color:var(--ink-soft)}
+.side-cta{display:inline-flex;align-items:center;gap:6px;border:0;background:none;color:var(--amber);font-weight:800;font-size:12.5px;cursor:pointer;padding:0;transition:all 0.3s var(--spring)}
+.side-card:hover .side-cta{transform:translateX(4px);}
+.side-cta:active{transform:scale(0.9)}
 
-  .quick{ display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-  .quick-label{ font-family: var(--mono); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); font-weight: 600; }
-  .quick-row{ display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
-  
-  /* Botões de Ação Rápida */
-  .qa-btn{ display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 9px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; font-family: var(--sans); cursor: pointer; text-decoration: none; white-space: nowrap; }
-  .qa-btn svg{ width: 16px; height: 16px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--ease); }
-  .qa-btn:hover{ transform: translateY(-2px); box-shadow: 0 8px 18px -6px rgba(0,0,0,.14); border-color: var(--teal); }
-  .qa-btn:hover svg{ transform: scale(1.15); }
-  .qa-btn:active{ transform: translateY(0); }
-  
-  /* Destaques de Cor dos Botões */
-  .qa-btn.highlight{ background: var(--amber-wash); border-color: var(--amber); color: var(--amber); }
-  .qa-btn.highlight:hover{ box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--amber) 55%, transparent); }
-  
-  .qa-btn.panel{ background: var(--plum-wash); border-color: var(--plum); color: var(--plum); }
-  .qa-btn.panel:hover{ border-color: var(--plum); box-shadow: 0 8px 18px -6px color-mix(in srgb, var(--plum) 55%, transparent); }
+/* Coluna principal */
+.col{display:flex;flex-direction:column;min-width:0;position:relative; z-index:1;}
+.col::before {
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(800px 400px at 90% -10%,var(--glow1),transparent 75%),
+              radial-gradient(600px 300px at 50% 10%,var(--glow2),transparent 70%);
+  background-repeat: no-repeat; background-attachment: fixed; z-index: -1; pointer-events: none;
+  animation: ambientGlow 8s ease-in-out infinite alternate;
+}
+.topbar{display:flex;align-items:center;justify-content:flex-end;gap:12px;padding:12px 28px;position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 75%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px); border-bottom: 1px solid color-mix(in srgb, var(--line) 50%, transparent);}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.btn-sm{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--paper);color:var(--ink);padding:8px 14px;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;position:relative;transition:all 0.4s var(--spring); border: 1px solid var(--line); box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+.btn-sm svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.4s var(--spring)}
+.btn-sm:hover{background:var(--line-soft); transform:translateY(-2px) scale(1.03); box-shadow: 0 6px 12px rgba(0,0,0,0.05); border-color: var(--amber);}
+.btn-sm:active{transform:scale(0.92) translateY(2px); box-shadow: none;}
+.bell:hover svg{transform:rotate(15deg) scale(1.2)}
+.bell{padding:8px}
+#muralCount{position:absolute;top: -4px;right: -4px;min-width:18px;height:18px;padding:0 4px;font-size:10px;background:var(--red);color:#fff;margin:0; border: 2px solid var(--bg); border-radius: 9px;}
 
-  .qa-badge, .count{ display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 7px; border-radius: 99px; font-size: 11px; font-weight: 700; background: color-mix(in srgb, currentColor 14%, transparent); color: inherit; }
-  .count.pop{ animation: countPop .4s var(--ease); }
-  #validBadge.running{ animation: pulseDot 1.8s ease-in-out infinite; }
+/* Estilos de Login e Badge (Corrigidos!) */
+.btn-login{background:var(--teal);color:#fff;border:0; padding:8px 16px;}
+.btn-login:hover{background:var(--teal-dark);border-color:var(--teal-dark); color:#fff; transform:translateY(-2px) scale(1.03); box-shadow: 0 6px 12px rgba(31,111,92,0.2);}
+.user-badge{display:none;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);padding:4px 12px 4px 4px;border-radius:99px;font-size:12.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--amber);color:var(--paper);display:grid;place-items:center;font-weight:800;font-size:11px; letter-spacing:1px}
+.user-meta{display:flex;flex-direction:column; line-height: 1.2;}
+.user-email{font-weight:800;color:var(--ink)}
+.user-role{font-size:9.5px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.05em;font-weight:800}
+.btn-logout{background:none;border:0;color:var(--ink-soft);font-size:11.5px;font-weight:800;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .3s ease; margin-left:4px}
+.btn-logout:hover{background:var(--rose-wash);color:var(--red)}
 
-  /* ---------- Main ---------- */
-  main{ flex: 1 0 auto; width: 100%; max-width: 1180px; margin: 0 auto; padding: 34px 24px 48px; }
+/* Hero e Títulos */
+main{padding:8px 28px 28px;flex:1 0 auto}
+.hero{position:relative;padding:16px 0 8px}
+.eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;font-weight:800;color:var(--amber);margin:0 0 10px; display:inline-block; transition: transform 0.4s var(--spring);}
+.hero:hover .eyebrow{transform: translateX(6px);}
+h1{font-family:var(--serif);font-size:46px;line-height:1.05;margin:0 0 14px;letter-spacing:-.03em;font-weight:800; transition: transform 0.5s var(--spring);}
+.subtitle{margin:0 0 24px;color:var(--ink-soft);font-size:15px;line-height:1.5;max-width:600px}
 
-  .section-head{ display: flex; align-items: center; gap: 10px; margin-bottom: 18px; }
-  .section-head .bar{ width: 3px; height: 14px; background: var(--amber); border-radius: 2px; transform-origin: top; animation: growBar .5s var(--ease) .35s both; }
-  .section-head .label{ font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; font-weight: 700; color: var(--ink); }
-  .count-pill{ font-family: var(--mono); font-size: 10px; font-weight: 700; background: var(--teal-wash); color: var(--teal); padding: 2px 7px; border-radius: 5px; }
-  .section-head .hint{ margin-left: auto; font-size: 12.5px; color: var(--ink-soft); }
+/* Search Bar */
+.field{display:flex;align-items:center;gap:10px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:0 18px;color:var(--ink-soft);transition:all .5s var(--spring)}
+.hero-search{max-width:680px;box-shadow:0 12px 30px -8px rgba(0,0,0,.12);}
+.hero-search:focus-within{box-shadow:0 18px 40px -8px color-mix(in srgb, var(--amber) 35%, transparent);transform:scale(1.02) translateY(-3px); border-color: var(--amber);}
+.field svg{width:18px;height:18px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;flex:0 0 auto}
+.field input{flex:1;min-width:0;border:0;outline:0;background:none;color:var(--ink);font:inherit;font-size:14.5px;padding:14px 0; font-weight:500;}
+.field input::placeholder{color:var(--ink-soft)}
+.field kbd{font-family:var(--mono);font-size:11px;color:var(--ink-soft);background:var(--line-soft);padding:3px 6px;border-radius:6px; flex:0 0 auto;}
 
-  .hub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .card-link { text-decoration: none; color: inherit; display: block; }
+/* Arte Flutuante Reduzida */
+.art{position:absolute;right:0;top:-10px;width:340px;height:260px;pointer-events:none}
+.art .win{position:absolute;top:6px;left:40px;width:240px;height:20px;border-radius:10px 10px 0 0;background:color-mix(in srgb,var(--ink-soft) 40%,var(--paper));display:flex;align-items:center;gap:5px;padding-left:10px; animation: slideSpring 1s var(--spring) both;}
+.art .win i{width:6px;height:6px;border-radius:50%;background:var(--paper);opacity:.9}
+.tile{position:absolute;width:60px;height:60px;border-radius:16px;background:var(--paper);display:grid;place-items:center;box-shadow:0 15px 30px -10px rgba(0,0,0,.25);animation:floatyExtreme 5s ease-in-out infinite alternate}
+.tile i{width:40px;height:40px;border-radius:12px;display:grid;place-items:center}
+.tile svg{width:20px;height:20px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.t1{left:20px;top:30px; animation-duration: 4.5s;}.t1 i{background:var(--teal-wash);color:var(--teal)}
+.t2{left:100px;top:20px;animation-delay:-1s; animation-duration: 5.5s;}.t2 i{background:var(--plum-wash);color:var(--plum)}
+.t3{left:200px;top:80px;animation-delay:-2.5s; animation-duration: 6s;}.t3 i{background:var(--rose-wash);color:var(--rose)}
+.t4{left:50px;top:110px;animation-delay:-3.5s; animation-duration: 4.8s;}.t4 i{background:var(--amber-wash);color:var(--amber)}
+.t5{left:250px;top:25px;width:55px;height:42px;opacity:.8;animation-delay:-2s; animation-duration: 5s;}
+.note{position:absolute;right:10px;top:60px;font-family:var(--serif);font-style:italic;font-size:12.5px;color:var(--ink-soft);text-align:center;line-height:1.4;transform:rotate(-4deg); animation: floatyExtreme 6s ease infinite;}
 
-  /* Mapeamento de Cores para os Cards */
-  .tool{ --acc: var(--teal); --acc-wash: var(--teal-wash); }
-  .tool[data-accent="amber"]{ --acc: var(--amber); --acc-wash: var(--amber-wash); }
-  .tool[data-accent="plum"]{ --acc: var(--plum); --acc-wash: var(--plum-wash); }
-  .tool[data-accent="blue"]{ --acc: var(--blue); --acc-wash: var(--blue-wash); }
-  .tool[data-accent="rose"]{ --acc: var(--rose); --acc-wash: var(--rose-wash); }
-  .tool[data-accent="cyan"]{ --acc: var(--cyan); --acc-wash: var(--cyan-wash); }
+/* Chips / Filtros */
+.filters{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:28px 0 20px; padding-bottom: 8px;}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:8px 16px;border-radius:999px;font-size:13.5px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.4s var(--spring); box-shadow: 0 3px 6px rgba(0,0,0,0.02);}
+.chip:hover{border-color:var(--amber);transform:translateY(-4px) scale(1.05);box-shadow:0 8px 16px -4px color-mix(in srgb, var(--amber) 40%, transparent); color: var(--amber);}
+.chip:hover svg {transform: rotate(8deg) scale(1.1);}
+.chip:active{transform:scale(0.9) translateY(2px); box-shadow:none;}
+.chip.active{border-color:var(--amber);background:var(--amber-wash);color:var(--amber); transform:scale(1.03) translateY(-1px); box-shadow: 0 6px 15px color-mix(in srgb, var(--amber) 25%, transparent);}
+.chip .n{font-size:11px;font-weight:800;min-width:20px;height:20px;border-radius:999px;display:grid;place-items:center;background:color-mix(in srgb,var(--amber) 22%,transparent);transition:all 0.4s var(--bounce)}
+.chip:hover .n{transform:scale(1.15); background:var(--amber); color:var(--paper);}
+.sort{margin-left:auto;display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);border-radius:999px;padding:4px 14px;color:var(--ink-soft);transition:all 0.4s var(--spring); box-shadow: 0 3px 6px rgba(0,0,0,0.02); height: 42px;}
+.sort:hover{border-color:var(--amber);transform:translateY(-3px) scale(1.02); box-shadow:0 8px 16px rgba(0,0,0,0.04); color: var(--ink);}
+.sort select{border:0;background:none;color:var(--ink);font:inherit;font-size:13.5px; font-weight:600; padding:6px 2px;cursor:pointer;outline:0}
 
-  .card { position: relative; overflow: hidden; background: var(--paper); border: 1px solid var(--line); border-radius: 12px; padding: 22px 22px 18px; height: 100%; display: flex; flex-direction: column; }
-  .card::before{ content:""; position:absolute; left:0; top:0; height:2px; width:100%; background: var(--acc); transform: scaleX(0); transform-origin: left; transition: transform .45s var(--ease); }
-  .card-link:hover .card { transform: translateY(-5px); box-shadow: 0 16px 32px -14px rgba(0,0,0,.3); border-color: color-mix(in srgb, var(--acc) 55%, var(--line)); }
-  .card-link:hover .card::before{ transform: scaleX(1); }
-  .card-link:active .card{ transform: translateY(-2px); }
-  .card-link:focus-visible{ outline: none; }
-  .card-link:focus-visible .card{ box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc) 35%, transparent); }
+/* Drag Over em Categorias */
+.chip.drag-over-chip { border-color: var(--teal) !important; background: var(--teal-wash) !important; color: var(--teal) !important; animation: pulseChip 0.5s var(--bounce) infinite; }
+.del-cat { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; background: color-mix(in srgb, currentColor 15%, transparent); margin-left: 6px; font-size: 10px; font-weight: 900; transition: all 0.4s var(--bounce); }
+.del-cat:hover { background: var(--red); color: white; transform:scale(1.3) rotate(90deg); }
 
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 18px; }
-  .card-icon { width: 38px; height: 38px; border-radius: 9px; background: var(--acc-wash); color: var(--acc); display: flex; align-items: center; justify-content: center; transition: transform .35s var(--ease); }
-  .card-link:hover .card-icon{ transform: scale(1.1) rotate(-6deg); }
-  .card-icon svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+/* Grid de Cards */
+.hub-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px; perspective: 1200px;}
+.card-link{text-decoration:none;color:inherit;display:block;border-radius:18px; cursor: grab; user-select: none; transition: transform 0.5s var(--spring), opacity 0.3s ease, filter 0.3s ease; transform-style: preserve-3d;}
+.card-link:active{cursor: grabbing;}
+.card-link.dragging{opacity: 0.85; animation: wiggleDrag 0.5s var(--spring) infinite; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.25)); z-index: 999; position:relative;}
+.card-link.drag-over .card{transform: scale(1.08) rotateX(-4deg) rotateY(4deg); z-index: 10; border: 3px dashed var(--teal); box-shadow: 0 20px 40px rgba(0,0,0,0.2); background: var(--teal-wash);}
 
-  .tag { font-family: var(--mono); font-size: 9.5px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 4px; font-weight: 700; background: var(--acc-wash); color: var(--acc); }
+.tool{--acc:var(--teal);--acc-wash:var(--teal-wash)}
+.tool[data-accent="amber"]{--acc:var(--amber);--acc-wash:var(--amber-wash)}
+.tool[data-accent="plum"]{--acc:var(--plum);--acc-wash:var(--plum-wash)}
+.tool[data-accent="blue"]{--acc:var(--blue);--acc-wash:var(--blue-wash)}
+.tool[data-accent="rose"]{--acc:var(--rose);--acc-wash:var(--rose-wash)}
+.tool[data-accent="cyan"]{--acc:var(--cyan);--acc-wash:var(--cyan-wash)}
 
-  .card-title { font-family: var(--serif); font-size: 21px; font-weight: 600; margin: 0 0 8px; color: var(--ink); letter-spacing: -0.005em; }
-  .card-desc { font-size: 13px; color: var(--ink-soft); line-height: 1.55; margin: 0 0 20px; flex-grow: 1; }
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:20px 22px 18px;height:100%;display:flex;flex-direction:column;pointer-events: none; transition: all 0.5s var(--spring); box-shadow: 0 8px 16px -8px rgba(0,0,0,0.05);}
+.card-link:hover .card{transform:translateZ(30px) translateY(-8px) scale(1.03) rotateX(2deg) rotateY(-2deg); box-shadow: -10px 25px 35px -10px color-mix(in srgb, var(--acc) 35%, transparent); border-color:var(--acc);}
+.card-link:active .card{transform:scale(0.95) translateY(4px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); border-color:var(--acc);}
+.card-link.dragging .card{transform:none; border-color:var(--teal); border-style:dashed; box-shadow:none;}
+.card-header{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.card-icon{width:46px;height:46px;border-radius:12px;background:var(--acc-wash);color:var(--acc);display:grid;place-items:center;flex:0 0 auto;transition:all 0.5s var(--bounce)}
+.card-link:hover .card-icon{transform:scale(1.2) rotate(-10deg); border-radius: 16px; box-shadow: 0 8px 16px color-mix(in srgb, var(--acc) 25%, transparent);}
+.card-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tag{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.12em;padding:4px 8px;border-radius:6px;font-weight:800;background:var(--acc-wash);color:var(--acc); transition: all 0.4s var(--bounce);}
+.card-link:hover .tag{transform: translateY(-2px) scale(1.05); background:var(--acc); color:var(--paper);}
+.chev{margin-left:auto;width:32px;height:32px;border-radius:50%;background:var(--line-soft);display:grid;place-items:center;color:var(--ink);flex:0 0 auto; transition:all 0.5s var(--bounce)}
+.chev svg{width:16px;height:16px;stroke:currentColor;stroke-width:2.5;fill:none;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.4s var(--bounce)}
+.card-link:hover .chev{background:var(--acc);color:var(--paper); transform:scale(1.2)}
+.card-link:hover .chev svg{transform:translateX(3px) scale(1.1)}
+.card-title{font-family:var(--serif);font-size:20px;font-weight:800;margin:0 0 8px;letter-spacing:-.01em; transition:color 0.3s ease;}
+.card-link:hover .card-title{color:var(--acc);}
+.card-desc{font-size:13.5px;color:var(--ink-soft);line-height:1.5;margin:0 0 20px;flex-grow:1}
+.card-foot{display:flex;justify-content:space-between;align-items:center}
+.go{font-size:13px;font-weight:700;color:var(--acc); transition:all 0.4s var(--bounce);}
+.card-link:hover .go{transform:translateX(4px);}
+.code{font-family:var(--mono);font-size:11px;color:var(--ink-soft);letter-spacing:.05em; font-weight:700; background:var(--line-soft); padding:3px 6px; border-radius:5px; transition:all 0.4s var(--bounce)}
+.card-link:hover .code{transform:scale(1.1) rotate(4deg); background:var(--acc-wash); color:var(--acc);}
 
-  .card-foot{ display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line-soft); padding-top: 13px; }
-  .go{ display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--acc); }
-  .go svg{ width: 12px; height: 12px; stroke: currentColor; stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; transition: transform .3s var(--ease); }
-  .card-link:hover .go svg{ transform: translate(3px,-3px); }
-  .code{ font-family: var(--mono); font-size: 10.5px; color: var(--ink-soft); letter-spacing: .04em; }
+.empty{display:none;text-align:center;padding:50px 20px;border:2px dashed var(--line);border-radius:20px;color:var(--ink-soft);font-size:14.5px;background:var(--paper); animation: popInExtreme 0.6s var(--spring) both;}
+.empty b{display:block;font-family:var(--serif);font-size:22px;color:var(--ink);margin-bottom:6px}
 
-  /* ---------- Rodapé ---------- */
-  .footer-bar{ border-top: 1px solid var(--line); background: var(--paper); flex: 0 0 auto; }
-  .footer-inner{ max-width: 1180px; margin: 0 auto; padding: 16px 24px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 16px; font-size: 12px; color: var(--ink-soft); }
-  .footer-brand{ display: flex; align-items: center; gap: 8px; font-family: var(--serif); font-size: 14px; color: var(--ink); }
-  .footer-brand svg{ width: 16px; height: 16px; stroke: var(--teal); stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .footer-right{ text-align: right; font-family: var(--mono); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; }
+/* Rodapé */
+.footer-bar{margin:16px 28px 0;border-top:1px solid var(--line)}
+.footer-inner{display:flex;align-items:center;gap:12px;padding:20px 0;font-size:12px;color:var(--ink-soft);flex-wrap:wrap}
+.footer-inner .brand-logo{width:24px;height:24px;border-radius:6px}
+.footer-inner .brand-logo svg{width:14px;height:14px}
+.footer-inner b{color:var(--ink);font-weight:700;font-size:13px}
+.vsep{width:1px;height:14px;background:var(--line); border-radius:1px;}
+.footer-right{margin-left:auto;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;display:flex;gap:12px;align-items:center; font-weight:700;}
 
-  /* ---------- Modais ---------- */
-  .sug-overlay{ position: fixed; inset: 0; background: rgba(10,15,13,.75); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
-  .sug-overlay.open{ display: flex; animation: fadeIn .22s ease both; backdrop-filter: blur(3px); }
-  .sug-overlay.open .sug-modal{ animation: popIn .35s var(--ease) both; }
-  .sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: 14px; width: 100%; max-width: 680px; max-height: 88vh; display: flex; flex-direction: column; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
-  .sug-head{ display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; border-bottom: 1px solid var(--line); }
-  .sug-head h2{ margin: 0; font-size: 18px; font-family: var(--serif); }
-  .sug-head p{ margin: 2px 0 0; font-size: 12.5px; color: var(--ink-soft); }
-  .sug-close{ border: 1.5px solid var(--line); background: var(--bg); color: var(--ink-soft); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; font-family: var(--sans); transition: all .2s var(--ease); }
-  .sug-close:hover{ border-color: var(--teal); color: var(--ink); transform: rotate(90deg); }
-  .sug-scroll{ overflow-y: auto; padding: 18px 22px 22px; }
+/* Modais Escalados */
+.sug-overlay{ position: fixed; inset: 0; background: rgba(10,15,13,.3); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 200; transition: backdrop-filter 0.4s ease, background 0.4s ease; }
+.sug-overlay.open{ display: flex; animation: fadeIn 0.3s ease both; backdrop-filter: blur(8px); background: rgba(10,15,13,.6); }
+.sug-overlay.open .sug-modal{ animation: popInExtreme 0.6s var(--spring) both; }
+.sug-modal{ background: var(--paper); border: 1px solid var(--line); border-radius: 20px; width: 100%; max-width: 650px; max-height: 85vh; display: flex; flex-direction: column; box-shadow: 0 30px 60px -15px rgba(0,0,0,.4); }
+.sug-head{ display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--line); }
+.sug-head h2{ margin: 0; font-size: 20px; font-family: var(--serif); font-weight:800;}
+.sug-head p{ margin: 4px 0 0; font-size: 13px; color: var(--ink-soft); }
+.sug-close{ border: 1px solid var(--line); background: var(--bg); color: var(--ink-soft); width: 34px; height: 34px; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight:bold; transition: all 0.5s var(--bounce); }
+.sug-close:hover{ border-color: var(--red); background: var(--rose-wash); color: var(--red); transform: rotate(180deg) scale(1.1); }
+.sug-scroll{ overflow-y: auto; padding: 20px 24px; }
+.sug-form{ background: var(--bg); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 20px; transition:all 0.4s var(--spring);}
+.sug-label{ font-family: var(--mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-soft); font-weight: 800; margin: 0 0 10px; display: block; }
+.sug-text{ width: 100%; min-height: 80px; resize: vertical; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.5; font-weight:500; transition: all 0.4s var(--spring); }
+.sug-btn{ background: var(--teal); color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 800; font-size: 13.5px; cursor: pointer; transition: all 0.4s var(--bounce); }
+.sug-btn.ghost{ background: var(--bg); color: var(--ink-soft); border: 1px solid var(--line); box-shadow: none; }
+.sug-btn:hover:not(:disabled){ transform: translateY(-3px) scale(1.03); box-shadow: 0 8px 16px rgba(31, 111, 92, 0.3); }
 
-  .sug-form{ background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 14px; margin-bottom: 18px; }
-  .sug-label{ font-family: var(--mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin: 0 0 8px; display: block; }
-  .sug-chips{ display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
-  .sug-chip{ border: 1.5px solid var(--line); background: var(--paper); color: var(--ink-soft); padding: 5px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 600; font-family: var(--sans); cursor: pointer; transition: all .15s ease; }
-  .sug-chip:hover:not(:disabled){ border-color: var(--teal); color: var(--ink); transform: translateY(-1px); }
-  .sug-chip:disabled{ cursor: not-allowed; opacity: 0.6; }
-  .sug-chip.sel{ background: var(--teal-wash); border-color: var(--teal); color: var(--teal); }
-  .sug-text{ width: 100%; min-height: 84px; resize: vertical; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 8px; background: var(--paper); color: var(--ink); font-family: var(--sans); font-size: 14px; line-height: 1.45; transition: border-color .15s ease, box-shadow .15s ease; }
-  .sug-text:focus{ outline: none; border-color: var(--teal); box-shadow: 0 0 0 4px color-mix(in srgb, var(--teal) 16%, transparent); }
-  .sug-text:disabled{ background: var(--bg); color: var(--ink-soft); cursor: not-allowed; }
-  .sug-form-foot{ display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 12px; flex-wrap: wrap; }
-  .sug-counter{ font-size: 12px; color: var(--ink-soft); }
-  .sug-btn{ background: var(--teal); color: #fff; border: none; padding: 9px 18px; border-radius: 8px; font-weight: 600; font-size: 13.5px; font-family: var(--sans); cursor: pointer; transition: transform .15s ease, opacity .15s ease; }
-  .sug-btn:hover:not(:disabled){ transform: translateY(-1px); opacity: .95; }
-  :root[data-theme="dark"] .sug-btn{ color: #0A0F0D; }
-  .sug-btn:disabled{ background: var(--line); color: var(--ink-soft); cursor: not-allowed; }
-  .sug-btn.ghost{ background: var(--bg); color: var(--ink-soft); border: 1.5px solid var(--line); }
-  :root[data-theme="dark"] .sug-btn.ghost{ color: var(--ink-soft); }
-  .sug-aviso{ font-size: 13px; color: var(--amber); background: var(--amber-wash); padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; display: none; line-height: 1.45; }
+/* Estilos das Listas (Mural e Sugestões) - Restaurados! */
+.sug-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:12px}
+.sug{display:flex;gap:12px;background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;transition:all .4s var(--spring)}
+.sug:hover{border-color:var(--amber);transform:translateX(4px);box-shadow:0 8px 16px rgba(0,0,0,.04)}
+.sug.done{opacity:.6;background:var(--line-soft)}
+.sug.done:hover{opacity:1}
+.sug-check{width:18px;height:18px;margin-top:2px;accent-color:var(--teal);cursor:pointer}
+.sug-body{flex:1;min-width:0}
+.sug-meta{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.sug-tag{font-family:var(--mono);font-size:9.5px;text-transform:uppercase;letter-spacing:.1em;font-weight:800;padding:3px 8px;border-radius:6px;background:var(--line-soft)}
+.t-teal{background:var(--teal-wash);color:var(--teal)}
+.t-amber{background:var(--amber-wash);color:var(--amber)}
+.t-plum{background:var(--plum-wash);color:var(--plum)}
+.sug-date{font-size:11.5px;color:var(--ink-soft)}
+.sug-date b{color:var(--ink)}
+.sug-content{font-size:13.5px;line-height:1.5;color:var(--ink);white-space:pre-wrap; word-break:break-word;}
+.sug-actions{display:flex;gap:12px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+.sug-link{background:none;border:0;color:var(--ink-soft);font-size:12px;font-weight:700;cursor:pointer;padding:0;transition:color .3s}
+.sug-link:hover{color:var(--amber)}
+.sug-link.danger:hover{color:var(--red)}
+.sug-empty{text-align:center;padding:30px;color:var(--ink-soft);font-size:13.5px;background:var(--line-soft);border-radius:12px;font-weight:600}
+.sug-admin-reply{margin-top:12px;padding:12px;background:var(--teal-wash);border-radius:8px;border-left:3px solid var(--teal)}
+.sug-admin-reply-label{display:block;font-size:10.5px;font-weight:800;color:var(--teal-dark);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.sug-admin-reply-text{font-size:13px;color:var(--ink);line-height:1.5;white-space:pre-wrap}
+.sug-edit-row{display:flex;gap:8px;margin-top:10px}
+.sug-chip{ border: 1px solid var(--line); background: var(--paper); color: var(--ink-soft); padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; font-family: var(--sans); cursor: pointer; transition: all 0.4s var(--bounce); }
+.sug-chip:hover:not(:disabled){ border-color: var(--teal); color: var(--ink); transform: translateY(-2px) scale(1.03); box-shadow: 0 6px 12px rgba(31,111,92,0.15); }
+.sug-chip.sel{ background: var(--teal); border-color: var(--teal); color: white; transform: scale(1.05) translateY(-2px); box-shadow: 0 6px 15px rgba(31,111,92,0.3);}
 
-  .sug-filters{ display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-  .sug-filters select{ border: 1.5px solid var(--line); background: var(--paper); color: var(--ink); padding: 7px 10px; border-radius: 8px; font-size: 13px; font-family: var(--sans); }
-  .sug-summary{ margin-left: auto; font-size: 12px; color: var(--ink-soft); }
+.icon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 10px; margin-bottom: 12px; }
+.icon-opt { width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line); background: var(--paper); color: var(--ink-soft); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.4s var(--bounce); }
+.icon-opt svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 2.2; fill: none; transition: transform 0.4s var(--bounce); }
+.icon-opt.selected { border-color: var(--teal); background: var(--teal); color: white; transform: scale(1.1); box-shadow: 0 8px 16px rgba(31, 111, 92, 0.3); border-radius:14px;}
 
-  .sug-list{ list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
-  .sug{ display: flex; gap: 12px; border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; background: var(--paper); }
-  .sug.done{ background: var(--bg); }
-  .sug.done .sug-content{ text-decoration: line-through; color: var(--ink-soft); }
-  .sug-check{ width: 18px; height: 18px; margin-top: 2px; accent-color: var(--teal); cursor: pointer; flex-shrink: 0; }
-  .sug-check:disabled { cursor: not-allowed; opacity: 0.5; }
-  .sug-body{ flex: 1; min-width: 0; }
-  .sug-meta{ display: flex; align-items: center; gap: 10px; margin-bottom: 6px; flex-wrap: wrap; }
-  .sug-tag{ font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; padding: 3px 7px; border-radius: 5px; font-weight: 700; }
-  .sug-tag.t-teal{ background: var(--teal-wash); color: var(--teal); }
-  .sug-tag.t-plum{ background: var(--plum-wash); color: var(--plum); }
-  .sug-tag.t-amber{ background: var(--amber-wash); color: var(--amber); }
-  .sug-date{ font-size: 11.5px; color: var(--ink-soft); }
-  .sug-date b { color: var(--ink); }
-  .sug-content{ font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
-  .sug-actions{ display: flex; gap: 14px; margin-top: 8px; }
-  .sug-link{ background: none; border: none; padding: 0; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); cursor: pointer; font-family: var(--sans); }
-  .sug-link:hover{ color: var(--teal); }
-  .sug-link.danger:hover{ color: var(--red); }
-  .sug-edit-row{ display: flex; gap: 8px; margin-top: 8px; }
-  .sug-empty{ text-align: center; color: var(--ink-soft); font-size: 14px; padding: 24px 0; }
+.toggle-switch { position: relative; display: inline-block; width: 48px; height: 26px; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--line); transition: .4s var(--bounce); border-radius: 26px; }
+.toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: var(--paper); transition: .4s var(--bounce); border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,.2); }
+input:checked + .toggle-slider { background-color: var(--teal); }
+input:checked + .toggle-slider:before { transform: translateX(22px) scale(1.05); }
 
-  .sug-admin-reply { margin-top: 12px; padding: 12px; background: var(--teal-wash); border-left: 4px solid var(--teal); border-radius: 4px; }
-  .sug-admin-reply-label { display: block; font-size: 11px; font-weight: 700; color: var(--teal); text-transform: uppercase; margin-bottom: 4px; }
-  .sug-admin-reply-text { font-size: 13.5px; color: var(--ink-soft); line-height: 1.4; white-space: pre-wrap; word-break: break-word; }
-  :root[data-theme="dark"] .sug-admin-reply-text { color: var(--ink); }
-
-  /* ---------- Responsivo ---------- */
-  @media (max-width: 980px){
-    .hub-grid{ grid-template-columns: repeat(2, 1fr); }
-    .quick{ align-items: flex-start; }
-    .quick-row{ justify-content: flex-start; }
-  }
-  @media (max-width: 640px){
-    h1{ font-size: 30px; }
-    .brand-sep, .brand-sub{ display: none; }
-    .hub-grid{ grid-template-columns: 1fr; }
-    .section-head .hint{ display: none; }
-    .hero-inner{ padding: 28px 24px 24px; }
-    .footer-inner{ grid-template-columns: 1fr; text-align: center; }
-    .footer-brand{ justify-content: center; }
-    .footer-right{ text-align: center; }
-  }
-
-  /* Fade suave na troca de tema: aplicado só durante a troca, em TODOS os elementos
-     (inclui o <html>, que pinta o fundo da página e antes não tinha transição) */
-  html.theme-fading,
-  html.theme-fading *,
-  html.theme-fading *::before,
-  html.theme-fading *::after{
-    transition: background-color .4s ease, color .4s ease, border-color .4s ease, box-shadow .4s ease, fill .4s ease, stroke .4s ease !important;
-  }
-
-  @media (prefers-reduced-motion: reduce){
-    *, *::before, *::after{ animation: none !important; transition: none !important; }
-  }
-</style></head>
+@media (max-width:1180px){.art{display:none}.hub-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:980px){.shell{grid-template-columns:1fr}.sidebar{position:static;height:auto;border-right:0;border-bottom:1px solid var(--line);padding:12px 14px;flex-direction:row;flex-wrap:wrap;align-items:center}.brand{padding:0 8px 0 0}.nav{flex-direction:row;flex-wrap:wrap}.nav-sep{display:none}.side-card{margin:4px 0 0;flex:1 1 100%;display:flex;align-items:center;gap:12px;padding:10px 14px}.side-card .ico{margin:0}.side-card p{display:none}.side-card h3{margin:0}.side-card .side-cta{margin-left:auto}.topbar{position:static;padding:10px 20px;flex-wrap:wrap; justify-content:center;}main{padding:6px 20px 24px}.footer-bar{margin:16px 20px 0}}
+@media (max-width:640px){h1{font-size:36px}.subtitle{font-size:14px}.hub-grid{grid-template-columns:1fr}.user-meta .user-role{display:none}.sort{margin-left:0}.filters{flex-wrap:nowrap;overflow-x:auto;padding-bottom:8px;}.footer-right{margin-left:0}}
+</style>
+</head>
 <body>
-
-<header class="top">
-  <!-- Barra superior -->
-  <div class="topbar a-down">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="brand-logo">
-          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>
-        </div>
-        <p class="brand-eyebrow">Hub Operacional</p>
-        <span class="brand-sep"></span>
-        <span class="brand-sub">Ferramentas internas</span>
-      </div>
-
-      <div class="topbar-actions">
-        <button class="btn-sm" id="themeToggle" type="button">🌙 Modo escuro</button>
-
-        <!-- Botão de Login deslogado -->
-        <button class="btn-sm" id="btnLogin" type="button">
-          <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-          Login
-        </button>
-
-        <!-- Selo de Usuário Logado -->
-        <div class="user-badge" id="userBadge">
-          <span class="user-email" id="userEmailTxt">carregando...</span>
-          <button class="btn-logout" id="btnLogout" type="button">Sair</button>
-        </div>
-      </div>
+<div class="shell">
+<aside class="sidebar">
+  <div class="brand"><div class="brand-logo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></div><span class="brand-name">Hub Operacional</span></div>
+  <nav class="nav">
+    <a class="nav-item active" href="#topo" aria-current="page"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Início</a>
+    <a class="nav-item" href="painel-validacao.html"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Painel de Validação<span class="qa-badge" id="validBadge" style="display:none;"></span></a>
+    <a class="nav-item" href="https://github.com/DgMarques-br/Hub-Ferramentas" aria-disabled="true" title="Em breve"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Documentação</a>
+    <a class="nav-item" href="#" aria-disabled="true" title="Em breve"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M5.6 5.6l3.9 3.9M14.5 14.5l3.9 3.9M18.4 5.6l-3.9 3.9M9.5 14.5l-3.9 3.9"/></svg>Suporte</a>
+    <div class="nav-sep"></div>
+    <a class="nav-item" href="#" id="btnConfig">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+      Configurações
+    </a>
+  </nav>
+  <div class="side-card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg></div><h3>Sugira uma ferramenta</h3><p>Tem uma ideia?<br>Nos ajude a melhorar!</p>
+    <button class="side-cta" id="btnSuggest" type="button">Enviar sugestão →<span class="count" id="sugCount" style="display:none;"></span></button></div>
+</aside>
+<div class="col" id="topo">
+  <header class="topbar a-down">
+    <div class="topbar-actions">
+      <button class="btn-sm" id="themeToggle" type="button">🌙 Modo escuro</button>
+      <button class="btn-sm bell" id="btnMural" type="button" aria-label="Mural de Avisos" title="Mural de Avisos"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg><span class="count" id="muralCount" style="display:none;"></span></button>
+      <button class="btn-sm btn-login" id="btnLogin" type="button"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Login</button>
+      <div class="user-badge" id="userBadge"><span class="avatar" id="userAvatar"></span><span class="user-meta"><span class="user-email" id="userEmailTxt">carregando...</span><span class="user-role">Usuário interno</span></span><button class="btn-logout" id="btnLogout" type="button">Sair</button></div>
     </div>
-  </div>
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-inner">
-      <div class="a-up" style="--d:80">
-        <h1>Central de Ferramentas</h1>
-        <p class="subtitle">Acesse rapidamente a todos os sistemas internos para cadastros, formatação, validação, métricas e IA.</p>
+  </header>
+  <main>
+    <section class="hero a-up" style="--d:60">
+      <div class="art" aria-hidden="true"><div class="win"><i></i><i></i><i></i></div>
+        <div class="tile t1"><i><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></i></div><div class="tile t2"><i><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></i></div><div class="tile t3"><i><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M19.07 4.93l-2.83 2.83"/></svg></i></div><div class="tile t4"><i><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></i></div><div class="tile t5"></div>
+        <div class="note">Mais produtividade<br>no seu dia a dia</div></div>
+      <p class="eyebrow">Hub Operacional</p>
+      <h1>Central de Ferramentas</h1>
+      <p class="subtitle">Acesse os sistemas internos para cadastros, formatação e validação. Organize arrastando os blocos ou crie novas categorias de forma fluida.</p>
+      <label class="field hero-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg><input id="heroSearch" type="search" placeholder="Buscar ferramenta por nome, categoria ou palavra-chave..." autocomplete="off"><kbd>⌘ K</kbd></label>
+    </section>
+    
+    <div class="filters a-up" style="--d:160" id="ferramentas">
+      <div id="chipContainer" style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <!-- Categorias dinâmicas -->
       </div>
-
-      <div class="quick a-up" style="--d:180">
-        <span class="quick-label">Acessos rápidos</span>
-        <div class="quick-row">
-          <a href="painel-validacao.html" class="qa-btn panel">
-            <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
-            Painel de Validação
-            <span class="qa-badge" id="validBadge" style="display:none;"></span>
-          </a>
-
-          <!-- Botão do Mural de Avisos -->
-          <button class="qa-btn highlight" id="btnMural" type="button">
-            <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
-            Mural de Avisos
-            <span class="count" id="muralCount" style="display:none;"></span>
-          </button>
-
-          <button class="qa-btn" id="btnSuggest" type="button">
-            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-            Caixa de Sugestões
-            <span class="count" id="sugCount" style="display:none;"></span>
-          </button>
-        </div>
-      </div>
+      <button class="btn-sm" id="btnNovaCatModal" type="button" style="border: 1px dashed var(--line); color: var(--ink-soft); margin-right: auto; padding: 8px 14px;" title="Criar nova categoria">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Categoria
+      </button>
+      
+      <label class="sort"><svg viewBox="0 0 24 24"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></svg><select id="sortSel"><option value="rel">Ordem Personalizada</option><option value="az">Nome (A–Z)</option></select></label>
     </div>
-  </div>
-</header>
 
-<main>
-  <div class="section-head a-up" style="--d:260">
-    <span class="bar"></span>
-    <span class="label">Todas as ferramentas</span>
-    <span class="count-pill">06</span>
-    <span class="hint">Selecione uma ferramenta para começar.</span>
-  </div>
-
-  <div class="hub-grid">
-    <!-- 1. Catálogo SAP (Verde Esmeralda) -->
-    <a href="catalogo-busca-sap.html" class="card-link tool a-up" data-accent="teal" style="--d:320">
+    <!-- O Efeito de Sumiço foi corrigido nesta Grid -->
+    <div class="hub-grid" id="grid">
+    <a href="catalogo-busca-sap.html" class="card-link tool a-up" data-accent="teal" data-cat="Operacional" data-id="tool-sap" draggable="true" style="--d:300">
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg></div>
-          <span class="tag">Operacional</span>
-        </div>
+        <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v6c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 11v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg></div><span class="tag">Operacional</span><span class="chev"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></div>
         <h2 class="card-title">Catálogo SAP</h2>
         <p class="card-desc">Consulta offline rápida de Hierarquia de Grupos de Itens, Marcas e Categorias para preenchimento no SAP.</p>
-        <div class="card-foot">
-          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
-          <span class="code">SAP</span>
-        </div>
+        <div class="card-foot"><span class="go">Acessar ferramenta →</span><span class="code">SAP</span></div>
       </div>
     </a>
-
-    <!-- 2. Validador de Links (Azul Elétrico) -->
-    <a href="buscador-links.html" class="card-link tool a-up" data-accent="blue" style="--d:390">
+    <a href="buscador-links.html" class="card-link tool a-up" data-accent="blue" data-cat="Operacional" data-id="tool-links" draggable="true" style="--d:370">
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg></div>
-          <span class="tag">Operacional</span>
-        </div>
+        <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></div><span class="tag">Operacional</span><span class="chev"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></div>
         <h2 class="card-title">Validador de Links</h2>
         <p class="card-desc">Pesquisa unificada em múltiplos sites de e-commerce e verificação de integridade de URLs.</p>
-        <div class="card-foot">
-          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
-          <span class="code">URL</span>
-        </div>
+        <div class="card-foot"><span class="go">Acessar ferramenta →</span><span class="code">URL</span></div>
       </div>
     </a>
-
-    <!-- 3. Formatador de Anúncios (Âmbar / Dourado) -->
-    <a href="formatador-anuncios.html" class="card-link tool a-up" data-accent="amber" style="--d:460">
+    <a href="formatador-anuncios.html" class="card-link tool a-up" data-accent="amber" data-cat="Operacional" data-id="tool-anuncios" draggable="true" style="--d:440">
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-          <span class="tag">Operacional</span>
-        </div>
+        <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div><span class="tag">Operacional</span><span class="chev"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></div>
         <h2 class="card-title">Formatador de Anúncios</h2>
         <p class="card-desc">Gerador de descrições HTML com extração de especificações, dimensões e termos de garantia.</p>
-        <div class="card-foot">
-          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
-          <span class="code">HTML</span>
-        </div>
+        <div class="card-foot"><span class="go">Acessar ferramenta →</span><span class="code">HTML</span></div>
       </div>
     </a>
-
-    <!-- 4. Formatador de Imagens (Coral / Rose) -->
-    <a href="formatador-imagem.html" class="card-link tool a-up" data-accent="rose" style="--d:530">
+    <a href="formatador-imagem.html" class="card-link tool a-up" data-accent="rose" data-cat="Mídia" data-id="tool-imagem" draggable="true" style="--d:510">
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg></div>
-          <span class="tag">Mídia</span>
-        </div>
+        <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></div><span class="tag">Mídia</span><span class="chev"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></div>
         <h2 class="card-title">Formatador de Imagens</h2>
         <p class="card-desc">Enquadramento automático para 1200x1200px sem cortar a imagem, com preenchimento de fundo.</p>
-        <div class="card-foot">
-          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
-          <span class="code">IMG</span>
-        </div>
+        <div class="card-foot"><span class="go">Acessar ferramenta →</span><span class="code">IMG</span></div>
       </div>
     </a>
-
-    <!-- 5. Dashboard de Métricas (Ciano) -->
-    <a href="Dashboard_Marketplaces.html" class="card-link tool a-up" data-accent="cyan" style="--d:600">
+    <a href="Dashboard_Marketplaces.html" class="card-link tool a-up" data-accent="cyan" data-cat="Analytics" data-id="tool-dashboard" draggable="true" style="--d:580">
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-          <span class="tag">Analytics</span>
-        </div>
+        <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><span class="tag">Analytics</span><span class="chev"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></div>
         <h2 class="card-title">Dashboard de Métricas</h2>
         <p class="card-desc">Visualização de dados analíticos, acompanhamento de KPIs e métricas de desempenho.</p>
-        <div class="card-foot">
-          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
-          <span class="code">KPIs</span>
-        </div>
+        <div class="card-foot"><span class="go">Acessar ferramenta →</span><span class="code">KPIs</span></div>
       </div>
     </a>
-
-    <!-- 6. Gerador de Descrições IA (Roxo / Violeta) -->
-    <a href="gerador-descricao-ia.html" class="card-link tool a-up" data-accent="plum" style="--d:670">
+    <a href="gerador-descricao-ia.html" class="card-link tool a-up" data-accent="plum" data-cat="IA" data-id="tool-ia" draggable="true" style="--d:650">
       <div class="card">
-        <div class="card-header">
-          <div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83"/></svg></div>
-          <span class="tag">IA (Testes finais)</span>
-        </div>
+        <div class="card-header"><div class="card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M19.07 4.93l-2.83 2.83"/></svg></div><span class="tag">IA</span><span class="chev"><svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg></span></div>
         <h2 class="card-title">Gerador de Descrições IA</h2>
         <p class="card-desc">Criação automática de descrições e especificações técnicas otimizadas.</p>
-        <div class="card-foot">
-          <span class="go">Acessar ferramenta <svg viewBox="0 0 24 24"><path d="M7 17L17 7M8 7h9v9"/></svg></span>
-          <span class="code">IA</span>
-        </div>
+        <div class="card-foot"><span class="go">Acessar ferramenta →</span><span class="code">IA</span></div>
       </div>
     </a>
-  </div>
-</main>
-
-<footer class="footer-bar">
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="8" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/><path d="M17 13v8M13 17h8"/></svg>
-      Central de Ferramentas
     </div>
-    <div>Virtualizando você no seu ritmo.</div>
-    <div class="footer-right">Uso interno</div>
+    <div class="empty" id="empty"><b>Nenhuma ferramenta encontrada</b>Tente outro termo ou escolha outra categoria.</div>
+  </main>
+  <footer class="footer-bar"><div class="footer-inner"><div class="brand-logo"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg></div><b>Central de Ferramentas</b><span class="vsep"></span><span>Facilitando o seu trabalho.</span>
+    <div class="footer-right"><span>Uso interno</span><span class="vsep"></span><span>v1.0.0</span></div></div></footer>
+</div>
+</div>
+
+<!-- Modal: Criar Nova Categoria -->
+<div class="sug-overlay" id="novaCatOverlay" aria-hidden="true">
+  <div class="sug-modal" role="dialog" aria-modal="true" aria-labelledby="novaCatTitulo" style="max-width: 480px;">
+    <div class="sug-head">
+      <div>
+        <h2 id="novaCatTitulo">Nova Categoria</h2>
+        <p>Organize suas ferramentas da sua maneira.</p>
+      </div>
+      <button class="sug-close" id="novaCatClose" type="button" aria-label="Fechar">✕</button>
+    </div>
+    <div class="sug-scroll">
+      <div class="sug-form">
+        <span class="sug-label">1. Nome da Categoria</span>
+        <input type="text" class="sug-text" id="novaCatNome" maxlength="25" placeholder="Ex: Finanças, Design, Relatórios..." style="min-height: 48px; margin-bottom: 16px;">
+        
+        <span class="sug-label">2. Escolha um Símbolo</span>
+        <div class="icon-grid" id="novaCatIcones">
+          <!-- Renderizado via JS -->
+        </div>
+        
+        <div style="display: flex; margin-top: 24px; justify-content: flex-end; gap: 10px;">
+          <button class="sug-btn ghost" id="novaCatCancelar" type="button">Cancelar</button>
+          <button class="sug-btn" id="novaCatSalvar" type="button" disabled>Criar Categoria</button>
+        </div>
+      </div>
+    </div>
   </div>
-</footer>
+</div>
+
+<!-- Modal de Configurações -->
+<div class="sug-overlay" id="configOverlay" aria-hidden="true">
+  <div class="sug-modal" role="dialog" aria-modal="true" aria-labelledby="configTitulo">
+    <div class="sug-head">
+      <div>
+        <h2 id="configTitulo">Configurações</h2>
+        <p>Ajuste suas preferências da Central de Ferramentas</p>
+      </div>
+      <button class="sug-close" id="configClose" type="button" aria-label="Fechar">✕</button>
+    </div>
+    <div class="sug-scroll">
+      <div class="sug-form">
+        <span class="sug-label">Aparência & Interface</span>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <div style="font-size: 14.5px; font-weight: 800; color: var(--ink);">Modo Escuro</div>
+            <div style="font-size: 12.5px; color: var(--ink-soft); margin-top: 4px;">Alternar entre o tema claro e escuro.</div>
+          </div>
+          <button class="sug-btn ghost" id="configThemeBtn" type="button">Alternar Tema</button>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; padding-top: 16px; border-top: 1px solid var(--line);">
+          <div>
+            <div style="font-size: 14.5px; font-weight: 800; color: var(--ink);">Reduzir Animações</div>
+            <div style="font-size: 12.5px; color: var(--ink-soft); margin-top: 4px;">Desativa movimentos e efeitos visuais intensos.</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="configReduceMotion">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <span class="sug-label" style="margin-top: 28px;">Organização e Layout</span>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top: 4px;">
+          <div>
+            <div style="font-size: 14.5px; font-weight: 800; color: var(--ink);">Restaurar Estrutura Original</div>
+            <div style="font-size: 12.5px; color: var(--ink-soft); margin-top: 4px;">Reverte posições e recria categorias padrão.</div>
+          </div>
+          <button class="sug-btn ghost" id="configResetLayout" type="button" style="color:var(--red); border-color:var(--rose-wash);">Restaurar Tudo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Modal do Mural de Avisos -->
 <div class="sug-overlay" id="muralOverlay" aria-hidden="true">
   <div class="sug-modal" role="dialog" aria-modal="true" aria-labelledby="muralTitulo">
     <div class="sug-head">
-      <div>
-        <h2 id="muralTitulo">Mural de Avisos</h2>
-        <p>Comunicados oficiais e atualizações para a equipe</p>
-      </div>
+      <div><h2 id="muralTitulo">Mural de Avisos</h2><p>Comunicados oficiais e atualizações</p></div>
       <button class="sug-close" id="muralClose" type="button" aria-label="Fechar">✕</button>
     </div>
     <div class="sug-scroll">
       <div class="sug-aviso" id="muralAviso"></div>
-
-      <!-- Formulário de criação/edição restrito ao Admin -->
       <div class="sug-form" id="muralFormWrap" style="display: none;">
         <span class="sug-label" id="muralFormTituloLabel">Novo Comunicado</span>
         <textarea class="sug-text" id="muralTexto" maxlength="600" placeholder="Escreva o aviso para a equipe..."></textarea>
-        <div class="sug-form-foot">
-          <span class="sug-counter" id="muralCounter">0 / 600</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+          <span class="sug-counter" id="muralCounter" style="font-size:11px; color:var(--ink-soft)">0 / 600</span>
           <div style="display: flex; gap: 8px;">
             <button class="sug-btn ghost" id="muralCancelarEdicao" type="button" style="display:none;">Cancelar</button>
             <button class="sug-btn" id="muralEnviar" type="button" disabled>Publicar Aviso</button>
           </div>
         </div>
       </div>
-
       <ul class="sug-list" id="muralLista"></ul>
     </div>
   </div>
@@ -480,59 +484,101 @@
 <div class="sug-overlay" id="sugOverlay" aria-hidden="true">
   <div class="sug-modal" role="dialog" aria-modal="true" aria-labelledby="sugTitulo">
     <div class="sug-head">
-      <div>
-        <h2 id="sugTitulo">Caixa de Sugestões</h2>
-        <p>Compartilhe melhorias e ideias com a equipe</p>
-      </div>
+      <div><h2 id="sugTitulo">Caixa de Sugestões</h2><p>Compartilhe melhorias e ideias com a equipe</p></div>
       <button class="sug-close" id="sugClose" type="button" aria-label="Fechar">✕</button>
     </div>
     <div class="sug-scroll">
       <div class="sug-aviso" id="sugAviso"></div>
-
       <div class="sug-form">
         <span class="sug-label">1. Sobre qual ferramenta?</span>
-        <div class="sug-chips" id="sugChips"></div>
+        <div id="sugChips" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;"></div>
         <span class="sug-label">2. Sua sugestão</span>
         <textarea class="sug-text" id="sugTexto" maxlength="500" placeholder="Faça login no topo da página para enviar sugestões..." disabled></textarea>
-        <div class="sug-form-foot">
-          <span class="sug-counter" id="sugCounter">0 / 500</span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px;">
+          <span class="sug-counter" id="sugCounter" style="font-size:11px; color:var(--ink-soft)">0 / 500</span>
           <button class="sug-btn" id="sugEnviar" type="button" disabled>Enviar sugestão</button>
         </div>
       </div>
-
-      <div class="sug-filters">
-        <select id="sugFiltroTag"></select>
-        <select id="sugFiltroStatus">
+      <div style="display:flex; gap:10px; margin-bottom:16px; align-items:center;">
+        <select id="sugFiltroTag" style="padding:6px; border-radius:8px; border:1px solid var(--line); font-size:12.5px;"></select>
+        <select id="sugFiltroStatus" style="padding:6px; border-radius:8px; border:1px solid var(--line); font-size:12.5px;">
           <option value="todas">Todas</option>
           <option value="abertas">Em aberto</option>
           <option value="concluidas">Concluídas</option>
         </select>
-        <span class="sug-summary" id="sugResumo"></span>
+        <span id="sugResumo" style="font-size:11px; color:var(--ink-soft); margin-left:auto;"></span>
       </div>
-
       <ul class="sug-list" id="sugLista"></ul>
     </div>
   </div>
 </div>
 
 <script>
-// Gestão de Modo Escuro
+// ---------- CONFIGURAÇÕES GLOBAIS E MODO ESCURO ----------
 const themeToggleBtn = document.getElementById('themeToggle');
+const configThemeBtn = document.getElementById('configThemeBtn');
+const configReduceMotion = document.getElementById('configReduceMotion');
+
 function applyTheme(theme){
   document.documentElement.setAttribute('data-theme', theme);
-  themeToggleBtn.textContent = theme === 'dark' ? '☀️ Modo claro' : '🌙 Modo escuro';
+  const isDark = theme === 'dark';
+  themeToggleBtn.innerHTML = isDark ? '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Modo claro' : '<svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>Modo escuro';
 }
-const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-applyTheme(localStorage.getItem('sapCatalogTheme') || (prefersDark ? 'dark' : 'light'));
 let themeFadeTimer;
-themeToggleBtn.addEventListener('click', () => {
+function toggleThemeAction() {
   const root = document.documentElement;
   const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
   root.classList.add('theme-fading');
   clearTimeout(themeFadeTimer);
-  themeFadeTimer = setTimeout(() => root.classList.remove('theme-fading'), 500);
+  themeFadeTimer = setTimeout(() => root.classList.remove('theme-fading'), 400);
   applyTheme(next);
   localStorage.setItem('sapCatalogTheme', next);
+}
+
+themeToggleBtn.addEventListener('click', toggleThemeAction);
+configThemeBtn.addEventListener('click', toggleThemeAction);
+
+configReduceMotion.checked = localStorage.getItem('hubReducedMotion') === 'true';
+configReduceMotion.addEventListener('change', (e) => {
+  const reduced = e.target.checked;
+  localStorage.setItem('hubReducedMotion', reduced);
+  if (reduced) document.documentElement.classList.add('reduced-motion');
+  else document.documentElement.classList.remove('reduced-motion');
+});
+
+function setupModal(overlayId, btnIds, closeIds) {
+  const overlay = document.getElementById(overlayId);
+  function open() { overlay.classList.add("open"); overlay.setAttribute("aria-hidden","false"); }
+  function close() { overlay.classList.remove("open"); overlay.setAttribute("aria-hidden","true"); }
+  
+  btnIds.forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.addEventListener("click", e => { e.preventDefault(); open(); });
+  });
+  closeIds.forEach(id => {
+    const btn = document.getElementById(id);
+    if(btn) btn.addEventListener("click", close);
+  });
+  overlay.addEventListener("click", e => { if (e.target === overlay) close(); });
+  return close;
+}
+
+const fecharConfig = setupModal("configOverlay", ["btnConfig"], ["configClose"]);
+const fecharSug = setupModal("sugOverlay", ["btnSuggest"], ["sugClose"]);
+const fecharMural = setupModal("muralOverlay", ["btnMural"], ["muralClose"]);
+const fecharNovaCat = setupModal("novaCatOverlay", ["btnNovaCatModal"], ["novaCatClose", "novaCatCancelar"]);
+
+document.addEventListener("keydown", (e) => { 
+  if (e.key === "Escape") { fecharConfig(); fecharSug(); fecharMural(); fecharNovaCat(); } 
+});
+
+document.getElementById("configResetLayout").addEventListener("click", () => {
+    if(confirm("Toda a sua organização, ordens e categorias customizadas serão apagadas. Tem certeza?")) {
+        localStorage.removeItem("hubToolOrder");
+        localStorage.removeItem("hubCategories");
+        localStorage.removeItem("hubToolCats");
+        window.location.reload();
+    }
 });
 </script>
 
@@ -551,7 +597,7 @@ Validador.subscribe(({ status, snap }) => {
 Validador.init();
 </script>
 
-<!-- Firebase / Firestore / Auth -->
+<!-- Firebase / Firestore / Auth (RESTUARADO INTEGRALMENTE) -->
 <script type="module">
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyA8-qG9BpzYvOnO64Xurk2_hYCh6Y8z0Zo",
@@ -564,10 +610,8 @@ const FIREBASE_CONFIG = {
 };
 
 const ADMIN_EMAIL = "diogo.moreira2777@gmail.com"; 
-
 const COLECAO = "sugestoes";
 const COLECAO_MURAL = "mural_avisos";
-const MAX_CHARS = 500;
 
 const TAGS = [
   { id: "catalogo",  label: "Catálogo SAP",           c: "teal"  },
@@ -575,66 +619,25 @@ const TAGS = [
   { id: "anuncios",  label: "Formatador de Anúncios", c: "amber" },
   { id: "imagem",    label: "Formatador de Imagem",   c: "teal"  },
   { id: "metricas",  label: "Métricas",               c: "amber" },
-  { id: "ia",        label: "IA",                     c: "plum"  },
-  { id: "painel",    label: "Painel de Validação",    c: "teal"  }
+  { id: "ia",        label: "IA",                     c: "plum"  }
 ];
 const tagInfo = (id) => TAGS.find(t => t.id === id) || { label: id, c: "teal" };
-
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 
 let db = null, fb = null, authInstance = null, authProvider = null;
-let currentUser = null;
-let itens = [];
-let avisosMural = [];
-let tagForm = null;
+let currentUser = null, itens = [], avisosMural = [], tagForm = null;
+let editId = null, editDraft = "", replyId = null, replyDraft = "", muralEditId = null;
 
-// Controle de Edição de Sugestões e Mural
-let editId = null, editDraft = "";
-let replyId = null, replyDraft = "";
-let muralEditId = null;
-
-// Atualiza um contador com uma pequena animação quando o valor muda
 function setCount(el, n){
-  const novo = String(n);
-  const mudou = el.textContent !== novo;
-  el.textContent = novo;
-  el.style.display = n ? "" : "none";
+  const novo = String(n); const mudou = el.textContent !== novo;
+  el.textContent = novo; el.style.display = n ? "" : "none";
   if (n && mudou) { el.classList.remove("pop"); void el.offsetWidth; el.classList.add("pop"); }
 }
 
-// ---------- Abrir / fechar Modais ----------
-const overlaySug = $("sugOverlay");
-function abrirSug(){ overlaySug.classList.add("open"); overlaySug.setAttribute("aria-hidden","false"); }
-function fecharSug(){ overlaySug.classList.remove("open"); overlaySug.setAttribute("aria-hidden","true"); }
-$("btnSuggest").addEventListener("click", abrirSug);
-$("sugClose").addEventListener("click", fecharSug);
-overlaySug.addEventListener("click", (e) => { if (e.target === overlaySug) fecharSug(); });
+function aviso(msg){ const el = $("sugAviso"); el.textContent = msg || ""; el.style.display = msg ? "block" : "none"; }
+function muralAviso(msg){ const el = $("muralAviso"); el.textContent = msg || ""; el.style.display = msg ? "block" : "none"; }
 
-const overlayMural = $("muralOverlay");
-function abrirMural(){ overlayMural.classList.add("open"); overlayMural.setAttribute("aria-hidden","false"); }
-function fecharMural(){ overlayMural.classList.remove("open"); overlayMural.setAttribute("aria-hidden","true"); }
-$("btnMural").addEventListener("click", abrirMural);
-$("muralClose").addEventListener("click", fecharMural);
-overlayMural.addEventListener("click", (e) => { if (e.target === overlayMural) fecharMural(); });
-
-document.addEventListener("keydown", (e) => { 
-  if (e.key === "Escape") { fecharSug(); fecharMural(); } 
-});
-
-function aviso(msg){
-  const el = $("sugAviso");
-  el.textContent = msg || "";
-  el.style.display = msg ? "block" : "none";
-}
-
-function muralAviso(msg){
-  const el = $("muralAviso");
-  el.textContent = msg || "";
-  el.style.display = msg ? "block" : "none";
-}
-
-// ---------- Gestão do Formulário de Sugestões ----------
 function renderChips(){
   $("sugChips").innerHTML = TAGS.map(t =>
     `<button type="button" class="sug-chip ${tagForm === t.id ? 'sel' : ''}" data-tag="${t.id}" ${!currentUser ? 'disabled' : ''}>${esc(t.label)}</button>`
@@ -643,141 +646,59 @@ function renderChips(){
 $("sugChips").addEventListener("click", (e) => {
   if(!currentUser) return;
   const b = e.target.closest("[data-tag]");
-  if (!b) return;
-  tagForm = b.dataset.tag;
-  renderChips();
-  validarForm();
+  if (!b) return; tagForm = b.dataset.tag; renderChips(); validarForm();
 });
 
 function validarForm(){
   const ta = $("sugTexto");
-  if(!currentUser) {
-    ta.disabled = true;
-    ta.placeholder = "🔒 Faça login no topo da página para enviar sugestões...";
-    $("sugEnviar").disabled = true;
-    return;
-  }
-  
-  ta.disabled = false;
-  ta.placeholder = "Descreva a melhoria, ideia ou problema...";
+  if(!currentUser) { ta.disabled = true; ta.placeholder = "🔒 Faça login no topo da página para enviar sugestões..."; $("sugEnviar").disabled = true; return; }
+  ta.disabled = false; ta.placeholder = "Descreva a melhoria, ideia ou problema...";
   const n = ta.value.trim().length;
-  $("sugCounter").textContent = `${ta.value.length} / 500`;
-  $("sugEnviar").disabled = !(db && tagForm && n >= 3);
+  $("sugCounter").textContent = `${ta.value.length} / 500`; $("sugEnviar").disabled = !(db && tagForm && n >= 3);
 }
 $("sugTexto").addEventListener("input", validarForm);
 
 $("sugEnviar").addEventListener("click", async () => {
-  if (!currentUser) return;
-  const texto = $("sugTexto").value.trim();
+  if (!currentUser) return; const texto = $("sugTexto").value.trim();
   if (!db || !tagForm || texto.length < 3) return;
   $("sugEnviar").disabled = true;
   try {
     const nomeExibicao = currentUser.displayName || currentUser.email.split('@')[0];
-    await fb.addDoc(fb.collection(db, COLECAO), {
-      texto, 
-      tag: tagForm, 
-      concluida: false, 
-      criadoEm: fb.serverTimestamp(),
-      autorId: currentUser.uid,          
-      autorEmail: currentUser.email,
-      autorNome: nomeExibicao
-    });
-    $("sugTexto").value = "";
-    tagForm = null;
-    renderChips();
-    aviso("");
-  } catch (err) {
-    aviso("Não foi possível enviar: " + err.message);
-  }
+    await fb.addDoc(fb.collection(db, COLECAO), { texto, tag: tagForm, concluida: false, criadoEm: fb.serverTimestamp(), autorId: currentUser.uid, autorEmail: currentUser.email, autorNome: nomeExibicao });
+    $("sugTexto").value = ""; tagForm = null; renderChips(); aviso("");
+  } catch (err) { aviso("Não foi possível enviar: " + err.message); }
   validarForm();
 });
 
-// ---------- Filtros Sugestões ----------
 $("sugFiltroTag").innerHTML = `<option value="todas">Todas as ferramentas</option>` + TAGS.map(t => `<option value="${t.id}">${esc(t.label)}</option>`).join("");
-$("sugFiltroTag").addEventListener("change", renderLista);
-$("sugFiltroStatus").addEventListener("change", renderLista);
+$("sugFiltroTag").addEventListener("change", renderLista); $("sugFiltroStatus").addEventListener("change", renderLista);
 
-function fmtData(ts){
-  try {
-    const d = ts && ts.toDate ? ts.toDate() : null;
-    return d ? d.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" }) : "agora";
-  } catch (e) { return ""; }
-}
+function fmtData(ts){ try { return (ts && ts.toDate ? ts.toDate() : null)?.toLocaleString("pt-BR", { dateStyle: "short", timeStyle: "short", timeZone: "America/Sao_Paulo" }) || "agora"; } catch (e) { return ""; } }
 
 function renderLista(){
-  const ft = $("sugFiltroTag").value;
-  const fs = $("sugFiltroStatus").value;
-  const abertas = itens.filter(i => !i.concluida).length;
-  const concl = itens.length - abertas;
-
-  setCount($("sugCount"), abertas);
-  $("sugResumo").textContent = `${abertas} em aberto · ${concl} concluída${concl === 1 ? '' : 's'}`;
-
-  const lista = itens.filter(i =>
-    (ft === "todas" || i.tag === ft) &&
-    (fs === "todas" || (fs === "abertas" ? !i.concluida : i.concluida))
-  );
-
-  if (!lista.length) {
-    $("sugLista").innerHTML = `<li class="sug-empty">${itens.length ? "Nenhuma sugestão neste filtro." : "Nenhuma sugestão ainda. Seja o primeiro! 💡"}</li>`;
-    return;
-  }
+  const ft = $("sugFiltroTag").value, fs = $("sugFiltroStatus").value;
+  const abertas = itens.filter(i => !i.concluida).length, concl = itens.length - abertas;
+  setCount($("sugCount"), abertas); $("sugResumo").textContent = `${abertas} em aberto · ${concl} concluída${concl === 1 ? '' : 's'}`;
+  const lista = itens.filter(i => (ft === "todas" || i.tag === ft) && (fs === "todas" || (fs === "abertas" ? !i.concluida : i.concluida)));
+  if (!lista.length) { $("sugLista").innerHTML = `<li class="sug-empty">${itens.length ? "Nenhuma sugestão neste filtro." : "Nenhuma sugestão ainda. Seja o primeiro! 💡"}</li>`; return; }
 
   const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
-
   $("sugLista").innerHTML = lista.map(i => {
-    const t = tagInfo(i.tag);
-    const isOwner = currentUser && i.autorId === currentUser.uid;
-    const canEditOrDelete = isOwner || isAdmin;
-    const nomeAutor = i.autorNome || (i.autorEmail ? i.autorEmail.split('@')[0] : 'Usuário Oculto');
-    const editando = editId === i.id;
-    const respondendo = replyId === i.id;
-    let corpo = '';
-    
-    let respostaHtml = '';
-    if (i.respostaAdmin && i.respostaAdmin.trim() !== "") {
-      respostaHtml = `
-        <div class="sug-admin-reply">
-          <span class="sug-admin-reply-label">Resposta do Admin:</span>
-          <div class="sug-admin-reply-text">${esc(i.respostaAdmin)}</div>
-        </div>
-      `;
-    }
+    const t = tagInfo(i.tag), isOwner = currentUser && i.autorId === currentUser.uid, canEditOrDelete = isOwner || isAdmin, nomeAutor = i.autorNome || (i.autorEmail ? i.autorEmail.split('@')[0] : 'Usuário Oculto');
+    const editando = editId === i.id, respondendo = replyId === i.id;
+    let corpo = '', respostaHtml = (i.respostaAdmin && i.respostaAdmin.trim() !== "") ? `<div class="sug-admin-reply"><span class="sug-admin-reply-label">Resposta do Admin:</span><div class="sug-admin-reply-text">${esc(i.respostaAdmin)}</div></div>` : '';
 
-    if (editando) {
-      corpo = `
-         <textarea class="sug-text" id="sugEditText" maxlength="500">${esc(editDraft)}</textarea>
-         <div class="sug-edit-row">
-           <button class="sug-btn" data-act="salvar" data-id="${i.id}" type="button">Salvar</button>
-           <button class="sug-btn ghost" data-act="cancelar" type="button">Cancelar</button>
-         </div>`;
-    } else if (respondendo) {
-      corpo = `
-         <textarea class="sug-text" id="sugReplyText" maxlength="500" placeholder="Digite a resposta do administrador...">${esc(replyDraft)}</textarea>
-         <div class="sug-edit-row">
-           <button class="sug-btn" data-act="salvar-resposta" data-id="${i.id}" type="button">Enviar Resposta</button>
-           <button class="sug-btn ghost" data-act="cancelar-resposta" type="button">Cancelar</button>
-         </div>`;
-    } else {
+    if (editando) corpo = `<textarea class="sug-text" id="sugEditText" maxlength="500">${esc(editDraft)}</textarea><div class="sug-edit-row"><button class="sug-btn" data-act="salvar" data-id="${i.id}" type="button">Salvar</button><button class="sug-btn ghost" data-act="cancelar" type="button">Cancelar</button></div>`;
+    else if (respondendo) corpo = `<textarea class="sug-text" id="sugReplyText" maxlength="500" placeholder="Digite a resposta do administrador...">${esc(replyDraft)}</textarea><div class="sug-edit-row"><button class="sug-btn" data-act="salvar-resposta" data-id="${i.id}" type="button">Enviar Resposta</button><button class="sug-btn ghost" data-act="cancelar-resposta" type="button">Cancelar</button></div>`;
+    else {
       corpo = `<div class="sug-content">${esc(i.texto)}</div>${respostaHtml}`;
       let botoes = '';
       if (canEditOrDelete) botoes += `<button class="sug-link" data-act="editar" data-id="${i.id}" type="button">Editar</button>`;
       if (isAdmin) botoes += `<button class="sug-link" data-act="responder" data-id="${i.id}" type="button" style="color: var(--teal);">Responder</button>`;
       if (canEditOrDelete) botoes += `<button class="sug-link danger" data-act="excluir" data-id="${i.id}" type="button">Excluir</button>`;
-      if(botoes !== '') corpo += `<div class="sug-actions">${botoes}</div>`;
+      if(botoes) corpo += `<div class="sug-actions">${botoes}</div>`;
     }
-
-    return `
-      <li class="sug ${i.concluida ? 'done' : ''}">
-        <input type="checkbox" class="sug-check" data-act="toggle" data-id="${i.id}" ${i.concluida ? 'checked' : ''} ${!isAdmin ? 'disabled title="Apenas o administrador pode concluir"' : 'title="Marcar como concluída"'}>
-        <div class="sug-body">
-          <div class="sug-meta">
-            <span class="sug-tag t-${t.c}">${esc(t.label)}</span>
-            <span class="sug-date">Por <b>${esc(nomeAutor)}</b> · ${fmtData(i.criadoEm)}${i.editadoEm ? ' (editada)' : ''}</span>
-          </div>
-          ${corpo}
-        </div>
-      </li>`;
+    return `<li class="sug ${i.concluida ? 'done' : ''}"><input type="checkbox" class="sug-check" data-act="toggle" data-id="${i.id}" ${i.concluida ? 'checked' : ''} ${!isAdmin ? 'disabled title="Apenas o administrador pode concluir"' : 'title="Marcar como concluída"'}><div class="sug-body"><div class="sug-meta"><span class="sug-tag t-${t.c}">${esc(t.label)}</span><span class="sug-date">Por <b>${esc(nomeAutor)}</b> · ${fmtData(i.criadoEm)}${i.editadoEm ? ' (editada)' : ''}</span></div>${corpo}</div></li>`;
   }).join("");
 }
 
@@ -787,163 +708,65 @@ $("sugLista").addEventListener("input", (e) => {
 });
 
 $("sugLista").addEventListener("click", async (e) => {
-  const el = e.target.closest("[data-act]");
-  if (!el || !db) return;
-  const act = el.dataset.act, id = el.dataset.id;
-  const ref = id ? fb.doc(db, COLECAO, id) : null;
-  const item = itens.find(i => i.id === id);
-  
+  const el = e.target.closest("[data-act]"); if (!el || !db) return;
+  const act = el.dataset.act, id = el.dataset.id, ref = id ? fb.doc(db, COLECAO, id) : null, item = itens.find(i => i.id === id);
   try {
-    if (act === "toggle") {
-      await fb.updateDoc(ref, { concluida: el.checked });
-    } else if (act === "editar") {
-      editId = id; editDraft = item ? item.texto : "";
-      replyId = null;
-      renderLista();
-    } else if (act === "cancelar") {
-      editId = null; editDraft = ""; renderLista();
-    } else if (act === "salvar") {
-      const texto = editDraft.trim();
-      if (texto.length < 3) { aviso("A sugestão precisa ter pelo menos 3 caracteres."); return; }
-      await fb.updateDoc(ref, { texto, editadoEm: fb.serverTimestamp() });
-      editId = null; editDraft = ""; aviso("");
-    } else if (act === "responder") {
-      replyId = id; replyDraft = item.respostaAdmin || "";
-      editId = null;
-      renderLista();
-    } else if (act === "cancelar-resposta") {
-      replyId = null; replyDraft = ""; renderLista();
-    } else if (act === "salvar-resposta") {
-      const resposta = replyDraft.trim();
-      await fb.updateDoc(ref, { respostaAdmin: resposta, respondidoEm: fb.serverTimestamp() });
-      replyId = null; replyDraft = ""; aviso("");
-    } else if (act === "excluir") {
-      if (!confirm("Excluir esta sugestão?")) return;
-      await fb.deleteDoc(ref);
-    }
-  } catch (err) {
-    aviso("Não foi possível concluir a ação: Sem permissão.");
-    if (act === "toggle") renderLista();
-  }
+    if (act === "toggle") await fb.updateDoc(ref, { concluida: el.checked });
+    else if (act === "editar") { editId = id; editDraft = item ? item.texto : ""; replyId = null; renderLista(); }
+    else if (act === "cancelar") { editId = null; editDraft = ""; renderLista(); }
+    else if (act === "salvar") { const t = editDraft.trim(); if (t.length < 3) return aviso("Mínimo de 3 caracteres."); await fb.updateDoc(ref, { texto: t, editadoEm: fb.serverTimestamp() }); editId = null; editDraft = ""; aviso(""); }
+    else if (act === "responder") { replyId = id; replyDraft = item.respostaAdmin || ""; editId = null; renderLista(); }
+    else if (act === "cancelar-resposta") { replyId = null; replyDraft = ""; renderLista(); }
+    else if (act === "salvar-resposta") { await fb.updateDoc(ref, { respostaAdmin: replyDraft.trim(), respondidoEm: fb.serverTimestamp() }); replyId = null; replyDraft = ""; aviso(""); }
+    else if (act === "excluir" && confirm("Excluir esta sugestão?")) await fb.deleteDoc(ref);
+  } catch (err) { aviso("Sem permissão."); if (act === "toggle") renderLista(); }
 });
 
-
-// ---------- Lógica do Mural de Avisos (Modal) ----------
 function validarMuralForm(){
-  const ta = $("muralTexto");
-  const n = ta.value.trim().length;
-  $("muralCounter").textContent = `${n} / 600`;
-  $("muralEnviar").disabled = n < 3;
+  const n = $("muralTexto").value.trim().length;
+  $("muralCounter").textContent = `${n} / 600`; $("muralEnviar").disabled = n < 3;
 }
 $("muralTexto").addEventListener("input", validarMuralForm);
-
 $("muralEnviar").addEventListener("click", async () => {
-  const texto = $("muralTexto").value.trim();
-  if (!db || texto.length < 3) return;
+  const texto = $("muralTexto").value.trim(); if (!db || texto.length < 3) return;
   $("muralEnviar").disabled = true;
-
   try {
     if (muralEditId) {
-      // Atualizar aviso existente
-      await fb.updateDoc(fb.doc(db, COLECAO_MURAL, muralEditId), {
-        texto,
-        editadoEm: fb.serverTimestamp()
-      });
-      muralEditId = null;
-      $("muralFormTituloLabel").textContent = "Novo Comunicado";
-      $("muralEnviar").textContent = "Publicar Aviso";
-      $("muralCancelarEdicao").style.display = "none";
-    } else {
-      // Criar novo aviso com data de lançamento
-      await fb.addDoc(fb.collection(db, COLECAO_MURAL), {
-        texto,
-        criadoEm: fb.serverTimestamp()
-      });
-    }
-    $("muralTexto").value = "";
-    muralAviso("");
-  } catch (err) {
-    muralAviso("Erro ao salvar aviso: " + err.message);
-  }
+      await fb.updateDoc(fb.doc(db, COLECAO_MURAL, muralEditId), { texto, editadoEm: fb.serverTimestamp() });
+      muralEditId = null; $("muralFormTituloLabel").textContent = "Novo Comunicado"; $("muralEnviar").textContent = "Publicar Aviso"; $("muralCancelarEdicao").style.display = "none";
+    } else await fb.addDoc(fb.collection(db, COLECAO_MURAL), { texto, criadoEm: fb.serverTimestamp() });
+    $("muralTexto").value = ""; muralAviso("");
+  } catch (err) { muralAviso("Erro ao salvar: " + err.message); }
   validarMuralForm();
 });
 
 $("muralCancelarEdicao").addEventListener("click", () => {
-  muralEditId = null;
-  $("muralTexto").value = "";
-  $("muralFormTituloLabel").textContent = "Novo Comunicado";
-  $("muralEnviar").textContent = "Publicar Aviso";
-  $("muralCancelarEdicao").style.display = "none";
-  validarMuralForm();
+  muralEditId = null; $("muralTexto").value = ""; $("muralFormTituloLabel").textContent = "Novo Comunicado";
+  $("muralEnviar").textContent = "Publicar Aviso"; $("muralCancelarEdicao").style.display = "none"; validarMuralForm();
 });
 
 function renderMuralLista(){
   const isAdmin = currentUser && currentUser.email === ADMIN_EMAIL;
-  
-  // Mostrar formulário apenas para o admin
-  $("muralFormWrap").style.display = isAdmin ? "block" : "none";
-  
-  // Atualizar contador no botão do cabeçalho
-  setCount($("muralCount"), avisosMural.length);
-
-  if (!avisosMural.length) {
-    $("muralLista").innerHTML = `<li class="sug-empty">Nenhum aviso publicado no momento. 📢</li>`;
-    return;
-  }
-
+  $("muralFormWrap").style.display = isAdmin ? "block" : "none"; setCount($("muralCount"), avisosMural.length);
+  if (!avisosMural.length) { $("muralLista").innerHTML = `<li class="sug-empty">Nenhum aviso publicado no momento. 📢</li>`; return; }
   $("muralLista").innerHTML = avisosMural.map(a => {
-    let botoesAdmin = '';
-    if (isAdmin) {
-      botoesAdmin = `
-        <div class="sug-actions">
-          <button class="sug-link" data-mural-act="editar" data-id="${a.id}" type="button">Alterar</button>
-          <button class="sug-link danger" data-mural-act="excluir" data-id="${a.id}" type="button">Excluir</button>
-        </div>
-      `;
-    }
-
-    return `
-      <li class="sug" style="background: var(--paper);">
-        <div class="sug-body">
-          <div class="sug-meta">
-            <span class="sug-tag t-amber">COMUNICADO OFICIAL</span>
-            <span class="sug-date">Lançado em: <b>${fmtData(a.criadoEm)}</b> ${a.editadoEm ? '(editado)' : ''}</span>
-          </div>
-          <div class="sug-content">${esc(a.texto)}</div>
-          ${botoesAdmin}
-        </div>
-      </li>
-    `;
+    let botoesAdmin = isAdmin ? `<div class="sug-actions"><button class="sug-link" data-mural-act="editar" data-id="${a.id}" type="button">Alterar</button><button class="sug-link danger" data-mural-act="excluir" data-id="${a.id}" type="button">Excluir</button></div>` : '';
+    return `<li class="sug" style="background: var(--paper);"><div class="sug-body"><div class="sug-meta"><span class="sug-tag t-amber">COMUNICADO OFICIAL</span><span class="sug-date">Lançado em: <b>${fmtData(a.criadoEm)}</b> ${a.editadoEm ? '(editado)' : ''}</span></div><div class="sug-content">${esc(a.texto)}</div>${botoesAdmin}</div></li>`;
   }).join("");
 }
 
 $("muralLista").addEventListener("click", async (e) => {
-  const el = e.target.closest("[data-mural-act]");
-  if (!el || !db) return;
-  const act = el.dataset.muralAct;
-  const id = el.dataset.id;
-  const avisoItem = avisosMural.find(a => a.id === id);
-
+  const el = e.target.closest("[data-mural-act]"); if (!el || !db) return;
+  const act = el.dataset.muralAct, id = el.dataset.id, avisoItem = avisosMural.find(a => a.id === id);
   try {
     if (act === "editar" && avisoItem) {
-      muralEditId = id;
-      $("muralTexto").value = avisoItem.texto;
-      $("muralFormTituloLabel").textContent = "Alterar Comunicado";
-      $("muralEnviar").textContent = "Guardar Alterações";
-      $("muralCancelarEdicao").style.display = "inline-block";
-      validarMuralForm();
-      $("muralTexto").focus();
-    } else if (act === "excluir") {
-      if (!confirm("Tem certeza que deseja excluir este aviso do mural?")) return;
-      await fb.deleteDoc(fb.doc(db, COLECAO_MURAL, id));
-    }
-  } catch (err) {
-    muralAviso("Erro ao executar ação: " + err.message);
-  }
+      muralEditId = id; $("muralTexto").value = avisoItem.texto; $("muralFormTituloLabel").textContent = "Alterar Comunicado";
+      $("muralEnviar").textContent = "Guardar Alterações"; $("muralCancelarEdicao").style.display = "inline-block";
+      validarMuralForm(); $("muralTexto").focus();
+    } else if (act === "excluir" && confirm("Excluir este aviso do mural?")) await fb.deleteDoc(fb.doc(db, COLECAO_MURAL, id));
+  } catch (err) { muralAviso("Erro ao executar ação: " + err.message); }
 });
 
-
-// ---------- Firebase Inicialização e Autenticação ----------
 async function conectar(){
   try {
     const [appModule, storeModule, authModule] = await Promise.all([
@@ -951,63 +774,275 @@ async function conectar(){
       import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js"),
       import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js")
     ]);
-    
-    fb = storeModule;
-    const app = appModule.initializeApp(FIREBASE_CONFIG);
-    db = storeModule.getFirestore(app);
-    authInstance = authModule.getAuth(app);
-    authProvider = new authModule.GoogleAuthProvider();
+    fb = storeModule; const app = appModule.initializeApp(FIREBASE_CONFIG);
+    db = storeModule.getFirestore(app); authInstance = authModule.getAuth(app); authProvider = new authModule.GoogleAuthProvider();
 
     authModule.onAuthStateChanged(authInstance, (user) => {
       currentUser = user;
-      
-      if (user) {
-        $("btnLogin").style.display = "none";
-        $("userBadge").style.display = "flex";
-        $("userEmailTxt").textContent = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
-      } else {
-        $("btnLogin").style.display = "inline-flex";
-        $("userBadge").style.display = "none";
-        $("userEmailTxt").textContent = "";
-      }
-      
-      renderChips();
-      validarForm();
-      renderLista();
-      renderMuralLista();
+      if (user) { $("btnLogin").style.display = "none"; $("userBadge").style.display = "flex"; $("userEmailTxt").textContent = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0]; }
+      else { $("btnLogin").style.display = "inline-flex"; $("userBadge").style.display = "none"; $("userEmailTxt").textContent = ""; }
+      renderChips(); validarForm(); renderLista(); renderMuralLista();
     });
-
-    $("btnLogin").addEventListener("click", async () => {
-      try { await authModule.signInWithPopup(authInstance, authProvider); } 
-      catch (err) { alert("Erro ao fazer login: " + err.message); }
-    });
-
-    $("btnLogout").addEventListener("click", () => {
-      authModule.signOut(authInstance);
-    });
-
-    // Listener de Sugestões
-    const q = storeModule.query(storeModule.collection(db, COLECAO), storeModule.orderBy("criadoEm", "desc"));
-    storeModule.onSnapshot(q, (snap) => {
-      itens = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
-      aviso("");
-      renderLista();
-    }, (err) => aviso("Não foi possível ler as sugestões: " + err.message));
-
-    // Listener do Mural de Avisos (múltiplos avisos ordenados por data)
-    const qMural = storeModule.query(storeModule.collection(db, COLECAO_MURAL), storeModule.orderBy("criadoEm", "desc"));
-    storeModule.onSnapshot(qMural, (snap) => {
-      avisosMural = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) }));
-      muralAviso("");
-      renderMuralLista();
-    }, (err) => muralAviso("Não foi possível carregar o mural: " + err.message));
-
-  } catch (err) {
-    aviso("Não foi possível carregar o Firebase: " + err.message);
-  }
+    $("btnLogin").addEventListener("click", async () => { try { await authModule.signInWithPopup(authInstance, authProvider); } catch (err) { alert("Erro ao fazer login: " + err.message); }});
+    $("btnLogout").addEventListener("click", () => { authModule.signOut(authInstance); });
+    
+    // Listeners do Firestore (Sugestões e Mural)
+    storeModule.onSnapshot(storeModule.query(storeModule.collection(db, COLECAO), storeModule.orderBy("criadoEm", "desc")), (snap) => {
+      itens = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) })); aviso(""); renderLista();
+    }, (err) => aviso("Erro: " + err.message));
+    
+    storeModule.onSnapshot(storeModule.query(storeModule.collection(db, COLECAO_MURAL), storeModule.orderBy("criadoEm", "desc")), (snap) => {
+      avisosMural = snap.docs.map(d => ({ id: d.id, ...d.data({ serverTimestamps: "estimate" }) })); muralAviso(""); renderMuralLista();
+    }, (err) => muralAviso("Erro: " + err.message));
+  } catch (err) {}
 }
-
 conectar();
+</script>
+
+<script>
+(function(){
+  const grid = document.getElementById('grid');
+  let cards = [...grid.children];
+  const empty = document.getElementById('empty');
+  const hero = document.getElementById('heroSearch'), sortSel = document.getElementById('sortSel');
+  
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+  const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  
+  const ICON_LIB = {
+    folder: '<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>',
+    settings: '<circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>',
+    trending: '<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline>',
+    activity: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>',
+    cpu: '<rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line>',
+    image: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline>',
+    star: '<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>',
+    layout: '<rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line>',
+    zap: '<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>',
+    tag: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>',
+    box: '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line>',
+    heart: '<path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>'
+  };
+
+  let storedCats = JSON.parse(localStorage.getItem('hubCategories'));
+  if (!storedCats || storedCats.length === 0) {
+    storedCats = [
+      { id: 'Operacional', label: 'Operacional', icon: 'settings' },
+      { id: 'Marketing', label: 'Marketing', icon: 'trending' },
+      { id: 'Analytics', label: 'Analytics', icon: 'activity' },
+      { id: 'IA', label: 'IA', icon: 'cpu' },
+      { id: 'Mídia', label: 'Mídia', icon: 'image' }
+    ];
+  } else {
+    storedCats = storedCats.map(c => typeof c === 'string' ? { id: c, label: c, icon: 'folder' } : c);
+  }
+  let customCats = storedCats;
+
+  const savedOrder = JSON.parse(localStorage.getItem('hubToolOrder')) || [];
+  let toolCats = JSON.parse(localStorage.getItem('hubToolCats')) || {};
+
+  if (savedOrder.length > 0) {
+    savedOrder.forEach(id => {
+      const cardToAppend = cards.find(c => c.dataset.id === id);
+      if (cardToAppend) grid.appendChild(cardToAppend);
+    });
+    cards = [...grid.children];
+  }
+
+  cards.forEach(c => {
+    const savedCat = toolCats[c.dataset.id];
+    if (savedCat) {
+      c.dataset.cat = savedCat;
+      const tagElement = c.querySelector('.tag');
+      if(tagElement) tagElement.textContent = savedCat;
+    }
+  });
+
+  const updateDatasetIndices = () => { [...grid.children].forEach((c, i) => { c.dataset.i = i; c.dataset.txt = norm(c.textContent+' '+c.dataset.cat); }); };
+  updateDatasetIndices();
+
+  let cat = 'Todas', q = '';
+
+  function renderChipsUI() {
+    const chipContainer = document.getElementById('chipContainer');
+    let html = `<button class="chip ${cat === 'Todas' ? 'active' : ''}" type="button" data-cat="Todas">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M17.5 14v7M14 17.5h7"/></svg>
+      Todas<span class="n">${cards.length}</span></button>`;
+      
+    customCats.forEach(c => {
+      const iconHtml = `<svg viewBox="0 0 24 24">${ICON_LIB[c.icon] || ICON_LIB['folder']}</svg>`;
+      html += `<button class="chip ${cat === c.id ? 'active' : ''}" type="button" data-cat="${c.id}">
+        ${iconHtml}${esc(c.label)}
+        <span class="del-cat" data-del="${c.id}" title="Excluir categoria">✕</span>
+      </button>`;
+    });
+    
+    chipContainer.innerHTML = html;
+    setupChipListeners();
+  }
+
+  function setupChipListeners() {
+    document.querySelectorAll('.chip').forEach(b => {
+      b.addEventListener('click', (e) => {
+        if(e.target.classList.contains('del-cat')){
+          const cToRemove = e.target.dataset.del;
+          if(confirm(`Tem certeza que quer remover a categoria "${cToRemove}"?\n\nAs ferramentas voltarão para a primeira categoria disponível.`)){
+            customCats = customCats.filter(x => x.id !== cToRemove);
+            const fallbackCat = customCats.length > 0 ? customCats[0].id : 'Geral';
+            if(customCats.length === 0) customCats.push({ id: fallbackCat, label: fallbackCat, icon: 'folder' });
+            
+            localStorage.setItem('hubCategories', JSON.stringify(customCats));
+            cards.forEach(card => {
+              if(card.dataset.cat === cToRemove) {
+                card.dataset.cat = fallbackCat;
+                card.querySelector('.tag').textContent = fallbackCat;
+                toolCats[card.dataset.id] = fallbackCat;
+              }
+            });
+            localStorage.setItem('hubToolCats', JSON.stringify(toolCats));
+            if(cat === cToRemove) cat = 'Todas';
+            updateDatasetIndices(); renderChipsUI(); apply();
+          }
+          e.stopPropagation(); return;
+        }
+        document.querySelectorAll('.chip').forEach(x => x.classList.remove('active')); 
+        b.classList.add('active'); cat = b.dataset.cat; apply(); 
+      });
+
+      if(b.dataset.cat !== 'Todas') {
+        b.addEventListener('dragover', e => { e.preventDefault(); b.classList.add('drag-over-chip'); });
+        b.addEventListener('dragleave', e => { b.classList.remove('drag-over-chip'); });
+        b.addEventListener('drop', e => {
+          e.preventDefault(); b.classList.remove('drag-over-chip');
+          if(draggedItem) {
+            const newCat = b.dataset.cat;
+            draggedItem.dataset.cat = newCat;
+            draggedItem.querySelector('.tag').textContent = newCat;
+            toolCats[draggedItem.dataset.id] = newCat;
+            localStorage.setItem('hubToolCats', JSON.stringify(toolCats));
+            updateDatasetIndices(); renderChipsUI(); apply();
+          }
+        });
+      }
+    });
+  }
+
+  const modalNome = document.getElementById('novaCatNome');
+  const modalIcones = document.getElementById('novaCatIcones');
+  const btnSalvarCat = document.getElementById('novaCatSalvar');
+  let selectedIconKey = 'folder';
+
+  modalIcones.innerHTML = Object.keys(ICON_LIB).map(key => 
+    `<div class="icon-opt ${key === 'folder' ? 'selected' : ''}" data-icon="${key}" title="${key}">
+      <svg viewBox="0 0 24 24">${ICON_LIB[key]}</svg>
+    </div>`
+  ).join('');
+
+  modalIcones.addEventListener('click', e => {
+    const opt = e.target.closest('.icon-opt');
+    if(opt) {
+      modalIcones.querySelectorAll('.icon-opt').forEach(x => x.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedIconKey = opt.dataset.icon;
+    }
+  });
+
+  modalNome.addEventListener('input', () => { btnSalvarCat.disabled = modalNome.value.trim().length === 0; });
+
+  btnSalvarCat.addEventListener('click', () => {
+    const label = modalNome.value.trim();
+    if(label.length > 0) {
+      const id = label;
+      if(!customCats.find(c => c.id.toLowerCase() === id.toLowerCase())) {
+        customCats.push({ id, label, icon: selectedIconKey });
+        localStorage.setItem('hubCategories', JSON.stringify(customCats));
+        renderChipsUI();
+        document.getElementById('novaCatClose').click();
+        
+        modalNome.value = ''; btnSalvarCat.disabled = true;
+        modalIcones.querySelectorAll('.icon-opt').forEach(x => x.classList.remove('selected'));
+        modalIcones.querySelector('[data-icon="folder"]').classList.add('selected');
+        selectedIconKey = 'folder';
+      } else { alert("Já existe uma categoria com este nome."); }
+    }
+  });
+
+  renderChipsUI();
+
+  let draggedItem = null;
+  let isDraggingState = false;
+
+  grid.addEventListener('dragstart', (e) => {
+    const card = e.target.closest('.card-link');
+    if (!card) return;
+    draggedItem = card; isDraggingState = true;
+    e.dataTransfer.effectAllowed = 'move';
+    setTimeout(() => card.classList.add('dragging'), 0);
+  });
+
+  grid.addEventListener('dragenter', (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.card-link');
+    if (target && target !== draggedItem) {
+      const allItems = [...grid.querySelectorAll('.card-link:not([hidden])')];
+      const draggedIdx = allItems.indexOf(draggedItem);
+      const targetIdx = allItems.indexOf(target);
+      if (draggedIdx < targetIdx) target.after(draggedItem);
+      else target.before(draggedItem);
+    }
+  });
+
+  grid.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = "move";});
+
+  grid.addEventListener('dragend', (e) => {
+    const card = e.target.closest('.card-link');
+    if (card) {
+      card.classList.remove('dragging');
+      card.classList.remove('pop-card');
+      void card.offsetWidth; 
+      card.classList.add('pop-card');
+    }
+    draggedItem = null; setTimeout(() => { isDraggingState = false; }, 50);
+    cards = [...grid.querySelectorAll('.card-link')]; 
+    const newOrder = cards.map(c => c.dataset.id);
+    localStorage.setItem('hubToolOrder', JSON.stringify(newOrder));
+    updateDatasetIndices();
+  });
+
+  grid.querySelectorAll('.card-link').forEach(card => {
+    card.addEventListener('click', e => { if (isDraggingState) { e.preventDefault(); e.stopPropagation(); } });
+  });
+
+  function apply(){
+    const nq = norm(q.trim()); let vis = 0;
+    const score = c => { const t = norm(c.querySelector('.card-title').textContent); return !nq ? 0 : t.startsWith(nq) ? 0 : t.includes(nq) ? 1 : 2; };
+    const list = cards.slice().sort((a,b) => sortSel.value === 'az' ? a.querySelector('.card-title').textContent.localeCompare(b.querySelector('.card-title').textContent,'pt-BR') : (score(a)-score(b)) || (a.dataset.i - b.dataset.i));
+    
+    let indexAnim = 0;
+    list.forEach(c => {
+      const ok = (cat === 'Todas' || c.dataset.cat === cat) && (!nq || c.dataset.txt.includes(nq));
+      c.hidden = !ok; 
+      c.style.display = ok ? 'block' : 'none';
+
+      if(ok) { 
+        vis++; 
+        c.style.animationDelay = `${indexAnim * 0.04}s`;
+        c.classList.remove('pop-card'); void c.offsetWidth; c.classList.add('pop-card');
+        indexAnim++;
+      }
+      grid.appendChild(c); 
+    });
+    empty.style.display = vis ? 'none' : 'block';
+  }
+  
+  hero.addEventListener('input', () => { q = hero.value; apply(); });
+  sortSel.addEventListener('change', apply);
+  document.addEventListener('keydown', e => { if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){ e.preventDefault(); hero.focus(); hero.select(); } });
+  document.querySelectorAll('.nav-item[aria-disabled="true"]').forEach(a => a.addEventListener('click', e => e.preventDefault()));
+  
+  const nameEl = document.getElementById('userEmailTxt'), av = document.getElementById('userAvatar');
+  new MutationObserver(() => { av.textContent = (nameEl.textContent||'').trim().slice(0,2).toUpperCase(); }).observe(nameEl, { childList:true, characterData:true, subtree:true });
+})();
 </script>
 </body>
 </html>
