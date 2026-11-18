@@ -431,7 +431,7 @@
             right: 24px;
             width: 420px;
             max-width: calc(100vw - 32px);
-            height: 580px;
+            height: 590px;
             max-height: calc(100vh - 110px);
             background: var(--bg-surface);
             border: 1px solid var(--border);
@@ -497,7 +497,7 @@
             background: rgba(255, 255, 255, 0.28);
         }
 
-        /* Painel de Configuração da Chave */
+        /* Painel de Configuração da Chave + Tutorial */
         .ai-key-panel {
             padding: 12px 14px;
             background: var(--primary-light);
@@ -506,16 +506,59 @@
             display: none;
             flex-direction: column;
             gap: 8px;
+            max-height: 295px;
+            overflow-y: auto;
         }
         .ai-key-panel.visible {
             display: flex;
         }
+        .ai-key-panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .ai-key-status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+        }
+        .ai-tutorial-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            color: var(--text-main);
+            line-height: 1.45;
+        }
+        .ai-tutorial-box ol {
+            padding-left: 18px;
+            margin: 6px 0;
+        }
+        .ai-tutorial-box li {
+            margin-bottom: 4px;
+        }
+        .ai-tutorial-link {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        .ai-tutorial-link:hover {
+            filter: brightness(1.15);
+        }
         .ai-key-row {
             display: flex;
             gap: 6px;
+            flex-wrap: wrap;
         }
         .ai-key-row input {
             flex: 1;
+            min-width: 160px;
             padding: 7px 10px;
             border-radius: 6px;
             border: 1px solid var(--border);
@@ -678,6 +721,11 @@
             border-radius: 4px;
             font-size: 11.5px;
             font-family: monospace;
+        }
+        .ai-msg.bot a {
+            color: var(--primary);
+            font-weight: 700;
+            text-decoration: underline;
         }
         .ai-action-pill {
             margin-top: 8px;
@@ -878,7 +926,7 @@
                 bottom: 72px;
                 width: auto;
                 max-width: none;
-                height: 72vh;
+                height: 75vh;
             }
         }
     </style>
@@ -1145,25 +1193,40 @@
                 <div class="ai-chat-avatar">✨</div>
                 <div>
                     <div style="font-size: 14px; font-weight: 700;">Copiloto de Catálogo</div>
-                    <div style="font-size: 11px; opacity: 0.85;">IA Ativa para Equipe</div>
+                    <div style="font-size: 11px; opacity: 0.85;" id="aiHeaderSubtitle">Configure sua chave API em ⚙️</div>
                 </div>
             </div>
             <div class="ai-chat-header-actions">
-                <button class="ai-header-btn" onclick="togglePainelChaveIA()" title="Configurar Chave da API (Opcional)">⚙️</button>
+                <button class="ai-header-btn" onclick="togglePainelChaveIA()" title="Tutorial e Configuração da Chave API">⚙️</button>
                 <button class="ai-header-btn" onclick="limparHistoricoChatIA()" title="Limpar Conversa">🗑️</button>
                 <button class="ai-header-btn" onclick="toggleChatIA()" title="Fechar Chat">✕</button>
             </div>
         </div>
 
-        <!-- PAINEL OPCIONAL DE CONFIGURAÇÃO DE CHAVE -->
+        <!-- PAINEL DE TUTORIAL + CONFIGURAÇÃO DE CHAVE (SALVA APENAS NO NAVEGADOR) -->
         <div class="ai-key-panel" id="aiKeyPanel">
-            <div style="font-weight: 700; color: var(--primary);">🔑 Chave da API Gemini</div>
-            <div style="color: var(--text-muted); line-height: 1.4;">
-                A chave padrão da equipe já está configurada. Só preencha abaixo se quiser substituir temporariamente neste navegador:
+            <div class="ai-key-panel-header">
+                <div style="font-weight: 700; color: var(--primary);">🔑 Chave da API Gemini</div>
+                <span class="ai-key-status-badge" id="aiKeyStatusBadge">⚠️ Não configurada</span>
             </div>
+
+            <div class="ai-tutorial-box">
+                <div style="font-weight: 700; margin-bottom: 4px;">📖 Como gerar sua chave gratuita (passo a passo):</div>
+                <ol>
+                    <li>Acesse o <a class="ai-tutorial-link" href="https://aistudio.google.com/apikey" target="_blank" rel="noopener noreferrer">Google AI Studio (Gerar Chave API) ↗</a> e entre com sua conta Google.</li>
+                    <li>Clique no botão <strong>"Create API key"</strong> (Criar chave de API).</li>
+                    <li>Escolha um projeto ou clique em <strong>"Create API key in new project"</strong>.</li>
+                    <li>Copie o código gerado (começa com <code>AIza...</code>), cole abaixo e clique em <strong>Salvar</strong>.</li>
+                </ol>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                    🔒 Sua chave fica salva apenas neste navegador (<code>localStorage</code>) e nunca é enviada ao GitHub.
+                </div>
+            </div>
+
             <div class="ai-key-row">
-                <input type="password" id="inputGeminiKey" placeholder="Deixe vazio para usar a chave padrão">
-                <button class="btn-sync" style="padding: 7px 12px; font-size: 12px;" onclick="salvarChaveGemini()">Salvar</button>
+                <input type="password" id="inputGeminiKey" placeholder="Cole sua chave AIza... aqui" onkeyup="if(event.key==='Enter') salvarChaveGemini()">
+                <button type="button" class="btn-sync" style="padding: 7px 12px; font-size: 12px;" onclick="salvarChaveGemini()">Salvar</button>
+                <button type="button" class="btn-outline" id="btnRemoverChave" style="padding: 7px 10px; font-size: 12px; display: none;" onclick="removerChaveGemini()" title="Remover chave salva">Remover</button>
             </div>
         </div>
 
@@ -1175,6 +1238,7 @@
                 <button class="ai-chip" onclick="abrirFiltroCatalogoIA()">🎛️ Filtrar Catálogo</button>
                 <button class="ai-chip" onclick="preencherExemploFiltroIA('Filtra no Anymarket apenas os itens que ainda não foram concluídos ordenados pelo maior estoque')">📋 Pendentes Anymarket</button>
                 <button class="ai-chip" onclick="limparFiltrosCatalogoPeloChat()">🔄 Limpar filtros</button>
+                <button class="ai-chip" onclick="togglePainelChaveIA(true)">🔑 Gerar / Trocar Key</button>
             </div>
             <button type="button" class="ai-chip-nav-btn" onclick="rolarChipsIA(1)" title="Rolar para a direita">›</button>
         </div>
@@ -1191,13 +1255,14 @@
 
     <script>
         // =========================================================
-        // CONFIGURAÇÕES GLOBAIS & CHAVE ÚNICA PARA TODA A EQUIPE
+        // CONFIGURAÇÕES GLOBAIS (SEM CHAVE SECRETA NO REPOSITÓRIO)
         // =========================================================
         const API_URL = "https://script.google.com/macros/s/AKfycbw5LhNN2TcUEp-CHI3lCFHv1IdmDITRcoDY3Km6fZ0W_rd7k_T3DKj8WEulAvXsLAfN5g/exec";
         const DB_NAME = "CatalogoDB";
 
-        // Sua chave configurada para todos usarem automaticamente:
-        const CHAVE_GEMINI_PADRAO = "AQ.Ab8RN6JIH7qOTmL7RoMNBmbPMrOp_0lVFSJn5SWjrvJXxM1upg";
+        // Nenhuma chave fixa no código para evitar bloqueio do GitHub Push Protection.
+        // O usuário insere a própria chave no painel ⚙️ (salva no localStorage do navegador).
+        const CHAVE_GEMINI_PADRAO = "";
         
         // Vars Catálogo
         let dadosGlobais = [], dadosFiltrados = [];
@@ -1213,7 +1278,7 @@
         let pAtualAny = 1; const itensPaginaAny = 50;
         let colunaErroAny = "", chavesAny = [], chaveTituloAny = "", chaveSkuAny = "", chaveCodMktAny = "", chaveEstoqueAny = "";
         let mapaCoresErro = {}; 
-        let ordemEstoqueAny = 0; // 0=normal, 1=maior, -1=menor
+        let ordemEstoqueAny = 0;
         let filtroApenasPendentesAny = false;
         let errosDisponiveisParaEscolha = [];
         const paletaCores = ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#84cc16', '#6366f1', '#10b981'];
@@ -1741,13 +1806,16 @@
             tb.innerHTML = "";
             am.forEach(d => {
                 let lbl = d.status==='sim'?'Sim':d.status==='nao'?'Não':'S/I';
-                let linkBtn = d.link && d.link.startsWith('http') ? `<a href="${d.link}" target="_blank" class="btn-link">🔗 Ver Anúncio</a>` : `<span class="badge vazio">Sem link</span>`;
+                let linkLimpo = (d.link || '').trim();
+                let linkBtn = /^https?:\/\//i.test(linkLimpo)
+                    ? `<a href="${escapeAttr(linkLimpo)}" target="_blank" rel="noopener noreferrer" class="btn-link">🔗 Ver Anúncio</a>`
+                    : `<span class="badge vazio">Sem link</span>`;
                 
                 tb.innerHTML += `<tr>
-                    <td style="color:var(--text-muted); font-size:11px;">${d.canal}</td>
-                    <td class="text-center" style="font-weight:600; color:var(--primary);">${d.curva}</td>
-                    <td class="text-center">${d.sku}</td>
-                    <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${d.desc.replace(/"/g, '&quot;')}">${d.desc}</td>
+                    <td style="color:var(--text-muted); font-size:11px;">${escapeAttr(d.canal)}</td>
+                    <td class="text-center" style="font-weight:600; color:var(--primary);">${escapeAttr(d.curva)}</td>
+                    <td class="text-center">${escapeAttr(d.sku)}</td>
+                    <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${escapeAttr(d.desc)}">${escapeAttr(d.desc)}</td>
                     <td class="text-center">${d.estoque}</td>
                     <td class="text-center"><span class="badge ${d.status}">${lbl}</span></td>
                     <td class="text-center">${linkBtn}</td>
@@ -1822,7 +1890,6 @@
             badge.innerText = `✓ ${feitos} / ${total} concluídos`;
         }
 
-        // Checklist individual com LocalStorage
         function toggleFeito(id, status) {
             let row = dadosAny.find(r => r._id === id);
             if(row) {
@@ -1867,7 +1934,6 @@
             }
         }
 
-        // MARCAR / DESMARCAR TODOS OS ITENS FILTRADOS
         function marcarTodosFiltradosAny(status, elCheckbox) {
             if (listaRenderAny.length === 0) {
                 elCheckbox.checked = false;
@@ -1941,7 +2007,6 @@
 
                     chavesAny = Object.keys(jsonArr[0]).filter(k => !k.startsWith('_'));
                     
-                    // Identificação inteligente das colunas da planilha Anymarket
                     colunaErroAny = chavesAny.find(k => /erro|motivo|mensagem|falha/i.test(k)) || chavesAny[chavesAny.length - 1];
                     chaveEstoqueAny = chavesAny.find(k => k !== colunaErroAny && /estoque|qtd|quantidade/i.test(k)) || "";
                     
@@ -2000,7 +2065,6 @@
                         options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{position:'right'}} }
                     });
 
-                    // Construção do Multi-Select Customizado
                     let containerLista = document.getElementById('listaErrosAny');
                     containerLista.innerHTML = '';
                     sortErr.forEach(err => {
@@ -2043,7 +2107,6 @@
             }
         }
 
-        // ORDENAÇÃO DE ESTOQUE NO ANYMARKET (MAIOR / MENOR)
         function ordenarEstoqueAny(forcarOrdem = null) {
             if (forcarOrdem !== null) {
                 ordemEstoqueAny = forcarOrdem;
@@ -2189,7 +2252,7 @@
         }
 
         /* =========================================================
-           LÓGICA DO ASSISTENTE IA + MODERAÇÃO + SELETORES
+           LÓGICA DO ASSISTENTE IA + TUTORIAL CHAVE + MODERAÇÃO
            ========================================================= */
         let historicoChatIA = [];
         let chatOcupado = false;
@@ -2280,15 +2343,38 @@
             return custom || (typeof CHAVE_GEMINI_PADRAO !== 'undefined' ? CHAVE_GEMINI_PADRAO.trim() : '');
         }
 
-        function inicializarChatIA() {
-            let chaveCustom = (localStorage.getItem('geminiApiKeyCatalogo') || '').trim();
-            if (chaveCustom === 'AQ.Ab8RN6JokjkcMRQJ-oxSynKRQrIxIIxYES84xJlOvFaO1DF7xg') {
-                localStorage.removeItem('geminiApiKeyCatalogo');
-                chaveCustom = '';
-            }
+        function atualizarStatusChaveUI() {
+            const chave = obterChaveGeminiAtiva();
+            const badge = document.getElementById('aiKeyStatusBadge');
+            const subtitle = document.getElementById('aiHeaderSubtitle');
+            const btnRemover = document.getElementById('btnRemoverChave');
 
+            if (chave) {
+                const finalMascarado = chave.length > 8 ? `...${chave.slice(-4)}` : 'ativa';
+                if (badge) {
+                    badge.innerText = `✅ Chave ativa (${finalMascarado})`;
+                    badge.style.color = 'var(--primary)';
+                    badge.style.borderColor = 'var(--primary)';
+                }
+                if (subtitle) subtitle.innerText = 'IA Conectada neste navegador';
+                if (btnRemover) btnRemover.style.display = 'inline-flex';
+            } else {
+                if (badge) {
+                    badge.innerText = '⚠️ Não configurada';
+                    badge.style.color = 'var(--orange)';
+                    badge.style.borderColor = 'var(--orange)';
+                }
+                if (subtitle) subtitle.innerText = 'Configure sua chave API em ⚙️';
+                if (btnRemover) btnRemover.style.display = 'none';
+            }
+        }
+
+        function inicializarChatIA() {
+            const chaveCustom = (localStorage.getItem('geminiApiKeyCatalogo') || '').trim();
             const inputKey = document.getElementById('inputGeminiKey');
             if (inputKey) inputKey.value = chaveCustom;
+
+            atualizarStatusChaveUI();
 
             if (!obterChaveGeminiAtiva()) {
                 document.getElementById('aiKeyPanel').classList.add('visible');
@@ -2320,10 +2406,17 @@
             const box = document.getElementById('aiChatMessages');
             if (!box) return;
             box.innerHTML = '';
+
+            const temChave = Boolean(obterChaveGeminiAtiva());
+            const avisoChave = temChave
+                ? ''
+                : '\n\n🔑 **Primeiro acesso:** Gere sua chave gratuita em [Google AI Studio](https://aistudio.google.com/apikey), cole no campo acima e clique em **Salvar**.';
+
             adicionarBolhaChat('bot',
                 'Olá! Sou seu **Copiloto de Catálogo e Anymarket**.\n\n' +
                 '• Clique em **🛠️ Explicar erros Anymarket** para escolher na lista suspensa qual erro deseja resolver.\n' +
-                '• Clique em **🎛️ Filtrar Catálogo** para escolher Curva, Loja/Canal, Status e Estoque.'
+                '• Clique em **🎛️ Filtrar Catálogo** para escolher Curva, Loja/Canal, Status e Estoque.' +
+                avisoChave
             );
         }
 
@@ -2333,6 +2426,7 @@
             const abrir = forcarAbrir !== null ? forcarAbrir : !win.classList.contains('open');
             win.classList.toggle('open', abrir);
             if (abrir) {
+                atualizarStatusChaveUI();
                 if (!obterChaveGeminiAtiva()) {
                     document.getElementById('aiKeyPanel').classList.add('visible');
                 }
@@ -2342,21 +2436,34 @@
             }
         }
 
-        function togglePainelChaveIA() {
-            document.getElementById('aiKeyPanel').classList.toggle('visible');
+        function togglePainelChaveIA(forcarAbrir = null) {
+            const panel = document.getElementById('aiKeyPanel');
+            if (!panel) return;
+            if (forcarAbrir === true) panel.classList.add('visible');
+            else if (forcarAbrir === false) panel.classList.remove('visible');
+            else panel.classList.toggle('visible');
         }
 
         function salvarChaveGemini() {
             const val = document.getElementById('inputGeminiKey').value.trim();
             if (!val) {
-                localStorage.removeItem('geminiApiKeyCatalogo');
-                document.getElementById('aiKeyPanel').classList.remove('visible');
-                mostrarNotificacao('Usando a chave padrão da equipe.', 'info', 2500);
+                mostrarNotificacao('Cole sua chave API (começa com AIza...) antes de salvar.', 'erro', 3000);
+                document.getElementById('inputGeminiKey').focus();
                 return;
             }
             localStorage.setItem('geminiApiKeyCatalogo', val);
+            atualizarStatusChaveUI();
             document.getElementById('aiKeyPanel').classList.remove('visible');
-            mostrarNotificacao('Chave personalizada salva neste navegador!', 'sucesso', 3000);
+            mostrarNotificacao('Chave Gemini salva neste navegador!', 'sucesso', 3000);
+            adicionarBolhaChat('bot', '✅ **Chave API salva com sucesso!** Agora você já pode pedir explicações de erros ou fazer perguntas no chat.');
+        }
+
+        function removerChaveGemini() {
+            localStorage.removeItem('geminiApiKeyCatalogo');
+            const inputKey = document.getElementById('inputGeminiKey');
+            if (inputKey) inputKey.value = '';
+            atualizarStatusChaveUI();
+            mostrarNotificacao('Chave removida deste navegador.', 'info', 2500);
         }
 
         function limparHistoricoChatIA() {
@@ -2584,7 +2691,6 @@
                 return `<option value="${idx}">(${item.pendentes}/${item.total} pend.) ${escapeAttr(resumoErro)}</option>`;
             }).join('');
 
-            // Sempre cria uma nova bolha no final do chat (nunca rola para a mensagem antiga de cima)
             const box = document.getElementById('aiChatMessages');
             const div = document.createElement('div');
             div.className = 'ai-msg bot';
@@ -2647,6 +2753,8 @@
             let safe = escapeAttr(texto);
             safe = safe.replace(/`([^`]+)`/g, '<code>$1</code>');
             safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            safe = safe.replace(/\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1 ↗</a>');
+
             const linhas = safe.split('\n');
             let html = '';
             let emLista = false;
@@ -2792,7 +2900,7 @@
                     ultimoErro = err;
                     const msg = String(err.message || '');
                     if (msg.includes('API key not valid') || msg.includes('API_KEY_INVALID')) {
-                        throw new Error('Chave de API inválida. Clique na engrenagem ⚙️ acima para atualizar a chave.');
+                        throw new Error('Chave de API inválida. Gere uma nova em [Google AI Studio](https://aistudio.google.com/apikey) e atualize no painel ⚙️ acima.');
                     }
                 }
             }
@@ -2913,7 +3021,12 @@
             const apiKey = obterChaveGeminiAtiva();
             if (!apiKey) {
                 document.getElementById('aiKeyPanel').classList.add('visible');
-                adicionarBolhaChat('bot', 'Nenhuma chave de API configurada. Cole sua chave no painel acima (⚙️) e clique em **Salvar**.');
+                adicionarBolhaChat(
+                    'bot',
+                    '🔑 **Chave API necessária:** Siga o tutorial no painel acima:\n' +
+                    '1. Gere sua chave gratuita em [Google AI Studio](https://aistudio.google.com/apikey).\n' +
+                    '2. Cole a chave no campo acima e clique em **Salvar**.'
+                );
                 return;
             }
 
