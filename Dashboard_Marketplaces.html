@@ -34,16 +34,16 @@
         [data-theme="dark"] {
             --bg-body: #0f172a; --bg-surface: #1e293b; --border: #334155;
             --text-main: #f8fafc; --text-muted: #94a3b8;
-            --primary-dark: #ccfbf1; --primary: #14b8a6; --primary-light: rgba(20, 184, 166, 0.1);
+            --primary-dark: #ccfbf1; --primary: #14b8a6; --primary-light: rgba(20, 184, 166, 0.14);
             --orange: #f59e0b; --danger: #ef4444; --gray-light: #334155;
             --badge-bg: #334155; --chart-text: #cbd5e1;
             --orange-light: rgba(245, 158, 11, 0.15);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s, border-color 0.3s; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; transition: background-color 0.25s, color 0.25s, border-color 0.25s; }
         body { background-color: var(--bg-body); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
-        /* NOTIFICAÇÕES TOAST BONITAS */
+        /* NOTIFICAÇÕES TOAST */
         #toastContainer {
             position: fixed;
             top: 20px;
@@ -79,75 +79,48 @@
         .toast.sucesso { border-left-color: #10b981; }
         .toast.erro { border-left-color: #ef4444; }
 
-        @keyframes toastIn { 
-            from { opacity: 0; transform: translateY(-20px) scale(0.95); } 
-            to { opacity: 1; transform: translateY(0) scale(1); } 
-        }
-        @keyframes toastOut { 
-            from { opacity: 1; transform: translateY(0) scale(1); } 
-            to { opacity: 0; transform: translateY(-20px) scale(0.95); } 
-        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes toastOut { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-20px) scale(0.95); } }
 
-        /* SIDEBAR */
-        .sidebar { width: 260px; background-color: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; z-index: 20; }
+        /* SIDEBAR & OVERLAY MOBILE */
+        .sidebar { width: 260px; flex-shrink: 0; background-color: var(--bg-surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; justify-content: space-between; padding: 24px 0; z-index: 200; transition: transform 0.3s ease; }
+        .sidebar-header-mobile { display: none; justify-content: space-between; align-items: center; padding: 0 20px 16px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
         .sidebar-title { font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 24px 12px; }
         .nav-item { padding: 12px 24px; display: flex; align-items: center; gap: 12px; color: var(--text-muted); font-size: 14px; font-weight: 500; cursor: pointer; border-left: 3px solid transparent; }
         .nav-item:hover { background-color: var(--gray-light); color: var(--text-main); }
         .nav-item.active { background-color: var(--primary-light); color: var(--primary); border-left-color: var(--primary); font-weight: 600; }
         
-        .theme-toggle { margin: 0 24px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(2px); z-index: 150; }
+        .sidebar-overlay.active { display: block; }
+
+        .btn-menu-mobile { display: none; background: var(--bg-body); border: 1px solid var(--border); color: var(--text-main); width: 38px; height: 38px; border-radius: 8px; font-size: 18px; cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0; }
+        .btn-menu-mobile:hover { border-color: var(--primary); color: var(--primary); }
+
+        .theme-toggle { margin: 0 24px; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); cursor: pointer; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 8px; width: calc(100% - 48px); }
         .theme-toggle:hover { border-color: var(--primary); }
 
         /* BOTÕES DE FILTRO SP / MG */
-        .uf-container {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-surface);
-            padding: 6px 12px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .uf-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-right: 4px;
-        }
-
-        .btn-uf {
-            padding: 6px 14px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            background: var(--bg-body);
-            color: var(--text-main);
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
+        .uf-container { display: flex; align-items: center; gap: 8px; background: var(--bg-surface); padding: 6px 12px; border-radius: 10px; border: 1px solid var(--border); flex-wrap: wrap; }
+        .uf-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-right: 4px; }
+        .btn-uf { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-body); color: var(--text-main); font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
         .btn-uf:hover { border-color: var(--primary); }
-
-        .btn-uf.active {
-            background: var(--primary);
-            color: #ffffff;
-            border-color: var(--primary);
-        }
+        .btn-uf.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
 
         /* MAIN CONTENT */
-        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        .view-section { display: none; padding: 32px; overflow-y: auto; height: 100%; }
+        .main-content { flex: 1; display: flex; flex-direction: column; position: relative; overflow: hidden; min-width: 0; }
+        .view-section { display: none; padding: 32px; overflow-y: auto; height: 100%; position: relative; }
         .view-section.active { display: block; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .topbar { padding: 16px 32px; border-bottom: 1px solid var(--border); background-color: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; z-index: 10; }
-        .btn-sync { background-color: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .topbar { padding: 16px 32px; border-bottom: 1px solid var(--border); background-color: var(--bg-surface); display: flex; justify-content: space-between; align-items: center; gap: 12px; z-index: 10; flex-wrap: wrap; }
+        .topbar-left { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .btn-sync { background-color: var(--primary); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap; }
+        .btn-sync:hover { filter: brightness(1.06); }
         .btn-sync:disabled { opacity: 0.6; cursor: wait; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; }
         .btn-outline:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+        .btn-ai-inline { background: var(--primary-light); border: 1px solid var(--primary); color: var(--primary); padding: 8px 14px; border-radius: 6px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; white-space: nowrap; }
+        .btn-ai-inline:hover { background: var(--primary); color: #fff; }
         .btn-link { background: var(--primary-light); color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; text-decoration: none; display: inline-block; }
 
         .header { margin-bottom: 24px; }
@@ -167,43 +140,43 @@
         /* TABELA */
         .toolbar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
         .filter-input { padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg-surface); color: var(--text-main); font-size: 13px; outline: none; }
+        .filter-input:focus { border-color: var(--primary); }
         
-        /* CHECKBOXES BONITOS STATUS */
-        .status-filter-group {
-            display: flex;
+        /* PÍLULA DE FILTRO EXTRA DA IA */
+        .ai-extra-filter-bar {
+            display: none;
             align-items: center;
             gap: 8px;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            padding: 4px 6px;
-            border-radius: 8px;
-            font-size: 13px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
         }
-
-        .status-title {
-            font-weight: 700;
-            color: var(--text-muted);
-            font-size: 11px;
-            text-transform: uppercase;
-            padding-left: 6px;
-            padding-right: 4px;
-        }
-
-        .custom-chk input[type="checkbox"] { display: none; }
-
-        .custom-chk {
-            cursor: pointer;
-            padding: 4px 12px;
-            border-radius: 6px;
-            font-weight: 600;
+        .ai-filter-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 5px 12px;
+            border-radius: 999px;
             font-size: 12px;
-            border: 1px solid var(--border);
-            background: transparent;
-            color: var(--text-muted);
-            transition: all 0.2s ease;
-            user-select: none;
+            font-weight: 600;
+        }
+        .ai-filter-tag button {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 1;
         }
 
+        /* CHECKBOXES STATUS */
+        .status-filter-group { display: flex; align-items: center; gap: 8px; background: var(--bg-surface); border: 1px solid var(--border); padding: 4px 6px; border-radius: 8px; font-size: 13px; flex-wrap: wrap; }
+        .status-title { font-weight: 700; color: var(--text-muted); font-size: 11px; text-transform: uppercase; padding-left: 6px; padding-right: 4px; }
+        .custom-chk input[type="checkbox"] { display: none; }
+        .custom-chk { cursor: pointer; padding: 4px 12px; border-radius: 6px; font-weight: 600; font-size: 12px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); transition: all 0.2s ease; user-select: none; }
         .custom-chk:hover { background: var(--gray-light); }
         .custom-chk.sim input:checked + span { color: var(--primary); }
         .custom-chk.sim:has(input:checked) { background: var(--primary-light); border-color: var(--primary); }
@@ -212,30 +185,702 @@
         .custom-chk.vazio input:checked + span { color: var(--text-main); }
         .custom-chk.vazio:has(input:checked) { background: var(--badge-bg); border-color: var(--text-muted); }
 
+        /* DROPDOWN MULTI-SELEÇÃO DE ERROS */
+        .dropdown-check-list { position: relative; display: inline-block; flex: 1; min-width: 240px; max-width: 350px; }
+        .dropdown-check-list .anchor { width: 100%; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--bg-surface); padding: 8px 12px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; color: var(--text-main); font-weight: 600; }
+        .dropdown-check-list .anchor:hover { border-color: var(--primary); }
+        .dropdown-check-list .items { display: none; position: absolute; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; width: 100%; max-height: 300px; overflow-y: auto; z-index: 100; box-shadow: 0 10px 25px rgba(0,0,0,0.15); padding: 6px; margin-top: 4px; }
+        .dropdown-check-list.visible .items { display: block; }
+        .dropdown-check-list .items li { list-style: none; }
+        .dropdown-check-list .items label { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; font-size: 12px; cursor: pointer; color: var(--text-main); transition: 0.2s; }
+        .dropdown-check-list .items label:hover { background: var(--gray-light); }
+
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
         th { padding: 12px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
         th.sortable:hover { color: var(--primary); background-color: var(--primary-light); border-radius: 6px; }
-        td { padding: 12px; border-bottom: 1px solid var(--border); }
+        td { padding: 12px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+        .text-center { text-align: center !important; }
         .badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
         .badge.sim { background: var(--primary-light); color: var(--primary); }
         .badge.nao { background: var(--orange-light); color: var(--orange); }
         .badge.vazio { background: var(--badge-bg); color: var(--text-muted); }
 
+        /* CHECKLIST ESTILIZADO - AUDITORIA ANYMARKET */
+        .any-checklist-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+        }
+        .any-checklist-wrap input[type="checkbox"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .any-checkmark {
+            width: 22px;
+            height: 22px;
+            border-radius: 7px;
+            border: 2px solid var(--border);
+            background-color: var(--bg-surface);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+        .any-checklist-wrap:hover .any-checkmark {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+            transform: scale(1.06);
+        }
+        .any-checkmark svg {
+            width: 13px;
+            height: 13px;
+            stroke: #ffffff;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .any-checklist-wrap input[type="checkbox"]:checked + .any-checkmark {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 2px 6px rgba(18, 122, 102, 0.28);
+        }
+        .any-checklist-wrap input[type="checkbox"]:checked + .any-checkmark svg {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .any-checkmark.partial {
+            background-color: var(--primary-light);
+            border-color: var(--primary);
+        }
+        .any-checkmark.partial::after {
+            content: "";
+            width: 10px;
+            height: 2.5px;
+            border-radius: 2px;
+            background-color: var(--primary);
+            display: block;
+        }
+
+        /* LINHA CONCLUÍDA E CÉLULAS COPIÁVEIS CENTRALIZADAS */
+        tr.any-row-item { transition: background-color 0.2s ease, opacity 0.2s ease; }
+        tr.any-row-item:hover { background-color: var(--gray-light); }
+        tr.any-row-done {
+            background-color: var(--primary-light) !important;
+            opacity: 0.72;
+        }
+        tr.any-row-done .any-strike {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .th-copyable {
+            cursor: pointer;
+            color: var(--primary) !important;
+            transition: background-color 0.2s ease;
+            border-radius: 6px;
+            text-align: center;
+        }
+        .th-copyable:hover {
+            background-color: var(--primary-light);
+        }
+
+        .copy-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 5px 10px;
+            border-radius: 6px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .copy-pill:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+        .copy-pill span.copy-text {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .copy-pill .copy-icon {
+            font-size: 11px;
+            opacity: 0.75;
+            flex-shrink: 0;
+        }
+
+        .any-toolbar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .any-toolbar-controls {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .any-progress-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid var(--primary);
+        }
+
         /* WIZARD */
         .wizard-step { margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
         .wizard-step h3 { font-size: 15px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .wizard-step h3 span { background: var(--primary); color: #fff; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; }
-        .checkbox-group { display: flex; gap: 16px; flex-wrap: wrap; }
+        .wizard-step h3 span { background: var(--primary); color: #fff; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 12px; flex-shrink: 0; }
+        .checkbox-group { display: flex; gap: 12px; flex-wrap: wrap; }
         .checkbox-label { display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer; background: var(--gray-light); padding: 8px 16px; border-radius: 8px; border: 1px solid transparent; }
         .checkbox-label:hover { border-color: var(--primary); }
 
-        /* UPLOAD */
-        .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 40px; text-align: center; color: var(--text-muted); cursor: pointer; transition: 0.2s; background: var(--bg-surface); }
+        /* DROPZONE DE TELA INTEIRA PARA ANYMARKET */
+        #dropzoneFullAny {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(6px);
+            z-index: 999;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 3px dashed var(--primary);
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .dropzone { border: 2px dashed var(--border); border-radius: 12px; padding: 40px 20px; text-align: center; color: var(--text-muted); cursor: pointer; transition: 0.2s; background: var(--bg-surface); display: block; }
         .dropzone:hover { border-color: var(--primary); background: var(--primary-light); }
 
-        #loadingState { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 50; color: white; }
+        #loadingState { position: absolute; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 50; color: white; text-align: center; padding: 20px; }
         .spinner { border: 4px solid rgba(255,255,255,0.3); border-top: 4px solid white; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 16px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* =========================================================
+           WIDGET DE CHAT FLUTUANTE COM IA (GEMINI)
+           ========================================================= */
+        .ai-chat-fab {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 450;
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            border-radius: 999px;
+            padding: 13px 20px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px -5px rgba(18, 122, 102, 0.45), 0 4px 10px rgba(0, 0, 0, 0.15);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .ai-chat-fab:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 14px 30px -5px rgba(18, 122, 102, 0.55), 0 6px 14px rgba(0, 0, 0, 0.2);
+        }
+        .ai-chat-fab-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            background: #6ee7b7;
+            box-shadow: 0 0 0 3px rgba(110, 231, 183, 0.28);
+        }
+
+        .ai-chat-window {
+            position: fixed;
+            bottom: 84px;
+            right: 24px;
+            width: 420px;
+            max-width: calc(100vw - 32px);
+            height: 580px;
+            max-height: calc(100vh - 110px);
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.28);
+            z-index: 460;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            animation: chatPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .ai-chat-window.open {
+            display: flex;
+        }
+        @keyframes chatPopIn {
+            from { opacity: 0; transform: translateY(14px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .ai-chat-header {
+            padding: 14px 16px;
+            background: var(--primary);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .ai-chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ai-chat-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        .ai-chat-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ai-header-btn {
+            background: rgba(255, 255, 255, 0.16);
+            border: none;
+            color: #ffffff;
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .ai-header-btn:hover {
+            background: rgba(255, 255, 255, 0.28);
+        }
+
+        /* Painel de Configuração da Chave */
+        .ai-key-panel {
+            padding: 12px 14px;
+            background: var(--primary-light);
+            border-bottom: 1px solid var(--border);
+            font-size: 12px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .ai-key-panel.visible {
+            display: flex;
+        }
+        .ai-key-row {
+            display: flex;
+            gap: 6px;
+        }
+        .ai-key-row input {
+            flex: 1;
+            padding: 7px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-size: 12px;
+            outline: none;
+        }
+        .ai-key-row input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Barra de Atalhos Rápidos com Setas Laterais */
+        .ai-chips-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 8px;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-body);
+        }
+        .ai-chip-nav-btn {
+            width: 24px;
+            height: 26px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            user-select: none;
+            line-height: 1;
+        }
+        .ai-chip-nav-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+        .ai-quick-chips {
+            flex: 1;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        .ai-quick-chips::-webkit-scrollbar { display: none; }
+        .ai-chip {
+            padding: 6px 11px;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-size: 11.5px;
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .ai-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+        }
+
+        /* Caixa de SELECT compacta dentro do Chat */
+        .ai-error-select-box {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: var(--bg-body);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .ai-select-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .ai-select-field {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .ai-select-field label {
+            font-size: 10.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+        .ai-error-select {
+            width: 100%;
+            padding: 7px 9px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-main);
+            font-size: 12px;
+            font-weight: 600;
+            outline: none;
+            cursor: pointer;
+        }
+        .ai-error-select:focus {
+            border-color: var(--primary);
+        }
+
+        /* Área de Mensagens */
+        .ai-chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: var(--bg-body);
+        }
+        .ai-msg {
+            max-width: 92%;
+            padding: 11px 14px;
+            border-radius: 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+        .ai-msg.bot {
+            align-self: flex-start;
+            background: var(--bg-surface);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 4px;
+            width: 100%;
+        }
+        .ai-msg.bot.warning-block {
+            border-color: var(--danger);
+            background: rgba(220, 38, 38, 0.06);
+        }
+        .ai-msg.user {
+            align-self: flex-end;
+            background: var(--primary);
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+        .ai-msg.bot ul, .ai-msg.bot ol {
+            padding-left: 18px;
+            margin: 6px 0;
+        }
+        .ai-msg.bot li {
+            margin-bottom: 4px;
+        }
+        .ai-msg.bot code {
+            background: var(--gray-light);
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            font-family: monospace;
+        }
+        .ai-action-pill {
+            margin-top: 8px;
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-size: 11.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .ai-typing {
+            align-self: flex-start;
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+        }
+        .ai-cancel-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--danger);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .ai-cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: var(--danger);
+        }
+        .ai-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            animation: bounceDot 1.2s infinite ease-in-out;
+        }
+        .ai-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .ai-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes bounceDot {
+            0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+            40% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Input de envio */
+        .ai-chat-input-area {
+            padding: 12px;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .ai-chat-input-area input {
+            flex: 1;
+            padding: 10px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: var(--bg-body);
+            color: var(--text-main);
+            font-size: 13px;
+            outline: none;
+        }
+        .ai-chat-input-area input:focus {
+            border-color: var(--primary);
+        }
+        .ai-chat-input-area input:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+        .ai-send-btn {
+            background: var(--primary);
+            color: #ffffff;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .ai-send-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        /* RESPONSIVIDADE (TABLET E MOBILE) */
+        @media (max-width: 1100px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 860px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                transform: translateX(-100%);
+                box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .sidebar-header-mobile {
+                display: flex;
+            }
+            .btn-menu-mobile {
+                display: inline-flex;
+            }
+            .topbar {
+                padding: 12px 16px;
+            }
+            .view-section {
+                padding: 20px 16px 90px;
+            }
+            .card {
+                padding: 16px;
+                margin-bottom: 16px;
+            }
+            .header h1 {
+                font-size: 20px;
+            }
+            .any-toolbar-controls {
+                width: 100%;
+                justify-content: stretch;
+            }
+            .dropdown-check-list {
+                min-width: 100%;
+                max-width: 100%;
+            }
+            #buscaAny {
+                max-width: 100% !important;
+                width: 100%;
+            }
+            #toastContainer {
+                left: 16px;
+                right: 16px;
+                top: 12px;
+            }
+            .toast {
+                min-width: unset;
+                max-width: 100%;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 540px) {
+            .kpi-grid {
+                grid-template-columns: 1fr;
+            }
+            .kpi b {
+                font-size: 26px;
+            }
+            .uf-container {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .btn-uf {
+                flex: 1;
+                text-align: center;
+                padding: 6px 10px;
+            }
+            .toolbar > * {
+                width: 100%;
+            }
+            .status-filter-group {
+                justify-content: space-between;
+            }
+            .chart-container {
+                height: 260px;
+            }
+            .ai-chat-fab {
+                bottom: 16px;
+                right: 16px;
+                padding: 12px 16px;
+            }
+            .ai-chat-window {
+                right: 12px;
+                left: 12px;
+                bottom: 72px;
+                width: auto;
+                max-width: none;
+                height: 72vh;
+            }
+        }
     </style>
 </head>
 <body>
@@ -243,9 +888,16 @@
     <!-- CONTAINER DE NOTIFICAÇÕES TOAST -->
     <div id="toastContainer"></div>
 
+    <!-- OVERLAY MOBILE -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="fecharMenuMobile()"></div>
+
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebarMenu">
         <div>
+            <div class="sidebar-header-mobile">
+                <strong style="font-size: 14px; color: var(--primary);">Menu</strong>
+                <button onclick="fecharMenuMobile()" style="background:none; border:none; color:var(--text-muted); font-size:18px; cursor:pointer;">✕</button>
+            </div>
             <div class="sidebar-title">Analytics</div>
             <div class="nav-item active" onclick="switchView('resumo', this)">📊 Resumo Executivo</div>
             <div class="nav-item admin-only" onclick="switchView('tabela', this)" style="display: none;">⚠️ Alertas & Catálogo</div>
@@ -265,8 +917,8 @@
     </aside>
 
     <!-- MODAL DE ACESSO DISCRETO PARA CADASTRO -->
-    <div id="modalAcesso" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100;">
-        <div class="card" style="width: 320px; text-align: center; padding: 24px;">
+    <div id="modalAcesso" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 300; padding: 16px;">
+        <div class="card" style="width: 100%; max-width: 320px; text-align: center; padding: 24px;">
             <h3 style="margin-bottom: 8px; font-size: 16px;">Acesso Restrito</h3>
             <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">Digite a senha para acessar a área operacional de cadastro.</p>
             <input type="password" id="inputSenhaCadastro" class="filter-input" style="width: 100%; margin-bottom: 12px; text-align: center;" placeholder="Senha" onkeyup="if(event.key==='Enter') verificarSenhaCadastro()">
@@ -284,7 +936,8 @@
         </div>
 
         <div class="topbar">
-            <div style="display: flex; align-items: center; gap: 16px;">
+            <div class="topbar-left">
+                <button class="btn-menu-mobile" onclick="abrirMenuMobile()" title="Abrir Menu">☰</button>
                 <a href="./index.html" class="btn-outline">← Voltar</a>
                 <div style="font-size: 13px; color: var(--text-muted);" id="syncTime">--</div>
             </div>
@@ -340,49 +993,38 @@
             </div>
 
             <div class="card">
+                <div id="aiFilterBannerCatalogo" class="ai-extra-filter-bar"></div>
                 <div class="toolbar">
                     <select id="filtroAba" class="filter-input"><option value="">Todos os Canais</option></select>
                     
-                    <!-- SELEÇÃO MÚLTIPLA DE STATUS BONITA -->
+                    <!-- SELEÇÃO MÚLTIPLA DE STATUS -->
                     <div class="status-filter-group">
                         <span class="status-title">Status:</span>
-                        
-                        <label class="custom-chk sim">
-                            <input type="checkbox" class="chk-status" value="sim" checked>
-                            <span>Sim</span>
-                        </label>
-                        
-                        <label class="custom-chk nao">
-                            <input type="checkbox" class="chk-status" value="nao" checked>
-                            <span>Não</span>
-                        </label>
-
-                        <label class="custom-chk vazio">
-                            <input type="checkbox" class="chk-status" value="vazio" checked>
-                            <span>Sem Info</span>
-                        </label>
+                        <label class="custom-chk sim"><input type="checkbox" class="chk-status" value="sim" checked><span>Sim</span></label>
+                        <label class="custom-chk nao"><input type="checkbox" class="chk-status" value="nao" checked><span>Não</span></label>
+                        <label class="custom-chk vazio"><input type="checkbox" class="chk-status" value="vazio" checked><span>Sem Info</span></label>
                     </div>
 
                     <select id="filtroCurva" class="filter-input"><option value="">Todas as Curvas</option></select>
-                    <input type="text" id="inputBusca" class="filter-input" style="flex: 1;" placeholder="Buscar SKU, Descrição ou Marca...">
+                    <input type="text" id="inputBusca" class="filter-input" style="flex: 1; min-width: 180px;" placeholder="Buscar SKU, Descrição ou Marca...">
                 </div>
-                <div style="overflow-x: auto;">
-                    <table>
+                <div class="table-responsive">
+                    <table style="min-width: 680px;">
                         <thead>
                             <tr>
                                 <th>Canal</th>
-                                <th>Curva</th>
-                                <th>SKU</th>
+                                <th class="text-center">Curva</th>
+                                <th class="text-center">SKU</th>
                                 <th>Descrição</th>
-                                <th id="thEstoque" class="sortable" onclick="ordenarEstoque()" style="cursor: pointer; user-select: none;" title="Clique para ordenar">Estoque ↕</th>
-                                <th>Status</th>
-                                <th>Link</th>
+                                <th id="thEstoque" class="sortable text-center" onclick="ordenarEstoque()" style="cursor: pointer; user-select: none;" title="Clique para ordenar">Estoque ↕</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Link</th>
                             </tr>
                         </thead>
                         <tbody id="tabelaCorpo"></tbody>
                     </table>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px; flex-wrap: wrap; gap: 10px;">
                     <span id="pageInfo">Mostrando 0 de 0</span>
                     <div style="display: flex; gap: 8px;">
                         <button class="filter-input" id="btnPrev" onclick="mudarPagina(-1)" style="cursor:pointer">Anterior</button>
@@ -394,9 +1036,16 @@
 
         <!-- 3. ANYMARKET WIDE -->
         <div id="view-anymarket" class="view-section">
+            <!-- Dropzone de Tela Inteira -->
+            <div id="dropzoneFullAny">
+                <div style="font-size: 48px; margin-bottom: 16px;">📂</div>
+                <h2 style="font-size: 22px; margin-bottom: 8px;">Solte o arquivo Excel (.xlsx) aqui</h2>
+                <p style="color: var(--text-muted); font-size: 14px;">O arquivo será carregado imediatamente para auditoria.</p>
+            </div>
+
             <div class="header">
                 <h1>Auditoria Anymarket</h1>
-                <p>Jogue a planilha de erros abaixo para mapear as falhas críticas de integração.</p>
+                <p>Arraste a planilha de erros em **qualquer lugar desta tela** para mapear as falhas críticas.</p>
             </div>
             
             <div class="card" id="cardUploadAny">
@@ -416,26 +1065,36 @@
                 
                 <!-- Tabela Larga -->
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 16px;">
-                        <h3 style="font-size: 16px;">Lista de Correção</h3>
-                        <div style="display: flex; gap: 12px; flex: 1; justify-content: flex-end; flex-wrap: wrap;">
-                            <select id="filtroErroAny" class="filter-input" style="max-width: 350px; flex: 1;" onchange="filtrarTabelaAny()">
-                                <option value="">⚠️ Todos os Erros</option>
-                            </select>
-                            <input type="text" id="buscaAny" class="filter-input" style="max-width: 250px; flex: 1;" placeholder="Buscar SKU ou Palavra..." oninput="filtrarTabelaAny()">
-                            <button class="btn-outline" onclick="exportarAnyCSV()">📥 Exportar Lista (Planilha Original)</button>
+                    <div id="aiFilterBannerAny" class="ai-extra-filter-bar"></div>
+                    <div class="any-toolbar-header">
+                        <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <h3 style="font-size: 16px;">Lista de Correção</h3>
+                            <span id="progressoAnyBadge" class="any-progress-badge">✓ 0 / 0 concluídos</span>
+                        </div>
+                        <div class="any-toolbar-controls">
+                            <!-- DROPDOWN MULTI-SELEÇÃO DE ERROS -->
+                            <div id="checkListErros" class="dropdown-check-list" tabindex="100">
+                                <span class="anchor" onclick="document.getElementById('checkListErros').classList.toggle('visible')">⚠️ Filtrar Múltiplos Erros...</span>
+                                <ul id="listaErrosAny" class="items"></ul>
+                            </div>
+
+                            <input type="text" id="buscaAny" class="filter-input" style="max-width: 220px; flex: 1;" placeholder="Buscar SKU, Cód. Mkt..." oninput="filtrarTabelaAny()">
+                            
+                            <button class="btn-ai-inline" onclick="pedirGuiaErrosAnymarket()">✨ Escolher Erro p/ IA Explicar</button>
+                            <button class="btn-outline" onclick="exportarAnyCSV()">📥 Exportar Lista</button>
+                            <button class="btn-sync" onclick="novaPlanilhaAny()">🔄 Subir Outra</button>
                         </div>
                     </div>
                     
-                    <div style="overflow-x: auto;">
-                        <table style="font-size: 13px; width: 100%; table-layout: fixed; min-width: 600px;">
+                    <div class="table-responsive">
+                        <table style="font-size: 13px; width: 100%; table-layout: fixed; min-width: 880px;">
                             <thead><tr id="anyTableHeader"></tr></thead>
                             <tbody id="anyTableBody"></tbody>
                         </table>
                     </div>
 
                     <!-- Paginação Anymarket -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px; flex-wrap: wrap; gap: 10px;">
                         <span id="pageInfoAny">Mostrando 0 de 0</span>
                         <div style="display: flex; gap: 8px;">
                             <button class="filter-input" id="btnPrevAny" onclick="mudarPaginaAny(-1)" style="cursor:pointer">Anterior</button>
@@ -473,10 +1132,72 @@
         </div>
     </main>
 
+    <!-- BOTÃO FLUTUANTE DO CHAT IA -->
+    <button class="ai-chat-fab" id="aiChatFab" onclick="toggleChatIA()" title="Abrir Assistente IA">
+        <span class="ai-chat-fab-dot"></span>
+        <span>✨ Assistente IA</span>
+    </button>
+
+    <!-- JANELA DO CHAT IA -->
+    <div class="ai-chat-window" id="aiChatWindow">
+        <div class="ai-chat-header">
+            <div class="ai-chat-header-info">
+                <div class="ai-chat-avatar">✨</div>
+                <div>
+                    <div style="font-size: 14px; font-weight: 700;">Copiloto de Catálogo</div>
+                    <div style="font-size: 11px; opacity: 0.85;">IA Ativa para Equipe</div>
+                </div>
+            </div>
+            <div class="ai-chat-header-actions">
+                <button class="ai-header-btn" onclick="togglePainelChaveIA()" title="Configurar Chave da API (Opcional)">⚙️</button>
+                <button class="ai-header-btn" onclick="limparHistoricoChatIA()" title="Limpar Conversa">🗑️</button>
+                <button class="ai-header-btn" onclick="toggleChatIA()" title="Fechar Chat">✕</button>
+            </div>
+        </div>
+
+        <!-- PAINEL OPCIONAL DE CONFIGURAÇÃO DE CHAVE -->
+        <div class="ai-key-panel" id="aiKeyPanel">
+            <div style="font-weight: 700; color: var(--primary);">🔑 Chave da API Gemini</div>
+            <div style="color: var(--text-muted); line-height: 1.4;">
+                A chave padrão da equipe já está configurada. Só preencha abaixo se quiser substituir temporariamente neste navegador:
+            </div>
+            <div class="ai-key-row">
+                <input type="password" id="inputGeminiKey" placeholder="Deixe vazio para usar a chave padrão">
+                <button class="btn-sync" style="padding: 7px 12px; font-size: 12px;" onclick="salvarChaveGemini()">Salvar</button>
+            </div>
+        </div>
+
+        <!-- ATALHOS RÁPIDOS COM SETAS LATERAIS -->
+        <div class="ai-chips-bar-container">
+            <button type="button" class="ai-chip-nav-btn" onclick="rolarChipsIA(-1)" title="Rolar para a esquerda">‹</button>
+            <div class="ai-quick-chips" id="aiQuickChips">
+                <button class="ai-chip" onclick="pedirGuiaErrosAnymarket()">🛠️ Explicar erros Anymarket</button>
+                <button class="ai-chip" onclick="abrirFiltroCatalogoIA()">🎛️ Filtrar Catálogo</button>
+                <button class="ai-chip" onclick="preencherExemploFiltroIA('Filtra no Anymarket apenas os itens que ainda não foram concluídos ordenados pelo maior estoque')">📋 Pendentes Anymarket</button>
+                <button class="ai-chip" onclick="limparFiltrosCatalogoPeloChat()">🔄 Limpar filtros</button>
+            </div>
+            <button type="button" class="ai-chip-nav-btn" onclick="rolarChipsIA(1)" title="Rolar para a direita">›</button>
+        </div>
+
+        <!-- MENSAGENS -->
+        <div class="ai-chat-messages" id="aiChatMessages"></div>
+
+        <!-- INPUT -->
+        <div class="ai-chat-input-area">
+            <input type="text" id="aiChatInput" placeholder="Ex: Traduz os erros ou pergunte algo..." onkeyup="if(event.key==='Enter') enviarMensagemChatIA()">
+            <button class="ai-send-btn" id="aiSendBtn" onclick="enviarMensagemChatIA()" title="Enviar">➤</button>
+        </div>
+    </div>
+
     <script>
-        // CONFIG GLOBAIS
+        // =========================================================
+        // CONFIGURAÇÕES GLOBAIS & CHAVE ÚNICA PARA TODA A EQUIPE
+        // =========================================================
         const API_URL = "https://script.google.com/macros/s/AKfycbw5LhNN2TcUEp-CHI3lCFHv1IdmDITRcoDY3Km6fZ0W_rd7k_T3DKj8WEulAvXsLAfN5g/exec";
         const DB_NAME = "CatalogoDB";
+
+        // Sua chave configurada para todos usarem automaticamente:
+        const CHAVE_GEMINI_PADRAO = "AQ.Ab8RN6JIH7qOTmL7RoMNBmbPMrOp_0lVFSJn5SWjrvJXxM1upg";
         
         // Vars Catálogo
         let dadosGlobais = [], dadosFiltrados = [];
@@ -484,16 +1205,32 @@
         let cStatus = null, cMarket = null, cAny = null;
         let ordemEstoque = 0; 
         let ufAtual = 'TODOS';
+        let filtroMinEstoqueCatalogo = null;
+        let filtroMaxEstoqueCatalogo = null;
 
         // Vars Anymarket
         let dadosAny = [], listaRenderAny = [];
         let pAtualAny = 1; const itensPaginaAny = 50;
-        let colunaErroAny = "", chavesAny = [];
+        let colunaErroAny = "", chavesAny = [], chaveTituloAny = "", chaveSkuAny = "", chaveCodMktAny = "", chaveEstoqueAny = "";
         let mapaCoresErro = {}; 
+        let ordemEstoqueAny = 0; // 0=normal, 1=maior, -1=menor
+        let filtroApenasPendentesAny = false;
+        let errosDisponiveisParaEscolha = [];
         const paletaCores = ['#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6', '#f43f5e', '#84cc16', '#6366f1', '#10b981'];
 
         // Modo Cadastro
         let modoCadastroAtivo = false;
+
+        // MENU MOBILE
+        function abrirMenuMobile() {
+            document.getElementById('sidebarMenu').classList.add('open');
+            document.getElementById('sidebarOverlay').classList.add('active');
+        }
+
+        function fecharMenuMobile() {
+            document.getElementById('sidebarMenu').classList.remove('open');
+            document.getElementById('sidebarOverlay').classList.remove('active');
+        }
 
         // GERENCIADOR DE NOTIFICAÇÕES TOAST
         function mostrarNotificacao(mensagem, tipo = 'info', duracao = 5000) {
@@ -516,7 +1253,31 @@
             }, duracao);
         }
 
-        // HELPER BANCO DE DADOS INTERNO (IndexedDB - Suporta grandes volumes sem erro de quota)
+        // COPIAR TEXTO GENÉRICO E POR ELEMENTO
+        function copiarTexto(texto, msgCustomizada = null) {
+            if (!texto || texto === '-') return;
+            navigator.clipboard.writeText(texto).then(() => {
+                mostrarNotificacao(msgCustomizada || `Copiado: ${texto}`, 'sucesso', 2500);
+            }).catch(() => {
+                mostrarNotificacao('Erro ao copiar o texto.', 'erro', 2500);
+            });
+        }
+
+        function copiarDoElemento(el, rotulo) {
+            const valor = el.getAttribute('data-copy');
+            if (!valor || valor === '-') return;
+            copiarTexto(valor, `${rotulo} copiado: ${valor}`);
+        }
+
+        // FECHAR DROPDOWN DE ERROS AO CLICAR FORA
+        document.addEventListener('click', function(event) {
+            let checkList = document.getElementById('checkListErros');
+            if (checkList && !checkList.contains(event.target)) {
+                checkList.classList.remove('visible');
+            }
+        });
+
+        // HELPER BANCO DE DADOS INTERNO
         function salvarCacheIDB(dados, tempo) {
             try {
                 let req = indexedDB.open(DB_NAME, 1);
@@ -562,8 +1323,9 @@
             atualizarTextoBotaoTema();
             inicializarModoAcesso();
             configurarFiltros(); 
+            configurarDragAndDropTelaInteira();
+            inicializarChatIA();
             
-            // Tenta carregar do banco interno rapidamente
             lerCacheIDB((cacheDados, cacheTempo) => {
                 if (cacheDados && cacheDados.length > 0) {
                     dadosGlobais = cacheDados;
@@ -572,17 +1334,57 @@
                     popularDropdowns();
                     processarResumo();
                     aplicarFiltros();
-                    buscarDadosAPI(false, false); // Atualiza no fundo na abertura sem avisos popups
+                    buscarDadosAPI(false, false); 
                 } else {
-                    buscarDadosAPI(true, true); // Se não tem cache, mostra tela de carregamento na 1ª vez
+                    buscarDadosAPI(true, true); 
                 }
             });
 
-            // Sincronização automática a cada 10 minutos (600.000 ms) em segundo plano
             setInterval(() => {
                 buscarDadosAPI(false, false);
             }, 10 * 60 * 1000);
         };
+
+        /* --- DRAG AND DROP TELA INTEIRA PARA ANYMARKET --- */
+        function configurarDragAndDropTelaInteira() {
+            let viewAny = document.getElementById('view-anymarket');
+            let dropZoneFull = document.getElementById('dropzoneFullAny');
+
+            if(!viewAny || !dropZoneFull) return;
+
+            let dragCounter = 0;
+
+            viewAny.addEventListener('dragenter', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                dragCounter++;
+                dropZoneFull.style.display = 'flex';
+            });
+
+            viewAny.addEventListener('dragleave', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                dragCounter--;
+                if (dragCounter <= 0) {
+                    dropZoneFull.style.display = 'none';
+                    dragCounter = 0;
+                }
+            });
+
+            viewAny.addEventListener('dragover', (e) => {
+                e.preventDefault(); e.stopPropagation();
+            });
+
+            viewAny.addEventListener('drop', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                dragCounter = 0;
+                dropZoneFull.style.display = 'none';
+
+                let files = e.dataTransfer.files;
+                if(files && files.length > 0) {
+                    let fakeEvent = { target: { files: files } };
+                    lerPlanilhaAny(fakeEvent);
+                }
+            });
+        }
 
         /* --- CONTROLE DE MODO PÚBLICO / CADASTRO --- */
         function inicializarModoAcesso() {
@@ -597,6 +1399,7 @@
                 if (confirm("Deseja sair do modo de edição/cadastro?")) desativarModoCadastro();
                 return;
             }
+            fecharMenuMobile();
             document.getElementById('modalAcesso').style.display = 'flex';
             document.getElementById('inputSenhaCadastro').value = '';
             document.getElementById('inputSenhaCadastro').focus();
@@ -630,9 +1433,16 @@
 
         function switchView(id, el) {
             document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'));
-            if (el) el.classList.add('active');
+            if (el) {
+                el.classList.add('active');
+            } else {
+                const mapIndex = { resumo: 0, tabela: 1, anymarket: 2, relatorio: 3 };
+                const navs = document.querySelectorAll('.nav-item');
+                if (navs[mapIndex[id]]) navs[mapIndex[id]].classList.add('active');
+            }
             document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
             document.getElementById('view-' + id).classList.add('active');
+            fecharMenuMobile();
             if (id === 'tabela') renderTabela();
         }
 
@@ -656,6 +1466,13 @@
             ufAtual = uf;
             document.querySelectorAll('.btn-uf').forEach(b => b.classList.remove('active'));
             if(el) el.classList.add('active');
+            else {
+                document.querySelectorAll('.btn-uf').forEach(b => {
+                    if (b.innerText.includes(uf) || (uf === 'TODOS' && b.innerText.includes('Todos'))) {
+                        b.classList.add('active');
+                    }
+                });
+            }
             processarResumo();
         }
 
@@ -717,16 +1534,13 @@
                 dadosFiltrados = [...dadosGlobais];
                 let timeNow = new Date().toLocaleTimeString();
                 
-                // Salva no banco de dados interno sem risco de estouro
                 salvarCacheIDB(dadosGlobais, timeNow);
-
                 document.getElementById('syncTime').innerHTML = `Sincronização: <strong>${timeNow}</strong>`;
                 
                 popularDropdowns();
                 processarResumo();
                 aplicarFiltros(); 
                 
-                // Notificação de Sucesso após a conclusão
                 mostrarNotificacao('Dados atualizados com sucesso!', 'sucesso', 4000);
 
             } catch (e) { 
@@ -805,7 +1619,6 @@
                 options: { responsive: true, maintainAspectRatio: false, cutout: '70%' }
             });
 
-            // Ordenar canais por volume total
             let canaisOrdenados = Object.keys(cBreakdown).sort((a,b) => {
                 let totalA = Object.values(cBreakdown[a]).reduce((sum, v) => sum + v, 0);
                 let totalB = Object.values(cBreakdown[b]).reduce((sum, v) => sum + v, 0);
@@ -834,23 +1647,9 @@
                     responsive: true, 
                     maintainAspectRatio: false, 
                     indexAxis: 'y',
-                    interaction: {
-                        mode: 'nearest',
-                        axis: 'y',
-                        intersect: true
-                    },
-                    scales: {
-                        x: { stacked: true, grid: { color: 'rgba(150, 150, 150, 0.1)' } },
-                        y: { stacked: true, grid: { display: false } }
-                    },
-                    plugins: {
-                        legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } },
-                        tooltip: { 
-                            mode: 'nearest', 
-                            axis: 'y', 
-                            intersect: true 
-                        }
-                    }
+                    interaction: { mode: 'nearest', axis: 'y', intersect: true },
+                    scales: { x: { stacked: true, grid: { color: 'rgba(150, 150, 150, 0.1)' } }, y: { stacked: true, grid: { display: false } } },
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }, tooltip: { mode: 'nearest', axis: 'y', intersect: true } }
                 }
             });
         }
@@ -867,10 +1666,36 @@
             });
         }
 
-        function ordenarEstoque() {
-            if(ordemEstoque === 0) ordemEstoque = 1;
-            else if(ordemEstoque === 1) ordemEstoque = -1;
-            else ordemEstoque = 0;
+        function limparFiltroEstoqueIA() {
+            filtroMinEstoqueCatalogo = null;
+            filtroMaxEstoqueCatalogo = null;
+            atualizarBannerFiltroCatalogo();
+            aplicarFiltros();
+        }
+
+        function atualizarBannerFiltroCatalogo() {
+            const banner = document.getElementById('aiFilterBannerCatalogo');
+            if (!banner) return;
+            if (filtroMaxEstoqueCatalogo === 0) {
+                banner.style.display = 'flex';
+                banner.innerHTML = `<span class="ai-filter-tag">✨ Filtro IA: Sem estoque (= 0) <button onclick="limparFiltroEstoqueIA()" title="Remover filtro">✕</button></span>`;
+            } else if (filtroMinEstoqueCatalogo !== null && !isNaN(filtroMinEstoqueCatalogo)) {
+                banner.style.display = 'flex';
+                banner.innerHTML = `<span class="ai-filter-tag">✨ Filtro IA: Estoque ≥ ${filtroMinEstoqueCatalogo} <button onclick="limparFiltroEstoqueIA()" title="Remover filtro">✕</button></span>`;
+            } else {
+                banner.style.display = 'none';
+                banner.innerHTML = '';
+            }
+        }
+
+        function ordenarEstoque(forcarOrdem = null) {
+            if (forcarOrdem !== null) {
+                ordemEstoque = forcarOrdem;
+            } else {
+                if(ordemEstoque === 0) ordemEstoque = 1;
+                else if(ordemEstoque === 1) ordemEstoque = -1;
+                else ordemEstoque = 0;
+            }
 
             let th = document.getElementById('thEstoque');
             if(ordemEstoque === 1) th.innerText = "Estoque ▲";
@@ -889,8 +1714,12 @@
 
             dadosFiltrados = dadosGlobais.filter(d => {
                 let passaStatus = statusSelecionados.includes(d.status);
+                let passaMinEstoque = (filtroMinEstoqueCatalogo === null) || (d.estoque >= filtroMinEstoqueCatalogo);
+                let passaMaxEstoque = (filtroMaxEstoqueCatalogo === null) || (d.estoque <= filtroMaxEstoqueCatalogo);
                 return (a==="" || d.canal===a) && 
                        passaStatus && 
+                       passaMinEstoque &&
+                       passaMaxEstoque &&
                        (c==="" || d.curva===c) &&
                        (q==="" || d.sku.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q) || d.marca.toLowerCase().includes(q));
             });
@@ -916,12 +1745,12 @@
                 
                 tb.innerHTML += `<tr>
                     <td style="color:var(--text-muted); font-size:11px;">${d.canal}</td>
-                    <td style="font-weight:600; color:var(--primary);">${d.curva}</td>
-                    <td style="font-weight:600">${d.sku}</td>
+                    <td class="text-center" style="font-weight:600; color:var(--primary);">${d.curva}</td>
+                    <td class="text-center">${d.sku}</td>
                     <td style="max-width:250px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${d.desc.replace(/"/g, '&quot;')}">${d.desc}</td>
-                    <td>${d.estoque}</td>
-                    <td><span class="badge ${d.status}">${lbl}</span></td>
-                    <td>${linkBtn}</td>
+                    <td class="text-center">${d.estoque}</td>
+                    <td class="text-center"><span class="badge ${d.status}">${lbl}</span></td>
+                    <td class="text-center">${linkBtn}</td>
                 </tr>`;
             });
 
@@ -956,6 +1785,146 @@
         }
 
         /* --- AUDITORIA ANYMARKET --- */
+
+        function novaPlanilhaAny() {
+            document.getElementById('fileAny').value = "";
+            document.getElementById('resultadoAny').style.display = 'none';
+            document.getElementById('cardUploadAny').style.display = 'block';
+            dadosAny = [];
+            listaRenderAny = [];
+            filtroApenasPendentesAny = false;
+            atualizarBannerFiltroAny();
+        }
+
+        function copiarSkusEmMassa() {
+            if(listaRenderAny.length === 0) return mostrarNotificacao("Nenhum item filtrado.", "erro");
+            if(!chaveSkuAny) return mostrarNotificacao("Coluna de SKU não encontrada.", "erro");
+            let skus = listaRenderAny.map(r => String(r[chaveSkuAny] || '').trim()).filter(s => s && s !== '-');
+            let skusUnicos = [...new Set(skus)];
+            if(skusUnicos.length === 0) return mostrarNotificacao("Nenhum SKU válido encontrado.", "erro");
+            copiarTexto(skusUnicos.join('\n'), `${skusUnicos.length} SKUs copiados de uma vez!`);
+        }
+
+        function copiarCodigosMarketplaceEmMassa() {
+            if(listaRenderAny.length === 0) return mostrarNotificacao("Nenhum item filtrado.", "erro");
+            if(!chaveCodMktAny) return mostrarNotificacao("Coluna de Código do Marketplace não encontrada na planilha.", "erro");
+            let codigos = listaRenderAny.map(r => String(r[chaveCodMktAny] || '').trim()).filter(c => c && c !== '-');
+            let codigosUnicos = [...new Set(codigos)];
+            if(codigosUnicos.length === 0) return mostrarNotificacao("Nenhum código de marketplace preenchido nos itens filtrados.", "erro");
+            copiarTexto(codigosUnicos.join('\n'), `${codigosUnicos.length} códigos do marketplace copiados de uma vez!`);
+        }
+
+        function atualizarProgressoAny() {
+            const badge = document.getElementById('progressoAnyBadge');
+            if (!badge) return;
+            const total = listaRenderAny.length;
+            const feitos = listaRenderAny.filter(r => r._feito).length;
+            badge.innerText = `✓ ${feitos} / ${total} concluídos`;
+        }
+
+        // Checklist individual com LocalStorage
+        function toggleFeito(id, status) {
+            let row = dadosAny.find(r => r._id === id);
+            if(row) {
+                row._feito = status;
+                if(status) {
+                    localStorage.setItem(row._resolvedKey, 'true');
+                } else {
+                    localStorage.removeItem(row._resolvedKey);
+                }
+            }
+            
+            let tr = document.getElementById(`any-row-${id}`);
+            if(tr) {
+                if(status) {
+                    tr.classList.add('any-row-done');
+                } else {
+                    tr.classList.remove('any-row-done');
+                }
+            }
+            atualizarEstadoSelectAllAny();
+            atualizarProgressoAny();
+            atualizarDropdownErrosStyles();
+        }
+
+        function atualizarEstadoSelectAllAny() {
+            const chkMaster = document.getElementById('chkSelectAllAny');
+            const checkmarkMaster = document.getElementById('checkmarkSelectAllAny');
+            if (!chkMaster || !checkmarkMaster) return;
+
+            const total = listaRenderAny.length;
+            const feitos = listaRenderAny.filter(r => r._feito).length;
+
+            if (total > 0 && feitos === total) {
+                chkMaster.checked = true;
+                checkmarkMaster.classList.remove('partial');
+            } else if (feitos > 0) {
+                chkMaster.checked = false;
+                checkmarkMaster.classList.add('partial');
+            } else {
+                chkMaster.checked = false;
+                checkmarkMaster.classList.remove('partial');
+            }
+        }
+
+        // MARCAR / DESMARCAR TODOS OS ITENS FILTRADOS
+        function marcarTodosFiltradosAny(status, elCheckbox) {
+            if (listaRenderAny.length === 0) {
+                elCheckbox.checked = false;
+                return;
+            }
+
+            if (!status) {
+                let confirmar = confirm(`Deseja desmarcar todos os ${listaRenderAny.length} itens marcados como concluídos?`);
+                if (!confirmar) {
+                    elCheckbox.checked = true;
+                    return;
+                }
+            }
+
+            listaRenderAny.forEach(r => {
+                r._feito = status;
+                if (status) {
+                    localStorage.setItem(r._resolvedKey, 'true');
+                } else {
+                    localStorage.removeItem(r._resolvedKey);
+                }
+            });
+
+            renderTabelaAny();
+            atualizarDropdownErrosStyles();
+            mostrarNotificacao(
+                status 
+                    ? `Todos os ${listaRenderAny.length} itens foram marcados como concluídos!` 
+                    : `Todos os ${listaRenderAny.length} itens foram desmarcados!`,
+                'sucesso',
+                3000
+            );
+        }
+
+        function atualizarDropdownErrosStyles() {
+            let eCount = {}; let eFeitos = {};
+            dadosAny.forEach(r => { 
+                let eMsg = r[colunaErroAny] || "Sem Descrição"; 
+                eCount[eMsg] = (eCount[eMsg]||0)+1; 
+                if (r._feito) eFeitos[eMsg] = (eFeitos[eMsg]||0)+1;
+            });
+
+            document.querySelectorAll('.lbl-erro-any').forEach(lbl => {
+                let input = lbl.querySelector('input');
+                let msg = input.value;
+                let total = eCount[msg] || 0;
+                let feitos = eFeitos[msg] || 0;
+                let isComplete = (total > 0 && feitos === total);
+                
+                lbl.style.textDecoration = isComplete ? 'line-through' : 'none';
+                lbl.style.opacity = isComplete ? '0.6' : '1';
+                
+                let textSpan = lbl.querySelector('.err-text');
+                if (textSpan) textSpan.innerText = `${msg.substring(0, 50)}... (${feitos}/${total})`;
+            });
+        }
+
         function lerPlanilhaAny(e) {
             const f = e.target.files[0]; if(!f) return;
             document.getElementById('loadingState').style.display = 'flex';
@@ -970,9 +1939,43 @@
                     
                     if(jsonArr.length === 0) throw new Error("A planilha está vazia.");
 
-                    dadosAny = jsonArr;
-                    chavesAny = Object.keys(dadosAny[0]);
-                    colunaErroAny = chavesAny.find(k => /erro|motivo|mensagem|falha/i.test(k)) || chavesAny[chavesAny.length - 1]; 
+                    chavesAny = Object.keys(jsonArr[0]).filter(k => !k.startsWith('_'));
+                    
+                    // Identificação inteligente das colunas da planilha Anymarket
+                    colunaErroAny = chavesAny.find(k => /erro|motivo|mensagem|falha/i.test(k)) || chavesAny[chavesAny.length - 1];
+                    chaveEstoqueAny = chavesAny.find(k => k !== colunaErroAny && /estoque|qtd|quantidade/i.test(k)) || "";
+                    
+                    const usadas = new Set([colunaErroAny, chaveEstoqueAny].filter(Boolean));
+                    
+                    chaveSkuAny = chavesAny.find(k => !usadas.has(k) && /^sku$|sku\s*parceiro|c[oó]d.*sku|sku\s*loja/i.test(k))
+                               || chavesAny.find(k => !usadas.has(k) && /sku/i.test(k))
+                               || chavesAny[1] || "";
+                    if (chaveSkuAny) usadas.add(chaveSkuAny);
+
+                    chaveCodMktAny = chavesAny.find(k => !usadas.has(k) && /c[oó]d.*(marketplace|mkt|an[uú]ncio|canal)|id.*(marketplace|mkt|an[uú]ncio|canal)|(marketplace|mkt).*c[oó]d|(marketplace|mkt).*id|mlb|sku.*marketplace/i.test(k))
+                                  || chavesAny.find(k => !usadas.has(k) && /marketplace|c[oó]digo|cod|id/i.test(k))
+                                  || "";
+                    if (chaveCodMktAny) usadas.add(chaveCodMktAny);
+
+                    chaveTituloAny = chavesAny.find(k => !usadas.has(k) && /t[ií]tulo|produto|nome|descri[cç][aã]o/i.test(k))
+                                  || chavesAny.find(k => !usadas.has(k))
+                                  || chavesAny[0] || "";
+                    if (chaveTituloAny) usadas.add(chaveTituloAny);
+
+                    if (!chaveCodMktAny) {
+                        chaveCodMktAny = chavesAny.find(k => !usadas.has(k)) || "";
+                    }
+                    
+                    dadosAny = jsonArr.map((r, index) => {
+                        let skuVal = chaveSkuAny ? (r[chaveSkuAny] || '') : ''; 
+                        let msgErro = r[colunaErroAny] || '';
+                        let resolvedId = `resolvido_${skuVal}_${msgErro.substring(0,20)}`;
+                        
+                        r._id = index;
+                        r._resolvedKey = resolvedId;
+                        r._feito = localStorage.getItem(resolvedId) === 'true'; 
+                        return r;
+                    });
                     
                     let eCount = {};
                     dadosAny.forEach(r => { let eMsg = r[colunaErroAny] || "Sem Descrição"; eCount[eMsg] = (eCount[eMsg]||0)+1; });
@@ -997,13 +2000,24 @@
                         options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{position:'right'}} }
                     });
 
-                    let fSel = document.getElementById('filtroErroAny');
-                    fSel.innerHTML = '<option value="">⚠️ Todos os Erros (Críticos Primeiro)</option>';
-                    sortErr.forEach(err => { fSel.innerHTML += `<option value="${err[0].replace(/"/g, '&quot;')}">${err[0].substring(0, 70)}... (${err[1]} itens)</option>`; });
+                    // Construção do Multi-Select Customizado
+                    let containerLista = document.getElementById('listaErrosAny');
+                    containerLista.innerHTML = '';
+                    sortErr.forEach(err => {
+                        let msg = err[0];
+                        containerLista.innerHTML += `
+                            <li>
+                                <label class="lbl-erro-any">
+                                    <input type="checkbox" class="chk-erro-any" value="${msg.replace(/"/g, '&quot;')}" onchange="filtrarTabelaAny()" style="accent-color: var(--primary); width: 15px; height: 15px; cursor: pointer;">
+                                    <span class="err-text"></span>
+                                </label>
+                            </li>`;
+                    });
 
                     document.getElementById('cardUploadAny').style.display = 'none';
                     document.getElementById('resultadoAny').style.display = 'block';
 
+                    atualizarDropdownErrosStyles();
                     filtrarTabelaAny();
                 } catch(err) { alert("Erro ao ler planilha: " + err.message); } 
                 finally { document.getElementById('loadingState').style.display = 'none'; e.target.value = ""; }
@@ -1011,23 +2025,63 @@
             reader.readAsArrayBuffer(f);
         }
 
+        function limparFiltroPendentesAny() {
+            filtroApenasPendentesAny = false;
+            atualizarBannerFiltroAny();
+            filtrarTabelaAny();
+        }
+
+        function atualizarBannerFiltroAny() {
+            const banner = document.getElementById('aiFilterBannerAny');
+            if (!banner) return;
+            if (filtroApenasPendentesAny) {
+                banner.style.display = 'flex';
+                banner.innerHTML = `<span class="ai-filter-tag">✨ Filtro IA: Apenas itens não concluídos <button onclick="limparFiltroPendentesAny()" title="Remover filtro">✕</button></span>`;
+            } else {
+                banner.style.display = 'none';
+                banner.innerHTML = '';
+            }
+        }
+
+        // ORDENAÇÃO DE ESTOQUE NO ANYMARKET (MAIOR / MENOR)
+        function ordenarEstoqueAny(forcarOrdem = null) {
+            if (forcarOrdem !== null) {
+                ordemEstoqueAny = forcarOrdem;
+            } else {
+                ordemEstoqueAny = (ordemEstoqueAny === 0) ? 1 : (ordemEstoqueAny === 1 ? -1 : 0);
+            }
+            let th = document.getElementById('thEstoqueAny');
+            if (th) {
+                let nomeEstq = chaveEstoqueAny || 'Estoque';
+                if(ordemEstoqueAny === 1) th.innerText = nomeEstq + " ▲";
+                else if(ordemEstoqueAny === -1) th.innerText = nomeEstq + " ▼";
+                else th.innerText = nomeEstq + " ↕";
+            }
+            filtrarTabelaAny(); 
+        }
+
         function filtrarTabelaAny() {
-            let filtro = document.getElementById('filtroErroAny').value;
+            let chks = document.querySelectorAll('.chk-erro-any:checked');
+            let errosFiltrados = Array.from(chks).map(c => c.value);
             let busca = document.getElementById('buscaAny').value.toLowerCase();
 
             listaRenderAny = dadosAny.filter(r => {
                 let eMsg = r[colunaErroAny] || "Sem Descrição";
-                let passFiltro = filtro === "" || eMsg === filtro;
-                
-                let textoLinha = Object.values(r).join(" ").toLowerCase();
+                let passFiltro = errosFiltrados.length === 0 || errosFiltrados.includes(eMsg);
+                let textoLinha = chavesAny.map(k => r[k]).join(" ").toLowerCase();
                 let passBusca = busca === "" || textoLinha.includes(busca);
-                
-                return passFiltro && passBusca;
+                let passPendente = !filtroApenasPendentesAny || !r._feito;
+                return passFiltro && passBusca && passPendente;
             });
 
-            if (filtro === "") {
-                let eCount = {};
-                dadosAny.forEach(r => { let eMsg = r[colunaErroAny] || "Sem Descrição"; eCount[eMsg] = (eCount[eMsg]||0)+1; });
+            if (ordemEstoqueAny !== 0) {
+                listaRenderAny.sort((a, b) => {
+                    let estA = parseFloat(a[chaveEstoqueAny]) || 0;
+                    let estB = parseFloat(b[chaveEstoqueAny]) || 0;
+                    return ordemEstoqueAny === 1 ? estA - estB : estB - estA;
+                });
+            } else if (errosFiltrados.length === 0) {
+                let eCount = {}; dadosAny.forEach(r => { let eMsg = r[colunaErroAny] || "Sem Descrição"; eCount[eMsg] = (eCount[eMsg]||0)+1; });
                 listaRenderAny.sort((a,b) => eCount[b[colunaErroAny] || "Sem Descrição"] - eCount[a[colunaErroAny] || "Sem Descrição"]);
             }
 
@@ -1035,36 +2089,79 @@
             renderTabelaAny();
         }
 
+        function escapeAttr(val) {
+            return String(val ?? '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
         function renderTabelaAny() {
-            let cabecalhoHtml = `
-                <th style="width: 20%;">${chavesAny[0]}</th>
-                <th style="width: 30%;">${chavesAny[1] ? chavesAny[1] : 'Detalhe'}</th>
-                <th style="width: 50%;">Mensagem Completa do Anymarket</th>
-            `;
-            document.getElementById('anyTableHeader').innerHTML = cabecalhoHtml;
-            
             let ini = (pAtualAny - 1) * itensPaginaAny;
             let fim = ini + itensPaginaAny;
             let am = listaRenderAny.slice(ini, fim);
 
+            let todosMarcados = listaRenderAny.length > 0 && listaRenderAny.every(r => r._feito);
+            let algunsMarcados = !todosMarcados && listaRenderAny.some(r => r._feito);
+            let nomeEstqCol = chaveEstoqueAny || 'Estoque';
+            let indicadorOrdem = ordemEstoqueAny === 1 ? " ▲" : (ordemEstoqueAny === -1 ? " ▼" : " ↕");
+            let labelSku = chaveSkuAny || 'SKU';
+            let labelCodMkt = chaveCodMktAny || 'Cód. Marketplace';
+
+            const svgCheck = `<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+            let cabecalhoHtml = `
+                <th class="text-center" style="width: 6%;" title="Marcar/Desmarcar TODOS os ${listaRenderAny.length} itens filtrados">
+                    <label class="any-checklist-wrap">
+                        <input type="checkbox" id="chkSelectAllAny" ${todosMarcados ? 'checked' : ''} onchange="marcarTodosFiltradosAny(this.checked, this)">
+                        <span id="checkmarkSelectAllAny" class="any-checkmark ${algunsMarcados ? 'partial' : ''}">${svgCheck}</span>
+                    </label>
+                </th>
+                <th style="width: 22%;">${chaveTituloAny || 'Produto'}</th>
+                <th class="th-copyable text-center" style="width: 14%;" onclick="copiarSkusEmMassa()" title="Clique para copiar TODOS os SKUs listados (${listaRenderAny.length})">${labelSku} 📋</th>
+                <th class="th-copyable text-center" style="width: 16%;" onclick="copiarCodigosMarketplaceEmMassa()" title="Clique para copiar TODOS os Códigos Marketplace listados">${labelCodMkt} 📋</th>
+                <th id="thEstoqueAny" class="text-center" style="width: 9%; cursor:pointer; user-select:none; color:var(--primary);" onclick="ordenarEstoqueAny()" title="Clique para ordenar (Maior/Menor)">${nomeEstqCol}${indicadorOrdem}</th>
+                <th style="width: 33%;">Mensagem Completa do Anymarket</th>
+            `;
+            document.getElementById('anyTableHeader').innerHTML = cabecalhoHtml;
+            
             let corpoHtml = '';
             am.forEach(r => {
-                let detalhe = chavesAny[1] ? String(r[chavesAny[1]]) : '-';
+                let titulo = r[chaveTituloAny] || '-';
+                let skuVal = chaveSkuAny ? String(r[chaveSkuAny] || '').trim() : '';
+                let codMktVal = chaveCodMktAny ? String(r[chaveCodMktAny] || '').trim() : '';
                 let msgErro = r[colunaErroAny] || 'Nenhum motivo informado';
+                let estoque = chaveEstoqueAny !== "" ? r[chaveEstoqueAny] : '-';
                 let corDestaque = mapaCoresErro[msgErro] || '#6b7280';
+                
+                let isFeito = r._feito;
 
-                corpoHtml += `<tr>
-                    <td style="font-weight:600; word-wrap: break-word;">${r[chavesAny[0]] || '-'}</td>
-                    <td style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${detalhe.replace(/"/g, '&quot;')}">${detalhe}</td>
+                let skuHtml = skuVal && skuVal !== '-'
+                    ? `<button type="button" class="copy-pill" data-copy="${escapeAttr(skuVal)}" onclick="copiarDoElemento(this, 'SKU')" title="Clique para copiar apenas este SKU"><span class="copy-text">${escapeAttr(skuVal)}</span><span class="copy-icon">📋</span></button>`
+                    : `<span style="color:var(--text-muted);">-</span>`;
+
+                let codMktHtml = codMktVal && codMktVal !== '-'
+                    ? `<button type="button" class="copy-pill" data-copy="${escapeAttr(codMktVal)}" onclick="copiarDoElemento(this, 'Código Marketplace')" title="Clique para copiar apenas este Código Marketplace"><span class="copy-text">${escapeAttr(codMktVal)}</span><span class="copy-icon">📋</span></button>`
+                    : `<span style="color:var(--text-muted);">-</span>`;
+
+                corpoHtml += `<tr id="any-row-${r._id}" class="any-row-item ${isFeito ? 'any-row-done' : ''}">
+                    <td class="text-center">
+                        <label class="any-checklist-wrap" title="Marcar como concluído">
+                            <input type="checkbox" ${isFeito ? 'checked' : ''} onchange="toggleFeito(${r._id}, this.checked)">
+                            <span class="any-checkmark">${svgCheck}</span>
+                        </label>
+                    </td>
+                    <td class="any-strike" style="font-weight:600; word-wrap: break-word;">${escapeAttr(titulo)}</td>
+                    <td class="text-center">${skuHtml}</td>
+                    <td class="text-center">${codMktHtml}</td>
+                    <td class="text-center"><span class="badge ${estoque > 0 ? 'sim' : (estoque == 0 ? 'nao' : 'vazio')}">${estoque}</span></td>
                     <td style="white-space: normal; line-height: 1.4;">
                         <span style="display:inline-block; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; background: ${corDestaque}15; color: ${corDestaque}; border: 1px solid ${corDestaque}30;">
-                            ${msgErro}
+                            ${escapeAttr(msgErro)}
                         </span>
                     </td>
                 </tr>`;
             });
             document.getElementById('anyTableBody').innerHTML = corpoHtml;
 
+            atualizarProgressoAny();
             document.getElementById('pageInfoAny').innerText = `Página ${pAtualAny} (Total: ${listaRenderAny.length} erros)`;
             document.getElementById('btnPrevAny').disabled = pAtualAny === 1; 
             document.getElementById('btnNextAny').disabled = fim >= listaRenderAny.length;
@@ -1089,6 +2186,798 @@
             let blob = new Blob(["\uFEFF" + cab.join(";") + "\n" + lin.join("\n")], { type: 'text/csv;charset=utf-8;' });
             let l = document.createElement("a"); l.href = URL.createObjectURL(blob);
             l.download = `Correcao_Anymarket_${new Date().getTime()}.csv`; l.click();
+        }
+
+        /* =========================================================
+           LÓGICA DO ASSISTENTE IA + MODERAÇÃO + SELETORES
+           ========================================================= */
+        let historicoChatIA = [];
+        let chatOcupado = false;
+        let abortControllerAtual = null;
+        let cacheExplicacoesErros = {};
+
+        // Controle de Moderação (Falas Proibidas)
+        let tentativasFalasProibidas = 0;
+        let bloqueadoPorFalaProibida = false;
+        let timerBloqueioChat = null;
+
+        const LISTA_TERMOS_PROIBIDOS = [
+            'caralho', 'krl', 'porra', 'puta', 'putaria', 'puto', 'fdp', 'filho da puta', 'filha da puta',
+            'arrombado', 'arrombada', 'vai se foder', 'vai se fuder', 'foda-se', 'fodase', 'foder', 'fuder',
+            'vai tomar no cu', 'tomar no cu', 'vsf', 'tnc', 'pnc', 'pau no cu', 'cu', 'cuzão', 'cuzao',
+            'buceta', 'xoxota', 'piroca', 'cacete', 'punheta', 'siririca', 'broxa',
+            'merda', 'bosta', 'desgraca', 'desgracado', 'desgracada',
+            'idiota', 'imbecil', 'otario', 'otaria', 'babaca', 'trouxa', 'retardo', 'retardado', 'retardada',
+            'piranha', 'vagabunda', 'vagabundo', 'vadia', 'corno', 'corna',
+            'viado', 'bicha', 'sapatao', 'traveco', 'macaco', 'crioulo', 'nazista', 'hitler',
+            'estupro', 'estuprar', 'suicidio', 'se mata', 'te matar',
+            'fuck', 'shit', 'bitch', 'asshole', 'motherfucker', 'dick', 'pussy', 'nigger', 'faggot'
+        ];
+
+        function normalizarTextoModeracao(texto) {
+            return String(texto || '')
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9\s-]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function contemFalaProibida(texto) {
+            const norm = normalizarTextoModeracao(texto);
+            if (!norm) return false;
+            return LISTA_TERMOS_PROIBIDOS.some(termo => {
+                const termoNorm = normalizarTextoModeracao(termo);
+                const escaped = termoNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(?:^|\\s|-)${escaped}(?:$|\\s|-)`, 'i');
+                return regex.test(norm);
+            });
+        }
+
+        function iniciarBloqueioTemporarioChat(segundos = 20) {
+            bloqueadoPorFalaProibida = true;
+            const input = document.getElementById('aiChatInput');
+            const btn = document.getElementById('aiSendBtn');
+            let restante = segundos;
+
+            if (input) {
+                input.disabled = true;
+                input.placeholder = `Chat bloqueado por ${restante}s...`;
+            }
+            if (btn) btn.disabled = true;
+
+            adicionarBolhaChat(
+                'bot',
+                `🚫 **Chat bloqueado por ${segundos} segundos:** Você tentou enviar mensagens com palavras proibidas mais de 3 vezes. Aguarde o tempo acabar para voltar a enviar mensagens.`,
+                '',
+                true
+            );
+
+            if (timerBloqueioChat) clearInterval(timerBloqueioChat);
+            timerBloqueioChat = setInterval(() => {
+                restante--;
+                if (restante > 0) {
+                    if (input) input.placeholder = `Chat bloqueado por ${restante}s...`;
+                } else {
+                    clearInterval(timerBloqueioChat);
+                    timerBloqueioChat = null;
+                    bloqueadoPorFalaProibida = false;
+                    tentativasFalasProibidas = 0;
+                    if (input) {
+                        input.disabled = false;
+                        input.placeholder = 'Ex: Traduz os erros ou pergunte algo...';
+                        input.focus();
+                    }
+                    if (btn) btn.disabled = false;
+                    adicionarBolhaChat('bot', '✅ **Chat desbloqueado.** Você já pode enviar mensagens novamente.');
+                }
+            }, 1000);
+        }
+
+        function obterChaveGeminiAtiva() {
+            const custom = (localStorage.getItem('geminiApiKeyCatalogo') || '').trim();
+            return custom || (typeof CHAVE_GEMINI_PADRAO !== 'undefined' ? CHAVE_GEMINI_PADRAO.trim() : '');
+        }
+
+        function inicializarChatIA() {
+            let chaveCustom = (localStorage.getItem('geminiApiKeyCatalogo') || '').trim();
+            if (chaveCustom === 'AQ.Ab8RN6JokjkcMRQJ-oxSynKRQrIxIIxYES84xJlOvFaO1DF7xg') {
+                localStorage.removeItem('geminiApiKeyCatalogo');
+                chaveCustom = '';
+            }
+
+            const inputKey = document.getElementById('inputGeminiKey');
+            if (inputKey) inputKey.value = chaveCustom;
+
+            if (!obterChaveGeminiAtiva()) {
+                document.getElementById('aiKeyPanel').classList.add('visible');
+            } else {
+                document.getElementById('aiKeyPanel').classList.remove('visible');
+            }
+
+            const chipsBox = document.getElementById('aiQuickChips');
+            if (chipsBox) {
+                chipsBox.addEventListener('wheel', (e) => {
+                    if (e.deltaY !== 0) {
+                        e.preventDefault();
+                        chipsBox.scrollLeft += e.deltaY;
+                    }
+                }, { passive: false });
+            }
+
+            renderBoasVindasChat();
+        }
+
+        function rolarChipsIA(direcao) {
+            const box = document.getElementById('aiQuickChips');
+            if (box) {
+                box.scrollBy({ left: direcao * 180, behavior: 'smooth' });
+            }
+        }
+
+        function renderBoasVindasChat() {
+            const box = document.getElementById('aiChatMessages');
+            if (!box) return;
+            box.innerHTML = '';
+            adicionarBolhaChat('bot',
+                'Olá! Sou seu **Copiloto de Catálogo e Anymarket**.\n\n' +
+                '• Clique em **🛠️ Explicar erros Anymarket** para escolher na lista suspensa qual erro deseja resolver.\n' +
+                '• Clique em **🎛️ Filtrar Catálogo** para escolher Curva, Loja/Canal, Status e Estoque.'
+            );
+        }
+
+        function toggleChatIA(forcarAbrir = null) {
+            const win = document.getElementById('aiChatWindow');
+            if (!win) return;
+            const abrir = forcarAbrir !== null ? forcarAbrir : !win.classList.contains('open');
+            win.classList.toggle('open', abrir);
+            if (abrir) {
+                if (!obterChaveGeminiAtiva()) {
+                    document.getElementById('aiKeyPanel').classList.add('visible');
+                }
+                if (!bloqueadoPorFalaProibida) {
+                    setTimeout(() => document.getElementById('aiChatInput')?.focus(), 100);
+                }
+            }
+        }
+
+        function togglePainelChaveIA() {
+            document.getElementById('aiKeyPanel').classList.toggle('visible');
+        }
+
+        function salvarChaveGemini() {
+            const val = document.getElementById('inputGeminiKey').value.trim();
+            if (!val) {
+                localStorage.removeItem('geminiApiKeyCatalogo');
+                document.getElementById('aiKeyPanel').classList.remove('visible');
+                mostrarNotificacao('Usando a chave padrão da equipe.', 'info', 2500);
+                return;
+            }
+            localStorage.setItem('geminiApiKeyCatalogo', val);
+            document.getElementById('aiKeyPanel').classList.remove('visible');
+            mostrarNotificacao('Chave personalizada salva neste navegador!', 'sucesso', 3000);
+        }
+
+        function limparHistoricoChatIA() {
+            cancelarRequisicaoIA();
+            historicoChatIA = [];
+            renderBoasVindasChat();
+        }
+
+        function cancelarRequisicaoIA() {
+            if (abortControllerAtual) {
+                try { abortControllerAtual.abort(); } catch (e) {}
+                abortControllerAtual = null;
+            }
+            chatOcupado = false;
+            if (!bloqueadoPorFalaProibida) {
+                document.getElementById('aiSendBtn').disabled = false;
+            }
+            mostrarDigitandoChat(false);
+        }
+
+        function preencherExemploFiltroIA(texto) {
+            if (bloqueadoPorFalaProibida) return;
+            toggleChatIA(true);
+            const inp = document.getElementById('aiChatInput');
+            inp.value = texto;
+            enviarMensagemChatIA();
+        }
+
+        function limparFiltrosCatalogoPeloChat() {
+            toggleChatIA(true);
+            if (!modoCadastroAtivo) ativarModoCadastro(false);
+            switchView('tabela');
+            document.getElementById('filtroAba').value = '';
+            document.getElementById('filtroCurva').value = '';
+            document.getElementById('inputBusca').value = '';
+            document.querySelectorAll('.chk-status').forEach(cb => cb.checked = true);
+            filtroMinEstoqueCatalogo = null;
+            filtroMaxEstoqueCatalogo = null;
+            atualizarBannerFiltroCatalogo();
+            pAtual = 1;
+            ordenarEstoque(0);
+
+            adicionarBolhaChat('user', 'Limpar filtros do catálogo');
+            adicionarBolhaChat('bot', 'Todos os filtros do catálogo foram limpos.', `Catálogo completo (${dadosFiltrados.length} itens)`);
+        }
+
+        /* --- SELETOR INTERATIVO DE FILTROS DO CATÁLOGO (CURVA, CANAL, STATUS, ESTOQUE) --- */
+        function abrirFiltroCatalogoIA() {
+            toggleChatIA(true);
+
+            const canais = [...new Set(dadosGlobais.map(d => d.canal))].sort();
+            const curvas = [...new Set(dadosGlobais.map(d => d.curva).filter(c => c && c !== '-'))].sort();
+
+            const optCanais = ['<option value="">Todos os Canais</option>']
+                .concat(canais.map(c => `<option value="${escapeAttr(c)}">${escapeAttr(c)}</option>`))
+                .join('');
+
+            const optCurvas = ['<option value="">Todas as Curvas</option>']
+                .concat(curvas.map(cv => `<option value="${escapeAttr(cv)}">Curva ${escapeAttr(cv)}</option>`))
+                .join('');
+
+            const box = document.getElementById('aiChatMessages');
+            const div = document.createElement('div');
+            div.className = 'ai-msg bot';
+            div.innerHTML = `
+                <div style="font-weight:700;">🎛️ Selecione os filtros do Catálogo:</div>
+                <div class="ai-error-select-box">
+                    <div class="ai-select-grid">
+                        <div class="ai-select-field">
+                            <label>Curva</label>
+                            <select class="ai-error-select sel-cat-curva">
+                                ${optCurvas}
+                            </select>
+                        </div>
+                        <div class="ai-select-field">
+                            <label>Loja / Canal</label>
+                            <select class="ai-error-select sel-cat-canal">
+                                ${optCanais}
+                            </select>
+                        </div>
+                        <div class="ai-select-field">
+                            <label>Status</label>
+                            <select class="ai-error-select sel-cat-status">
+                                <option value="todos">Todos os Status</option>
+                                <option value="sim">Anunciados (Sim)</option>
+                                <option value="nao" selected>Não Anunciados (Não)</option>
+                                <option value="vazio">Sem Informação (S/I)</option>
+                                <option value="nao_vazio">Não Anunciados + S/I</option>
+                            </select>
+                        </div>
+                        <div class="ai-select-field">
+                            <label>Estoque</label>
+                            <select class="ai-error-select sel-cat-estoque">
+                                <option value="todos">Qualquer Estoque</option>
+                                <option value="com_estoque" selected>Com Estoque (&gt; 0)</option>
+                                <option value="maior_10">Estoque &gt; 10</option>
+                                <option value="maior_50">Estoque &gt; 50</option>
+                                <option value="sem_estoque">Sem Estoque (= 0)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="ai-select-field">
+                        <label>Ordenação por Estoque</label>
+                        <select class="ai-error-select sel-cat-ordem">
+                            <option value="desc" selected>Maior estoque primeiro</option>
+                            <option value="asc">Menor estoque primeiro</option>
+                            <option value="none">Ordem padrão da planilha</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-sync" style="width:100%; justify-content:center;" onclick="aplicarFiltroDoSeletorIA(this)">
+                        🔍 Aplicar Filtros na Tabela
+                    </button>
+                </div>
+            `;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function aplicarFiltroDoSeletorIA(btnEl) {
+            const container = btnEl.closest('.ai-error-select-box');
+            if (!container) return;
+
+            const curva = container.querySelector('.sel-cat-curva').value;
+            const canal = container.querySelector('.sel-cat-canal').value;
+            const statusModo = container.querySelector('.sel-cat-status').value;
+            const estoqueModo = container.querySelector('.sel-cat-estoque').value;
+            const ordemModo = container.querySelector('.sel-cat-ordem').value;
+
+            if (!modoCadastroAtivo) ativarModoCadastro(false);
+            switchView('tabela');
+
+            document.getElementById('filtroAba').value = canal;
+            document.getElementById('filtroCurva').value = curva;
+            document.getElementById('inputBusca').value = '';
+
+            let statusArray = ['sim', 'nao', 'vazio'];
+            let labelStatus = 'Todos';
+            if (statusModo === 'sim') { statusArray = ['sim']; labelStatus = 'Anunciados (Sim)'; }
+            else if (statusModo === 'nao') { statusArray = ['nao']; labelStatus = 'Não Anunciados'; }
+            else if (statusModo === 'vazio') { statusArray = ['vazio']; labelStatus = 'Sem Info'; }
+            else if (statusModo === 'nao_vazio') { statusArray = ['nao', 'vazio']; labelStatus = 'Não Anunciados + S/I'; }
+
+            document.querySelectorAll('.chk-status').forEach(cb => {
+                cb.checked = statusArray.includes(cb.value);
+            });
+
+            filtroMinEstoqueCatalogo = null;
+            filtroMaxEstoqueCatalogo = null;
+            let labelEstoque = 'Qualquer';
+
+            if (estoqueModo === 'com_estoque') {
+                filtroMinEstoqueCatalogo = 1;
+                labelEstoque = 'Com estoque (> 0)';
+            } else if (estoqueModo === 'maior_10') {
+                filtroMinEstoqueCatalogo = 11;
+                labelEstoque = 'Estoque > 10';
+            } else if (estoqueModo === 'maior_50') {
+                filtroMinEstoqueCatalogo = 51;
+                labelEstoque = 'Estoque > 50';
+            } else if (estoqueModo === 'sem_estoque') {
+                filtroMaxEstoqueCatalogo = 0;
+                labelEstoque = 'Sem estoque (= 0)';
+            }
+            atualizarBannerFiltroCatalogo();
+
+            const ordemNum = ordemModo === 'desc' ? -1 : (ordemModo === 'asc' ? 1 : 0);
+            pAtual = 1;
+            ordenarEstoque(ordemNum);
+
+            const resumoPedido = [
+                curva ? `Curva ${curva}` : 'Todas as Curvas',
+                canal ? `Canal: ${canal}` : 'Todos os Canais',
+                `Status: ${labelStatus}`,
+                `Estoque: ${labelEstoque}`
+            ].join(' | ');
+
+            adicionarBolhaChat('user', `Filtrar catálogo: ${resumoPedido}`);
+            adicionarBolhaChat(
+                'bot',
+                `Filtro aplicado na aba **Alertas & Catálogo**.`,
+                `${dadosFiltrados.length} produto(s) encontrado(s)`
+            );
+        }
+
+        /* --- CAIXA DE <SELECT> COMPACTA PARA ESCOLHER O ERRO DO ANYMARKET (SEMPRE NOVA MENSAGEM) --- */
+        function pedirGuiaErrosAnymarket() {
+            toggleChatIA(true);
+            if (!dadosAny || dadosAny.length === 0) {
+                if (!modoCadastroAtivo) ativarModoCadastro(false);
+                switchView('anymarket');
+                adicionarBolhaChat('bot', 'Abri a aba **Auditoria Anymarket** para você. Suba a planilha Excel (.xlsx) lá e clique aqui novamente para escolher o erro na lista!');
+                return;
+            }
+
+            let contagem = {};
+            let pendentes = {};
+            let exemplosProdutos = {};
+
+            dadosAny.forEach(r => {
+                const msg = r[colunaErroAny] || 'Sem Descrição';
+                contagem[msg] = (contagem[msg] || 0) + 1;
+                if (!r._feito) pendentes[msg] = (pendentes[msg] || 0) + 1;
+
+                if (!exemplosProdutos[msg]) exemplosProdutos[msg] = [];
+                if (exemplosProdutos[msg].length < 2) {
+                    const titulo = chaveTituloAny ? String(r[chaveTituloAny] || '').trim() : '';
+                    const sku = chaveSkuAny ? String(r[chaveSkuAny] || '').trim() : '';
+                    if (titulo || sku) {
+                        exemplosProdutos[msg].push(sku ? `[${sku}] ${titulo}` : titulo);
+                    }
+                }
+            });
+
+            errosDisponiveisParaEscolha = Object.entries(contagem)
+                .sort((a, b) => (pendentes[b[0]] || 0) - (pendentes[a[0]] || 0) || b[1] - a[1])
+                .map(([erro, total]) => ({
+                    erro,
+                    total,
+                    pendentes: pendentes[erro] || 0,
+                    exemplos: exemplosProdutos[erro] || []
+                }));
+
+            const optionsHtml = errosDisponiveisParaEscolha.map((item, idx) => {
+                const resumoErro = item.erro.length > 75 ? item.erro.substring(0, 75) + '...' : item.erro;
+                return `<option value="${idx}">(${item.pendentes}/${item.total} pend.) ${escapeAttr(resumoErro)}</option>`;
+            }).join('');
+
+            // Sempre cria uma nova bolha no final do chat (nunca rola para a mensagem antiga de cima)
+            const box = document.getElementById('aiChatMessages');
+            const div = document.createElement('div');
+            div.className = 'ai-msg bot';
+            div.innerHTML = `
+                <div style="font-weight:700;">Selecione o erro do Anymarket:</div>
+                <div class="ai-error-select-box">
+                    <select class="ai-error-select sel-erro-anymarket">
+                        ${optionsHtml}
+                    </select>
+                    <button type="button" class="btn-sync" style="width:100%; justify-content:center;" onclick="resolverErroSelecionadoNoSelect(this)">
+                        ✨ Explicar e Filtrar na Tabela
+                    </button>
+                </div>
+            `;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function resolverErroSelecionadoNoSelect(btnEl) {
+            const container = btnEl ? btnEl.closest('.ai-error-select-box') : null;
+            const sel = container ? container.querySelector('.sel-erro-anymarket') : null;
+            if (!sel) return;
+
+            const idx = parseInt(sel.value, 10);
+            const item = errosDisponiveisParaEscolha[idx];
+            if (!item) return;
+
+            if (!modoCadastroAtivo) ativarModoCadastro(false);
+            switchView('anymarket');
+            document.querySelectorAll('.chk-erro-any').forEach(cb => {
+                cb.checked = (cb.value === item.erro);
+            });
+            document.getElementById('buscaAny').value = '';
+            filtrarTabelaAny();
+
+            const badgeTabela = `Tabela filtrada: ${listaRenderAny.length} produto(s) com este erro`;
+
+            if (cacheExplicacoesErros[item.erro]) {
+                adicionarBolhaChat('user', `Resolver erro: "${item.erro}"`);
+                adicionarBolhaChat('bot', cacheExplicacoesErros[item.erro], badgeTabela);
+                return;
+            }
+
+            const listaExemplos = item.exemplos.length > 0
+                ? `\nProdutos afetados: ${item.exemplos.join(' | ')}`
+                : '';
+
+            const promptDireto = `Você é especialista em Anymarket e ERP no Brasil. Responda em português, de forma bem curta e direta (1 frase explicando a causa + 3 passos curtos do que corrigir no ERP ou Anymarket).\n\nErro do Anymarket: "${item.erro}"${listaExemplos}`;
+
+            enviarMensagemChatIA(
+                `Resolver erro: "${item.erro}"`,
+                promptDireto,
+                badgeTabela,
+                item.erro,
+                true
+            );
+        }
+
+        function formatarMarkdownSimples(texto) {
+            let safe = escapeAttr(texto);
+            safe = safe.replace(/`([^`]+)`/g, '<code>$1</code>');
+            safe = safe.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            const linhas = safe.split('\n');
+            let html = '';
+            let emLista = false;
+            for (let linha of linhas) {
+                const trim = linha.trim();
+                if (/^[-•*]\s+/.test(trim)) {
+                    if (!emLista) { html += '<ul>'; emLista = true; }
+                    html += `<li>${trim.replace(/^[-•*]\s+/, '')}</li>`;
+                } else {
+                    if (emLista) { html += '</ul>'; emLista = false; }
+                    if (trim === '') {
+                        html += '<div style="height:6px;"></div>';
+                    } else {
+                        html += `<div>${linha}</div>`;
+                    }
+                }
+            }
+            if (emLista) html += '</ul>';
+            return html;
+        }
+
+        function adicionarBolhaChat(remetente, texto, badgeAcao = '', isWarning = false) {
+            const box = document.getElementById('aiChatMessages');
+            const div = document.createElement('div');
+            div.className = `ai-msg ${remetente}${isWarning ? ' warning-block' : ''}`;
+            div.innerHTML = formatarMarkdownSimples(texto);
+            if (badgeAcao) {
+                div.innerHTML += `<div class="ai-action-pill">⚡ ${escapeAttr(badgeAcao)}</div>`;
+            }
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+            return div;
+        }
+
+        function mostrarDigitandoChat(mostrar, textoStatus = 'Respondendo...') {
+            const box = document.getElementById('aiChatMessages');
+            let el = document.getElementById('aiTypingIndicator');
+            if (mostrar) {
+                if (!el) {
+                    el = document.createElement('div');
+                    el.id = 'aiTypingIndicator';
+                    el.className = 'ai-typing';
+                    el.innerHTML = `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <div class="ai-dots"><span></span><span></span><span></span></div>
+                            <span id="aiTypingText">${escapeAttr(textoStatus)}</span>
+                        </div>
+                        <button type="button" class="ai-cancel-btn" onclick="cancelarRequisicaoIA()">Cancelar</button>
+                    `;
+                    box.appendChild(el);
+                } else {
+                    const spanTxt = document.getElementById('aiTypingText');
+                    if (spanTxt) spanTxt.innerText = textoStatus;
+                }
+                box.scrollTop = box.scrollHeight;
+            } else if (el) {
+                el.remove();
+            }
+        }
+
+        function montarContextoCompacto() {
+            const canais = [...new Set(dadosGlobais.map(d => d.canal))].slice(0, 20);
+            const curvas = [...new Set(dadosGlobais.map(d => d.curva).filter(c => c !== '-'))].slice(0, 10);
+            return { canais, curvas, anymarketCarregado: dadosAny.length > 0 };
+        }
+
+        async function fetchComTimeout(url, options, timeoutMs = 30000) {
+            abortControllerAtual = new AbortController();
+            const timer = setTimeout(() => {
+                if (abortControllerAtual) abortControllerAtual.abort();
+            }, timeoutMs);
+
+            try {
+                const resp = await fetch(url, { ...options, signal: abortControllerAtual.signal });
+                return resp;
+            } finally {
+                clearTimeout(timer);
+            }
+        }
+
+        async function chamarGeminiRapido(apiKey, promptFinal, mensagensAnteriores = []) {
+            const modelos = [
+                'gemini-3.5-flash-lite',
+                'gemini-flash-lite-latest',
+                'gemini-3.5-flash',
+                'gemini-flash-latest'
+            ];
+
+            const contents = [
+                ...mensagensAnteriores,
+                { role: 'user', parts: [{ text: promptFinal }] }
+            ];
+
+            const payload = {
+                contents,
+                generationConfig: {
+                    temperature: 0.2,
+                    maxOutputTokens: 450
+                }
+            };
+
+            let ultimoErro = null;
+
+            for (let i = 0; i < modelos.length; i++) {
+                const modelo = modelos[i];
+                if (i > 0) {
+                    mostrarDigitandoChat(true, `Tentando ${modelo}...`);
+                }
+
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent`;
+                    const resp = await fetchComTimeout(url, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-goog-api-key': apiKey
+                        },
+                        body: JSON.stringify(payload)
+                    }, 30000);
+
+                    const json = await resp.json();
+                    if (!resp.ok) {
+                        const msgErro = json?.error?.message || `HTTP ${resp.status}`;
+                        if ([404, 429, 500, 502, 503, 504].includes(resp.status) || /high demand|overloaded|unavailable|quota|rate limit|no longer available/i.test(msgErro)) {
+                            ultimoErro = new Error(msgErro);
+                            continue;
+                        }
+                        throw new Error(msgErro);
+                    }
+
+                    const texto = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (!texto) {
+                        ultimoErro = new Error('Resposta vazia do servidor.');
+                        continue;
+                    }
+                    return texto;
+                } catch (err) {
+                    if (err.name === 'AbortError') {
+                        if (!chatOcupado) throw new Error('Consulta cancelada.');
+                        ultimoErro = new Error('Tempo limite de 30s excedido neste servidor.');
+                        continue;
+                    }
+                    ultimoErro = err;
+                    const msg = String(err.message || '');
+                    if (msg.includes('API key not valid') || msg.includes('API_KEY_INVALID')) {
+                        throw new Error('Chave de API inválida. Clique na engrenagem ⚙️ acima para atualizar a chave.');
+                    }
+                }
+            }
+
+            throw ultimoErro || new Error('Não foi possível obter resposta agora. Tente novamente em alguns segundos.');
+        }
+
+        function executarAcaoDoDashboard(acaoObj) {
+            if (!acaoObj || !acaoObj.action || acaoObj.action === 'none') return '';
+
+            if (!modoCadastroAtivo && (acaoObj.action === 'filter_catalog' || acaoObj.action === 'filter_anymarket')) {
+                ativarModoCadastro(false);
+            }
+
+            if (acaoObj.action === 'filter_catalog') {
+                switchView('tabela');
+
+                const selCanal = document.getElementById('filtroAba');
+                if (acaoObj.canal) {
+                    const alvo = String(acaoObj.canal).toLowerCase();
+                    const optMatch = Array.from(selCanal.options).find(o => o.value.toLowerCase().includes(alvo));
+                    selCanal.value = optMatch ? optMatch.value : '';
+                } else {
+                    selCanal.value = '';
+                }
+
+                const selCurva = document.getElementById('filtroCurva');
+                if (acaoObj.curva) {
+                    const alvoC = String(acaoObj.curva).toUpperCase().trim();
+                    const optC = Array.from(selCurva.options).find(o => o.value.toUpperCase() === alvoC);
+                    selCurva.value = optC ? optC.value : '';
+                } else {
+                    selCurva.value = '';
+                }
+
+                const statusList = Array.isArray(acaoObj.status) && acaoObj.status.length > 0
+                    ? acaoObj.status.map(s => String(s).toLowerCase())
+                    : ['sim', 'nao', 'vazio'];
+                document.querySelectorAll('.chk-status').forEach(cb => {
+                    cb.checked = statusList.includes(cb.value);
+                });
+
+                document.getElementById('inputBusca').value = acaoObj.busca ? String(acaoObj.busca) : '';
+
+                filtroMaxEstoqueCatalogo = null;
+                if (acaoObj.minEstoque !== undefined && acaoObj.minEstoque !== null && acaoObj.minEstoque !== '') {
+                    filtroMinEstoqueCatalogo = Number(acaoObj.minEstoque);
+                } else {
+                    filtroMinEstoqueCatalogo = null;
+                }
+                atualizarBannerFiltroCatalogo();
+
+                const ordem = acaoObj.ordemEstoque === 'desc' ? -1 : (acaoObj.ordemEstoque === 'asc' ? 1 : 0);
+                pAtual = 1;
+                ordenarEstoque(ordem);
+
+                return `Catálogo filtrado (${dadosFiltrados.length} itens encontrados)`;
+            }
+
+            if (acaoObj.action === 'filter_anymarket') {
+                switchView('anymarket');
+                if (!dadosAny || dadosAny.length === 0) {
+                    return 'Abra a planilha do Anymarket primeiro para aplicar o filtro';
+                }
+
+                const termoErro = acaoObj.erroContem ? String(acaoObj.erroContem).toLowerCase() : '';
+                document.querySelectorAll('.chk-erro-any').forEach(cb => {
+                    cb.checked = termoErro ? cb.value.toLowerCase().includes(termoErro) : false;
+                });
+
+                document.getElementById('buscaAny').value = acaoObj.busca ? String(acaoObj.busca) : '';
+                filtroApenasPendentesAny = Boolean(acaoObj.apenasPendentes);
+                atualizarBannerFiltroAny();
+
+                const ordem = acaoObj.ordemEstoque === 'desc' ? -1 : (acaoObj.ordemEstoque === 'asc' ? 1 : 0);
+                ordenarEstoqueAny(ordem);
+
+                return `Auditoria Anymarket filtrada (${listaRenderAny.length} itens)`;
+            }
+
+            if (acaoObj.action === 'filter_uf') {
+                switchView('resumo');
+                const uf = ['SP', 'MG', 'TODOS'].includes(String(acaoObj.uf).toUpperCase())
+                    ? String(acaoObj.uf).toUpperCase()
+                    : 'TODOS';
+                filtrarUF(uf, null);
+                return `Resumo Executivo filtrado para: ${uf}`;
+            }
+
+            return '';
+        }
+
+        async function enviarMensagemChatIA(textoExibidoCustom = null, promptRealCustom = null, badgePreAplicado = '', chaveCacheErro = '', semHistorico = false) {
+            if (bloqueadoPorFalaProibida || chatOcupado) return;
+
+            const input = document.getElementById('aiChatInput');
+            const textoExibido = textoExibidoCustom || input.value.trim();
+            const textoBase = promptRealCustom || textoExibido;
+            if (!textoBase) return;
+
+            // Verificação de falas proibidas antes de enviar qualquer mensagem
+            if (!textoExibidoCustom && contemFalaProibida(textoExibido)) {
+                input.value = '';
+                tentativasFalasProibidas++;
+                if (tentativasFalasProibidas > 3) {
+                    iniciarBloqueioTemporarioChat(20);
+                } else {
+                    adicionarBolhaChat(
+                        'bot',
+                        `🚫 **Mensagem não enviada:** Palavras ofensivas ou inadequadas não são permitidas neste chat. (Aviso **${tentativasFalasProibidas}/3** — acima de 3 tentativas o chat será bloqueado por 20 segundos).`,
+                        '',
+                        true
+                    );
+                }
+                return;
+            }
+
+            const apiKey = obterChaveGeminiAtiva();
+            if (!apiKey) {
+                document.getElementById('aiKeyPanel').classList.add('visible');
+                adicionarBolhaChat('bot', 'Nenhuma chave de API configurada. Cole sua chave no painel acima (⚙️) e clique em **Salvar**.');
+                return;
+            }
+
+            if (!textoExibidoCustom) input.value = '';
+            adicionarBolhaChat('user', textoExibido);
+
+            chatOcupado = true;
+            document.getElementById('aiSendBtn').disabled = true;
+            mostrarDigitandoChat(true, 'Consultando IA...');
+
+            let promptFinal = textoBase;
+            if (!semHistorico) {
+                const ctx = montarContextoCompacto();
+                promptFinal = `Você é especialista em Marketplace, ERP e Anymarket (PT-BR). Seja curto e direto.
+Contexto: canais=${JSON.stringify(ctx.canais)}, curvas=${JSON.stringify(ctx.curvas)}.
+Se o usuário pedir para filtrar/buscar/ordenar na tela, inclua no final UM bloco \`\`\`json_action ... \`\`\`:
+- Catálogo: {"action":"filter_catalog","canal":"","curva":"","status":["sim","nao","vazio"],"busca":"","minEstoque":null,"ordemEstoque":"none"}
+- Anymarket: {"action":"filter_anymarket","erroContem":"","busca":"","apenasPendentes":false,"ordemEstoque":"none"}
+- Estado: {"action":"filter_uf","uf":"SP"}
+
+Pedido do usuário: ${textoBase}`;
+            }
+
+            try {
+                const histParaEnviar = semHistorico ? [] : historicoChatIA.slice(-4);
+                const respostaBruta = await chamarGeminiRapido(apiKey, promptFinal, histParaEnviar);
+
+                let textoLimpo = respostaBruta;
+                let badgeAcao = badgePreAplicado;
+
+                const matchAcao = respostaBruta.match(/```json_action\s*([\s\S]*?)```/i);
+                if (matchAcao && matchAcao[1]) {
+                    textoLimpo = respostaBruta.replace(matchAcao[0], '').trim();
+                    try {
+                        const acaoJson = JSON.parse(matchAcao[1].trim());
+                        const resAcao = executarAcaoDoDashboard(acaoJson);
+                        if (resAcao) badgeAcao = resAcao;
+                    } catch (e) {
+                        console.warn('Falha ao interpretar ação JSON da IA:', e);
+                    }
+                }
+
+                if (chaveCacheErro) {
+                    cacheExplicacoesErros[chaveCacheErro] = textoLimpo;
+                }
+
+                if (!semHistorico) {
+                    historicoChatIA.push({ role: 'user', parts: [{ text: textoExibido }] });
+                    historicoChatIA.push({ role: 'model', parts: [{ text: textoLimpo }] });
+                }
+
+                mostrarDigitandoChat(false);
+                adicionarBolhaChat('bot', textoLimpo, badgeAcao);
+            } catch (erro) {
+                mostrarDigitandoChat(false);
+                adicionarBolhaChat('bot', `⚠️ **Ops:** ${erro.message}`);
+            } finally {
+                abortControllerAtual = null;
+                chatOcupado = false;
+                if (!bloqueadoPorFalaProibida) {
+                    document.getElementById('aiSendBtn').disabled = false;
+                    input.focus();
+                }
+            }
         }
     </script>
 </body>
